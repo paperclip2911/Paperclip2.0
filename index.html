@@ -2,24 +2,22 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Paperclip Empire 3.0</title>
+<title>Paperclip Empire 4.0</title>
 <style>
 body{
     margin:0;
-    background:#f2f2f2;
+    background:#f4f4f4;
     font-family:Georgia, serif;
 }
 #topBar{
     background:#111;
     color:white;
     padding:8px;
-    font-size:14px;
 }
 #enterCasino{
     position:absolute;
     top:5px;
     left:5px;
-    font-size:12px;
 }
 .container{
     display:flex;
@@ -27,15 +25,15 @@ body{
 }
 .panel{
     width:33%;
-    padding:10px;
+    padding:15px;
 }
 button{
-    padding:5px 10px;
-    margin:3px;
+    padding:6px 10px;
+    margin:4px;
 }
 .bigButton{
-    width:200px;
-    height:200px;
+    width:220px;
+    height:220px;
     font-size:22px;
 }
 .casino{
@@ -44,73 +42,79 @@ button{
     background:white;
     display:none;
     padding:20px;
-}
-.casino h2{
-    margin-top:0;
+    overflow:auto;
 }
 .closeBtn{
     position:absolute;
     top:10px;
     right:20px;
 }
+.reel{
+    font-size:40px;
+    letter-spacing:10px;
+    height:60px;
+}
+.eventBox{
+    background:#fff3cd;
+    padding:10px;
+    margin:10px;
+    display:none;
+}
 </style>
 </head>
 <body>
 
 <div id="topBar">
-    > Autonomous paperclip production online...
+    Autonomous Paperclip System Active
     <button id="enterCasino">🎰 Casino</button>
 </div>
 
+<div class="eventBox" id="eventBox"></div>
+
 <div class="container">
-
-    <div class="panel">
-        <h2>Paperclips</h2>
-        <h3 id="clips">0</h3>
-        <button class="bigButton" onclick="clickClip()">MAKE PAPERCLIP</button>
-        <p>Per Click: <span id="perClick">1</span></p>
-        <p>Per Second: <span id="perSecond">0</span></p>
-    </div>
-
-    <div class="panel">
-        <h2>Production</h2>
-        <button onclick="buyAuto()">Buy Auto Maker (50)</button>
-        <p>Owned: <span id="autos">0</span></p>
-
-        <h2>Quests</h2>
-        <p id="questText"></p>
-        <button onclick="completeQuest()">Complete Quest</button>
-    </div>
-
-    <div class="panel">
-        <h2>Upgrades</h2>
-        <button onclick="upgradeClick()">Upgrade Click Power (100)</button>
-        <button onclick="rebirth()">Rebirth (1M)</button>
-        <p>Rebirth Bonus: x<span id="rebirthBonus">1</span></p>
-    </div>
-
+<div class="panel">
+<h2>Paperclips</h2>
+<h3 id="clips">0</h3>
+<button class="bigButton" onclick="clickClip()">MAKE PAPERCLIP</button>
+<p>Per Click: <span id="perClick">1</span></p>
+<p>Per Second: <span id="perSecond">0</span></p>
 </div>
 
-<!-- CASINO ROOM -->
+<div class="panel">
+<h2>Production</h2>
+<button onclick="buyAuto()">Buy Auto Maker (50)</button>
+<p>Owned: <span id="autos">0</span></p>
+</div>
+
+<div class="panel">
+<h2>Rebirth</h2>
+<button onclick="rebirth()">Rebirth (1M)</button>
+<p>Bonus Multiplier: x<span id="rebirthMult">1</span></p>
+</div>
+</div>
+
+<!-- CASINO -->
 <div class="casino" id="casinoRoom">
-    <button class="closeBtn" onclick="closeCasino()">Close</button>
-    <h2>Paperclip Casino</h2>
-    <p>Clips: <span id="casinoClips"></span></p>
+<button class="closeBtn" onclick="closeCasino()">Close</button>
+<h2>Paperclip Casino</h2>
+<p>Clips: <span id="casinoClips"></span></p>
 
-    <h3>Slot Machine</h3>
-    Bet: <input type="number" id="slotBet" value="10">
-    <button onclick="playSlots()">Spin</button>
-    <p id="slotResult"></p>
+<h3>🎰 Slot Machine</h3>
+<div class="reel" id="slotReel">🍒 🍋 🍒</div>
+Bet: <input type="number" id="slotBet" value="10">
+<button onclick="playSlots()">Spin</button>
+<p id="slotResult"></p>
 
-    <h3>Dice Game</h3>
-    Bet: <input type="number" id="diceBet" value="10">
-    <button onclick="playDice()">Roll (Win if 4+)</button>
-    <p id="diceResult"></p>
+<h3>🃏 Blackjack</h3>
+Bet: <input type="number" id="bjBet" value="10">
+<button onclick="playBlackjack()">Play</button>
+<p id="bjResult"></p>
 
-    <h3>Coin Flip</h3>
-    Bet: <input type="number" id="coinBet" value="10">
-    <button onclick="playCoin()">Flip</button>
-    <p id="coinResult"></p>
+<h3>🎡 Roulette (Red/Black)</h3>
+Bet: <input type="number" id="roulBet" value="10">
+<button onclick="playRoulette('red')">Bet Red</button>
+<button onclick="playRoulette('black')">Bet Black</button>
+<p id="roulResult"></p>
 </div>
 
 <script>
@@ -118,107 +122,117 @@ let clips=0
 let perClick=1
 let autos=0
 let rebirthMult=1
-let questGoal=100
+let eventMultiplier=1
 
 function update(){
-    document.getElementById("clips").innerText=Math.floor(clips)
-    document.getElementById("perClick").innerText=perClick
-    document.getElementById("autos").innerText=autos
-    document.getElementById("perSecond").innerText=autos*1*rebirthMult
-    document.getElementById("rebirthBonus").innerText=rebirthMult
-    document.getElementById("casinoClips").innerText=Math.floor(clips)
-    document.getElementById("questText").innerText="Reach "+questGoal+" clips"
+document.getElementById("clips").innerText=Math.floor(clips)
+document.getElementById("perClick").innerText=perClick
+document.getElementById("autos").innerText=autos
+document.getElementById("perSecond").innerText=autos*rebirthMult*eventMultiplier
+document.getElementById("rebirthMult").innerText=rebirthMult
+document.getElementById("casinoClips").innerText=Math.floor(clips)
 }
+
 setInterval(()=>{
-    clips+=autos*rebirthMult
-    update()
+clips+=autos*rebirthMult*eventMultiplier
+update()
 },1000)
 
 function clickClip(){
-    clips+=perClick*rebirthMult
-    update()
+clips+=perClick*rebirthMult*eventMultiplier
+update()
 }
 
 function buyAuto(){
-    if(clips>=50){
-        clips-=50
-        autos++
-    }
+if(clips>=50){
+clips-=50
+autos++
 }
-
-function upgradeClick(){
-    if(clips>=100){
-        clips-=100
-        perClick+=1
-    }
 }
 
 function rebirth(){
-    if(clips>=1000000){
-        clips=0
-        autos=0
-        perClick=1
-        rebirthMult+=1
-    }
+if(clips>=1000000){
+clips=0
+autos=0
+perClick=1
+rebirthMult+=1
+}
 }
 
-function completeQuest(){
-    if(clips>=questGoal){
-        clips+=questGoal
-        questGoal*=2
-    }
-}
+document.getElementById("enterCasino").onclick=()=>{document.getElementById("casinoRoom").style.display="block"}
+function closeCasino(){document.getElementById("casinoRoom").style.display="none"}
 
-function openCasino(){
-    document.getElementById("casinoRoom").style.display="block"
+/* LIMITED TIME EVENTS */
+function triggerEvent(){
+let r=Math.random()
+let box=document.getElementById("eventBox")
+if(r<0.3){
+eventMultiplier=2
+box.innerText="⚡ Production Surge! x2 for 30 seconds!"
+box.style.display="block"
+setTimeout(()=>{
+eventMultiplier=1
+box.style.display="none"
+},30000)
 }
-function closeCasino(){
-    document.getElementById("casinoRoom").style.display="none"
 }
-document.getElementById("enterCasino").onclick=openCasino
+setInterval(triggerEvent,45000)
 
-// SLOT MACHINE
+/* SLOT MACHINE */
 function playSlots(){
-    let bet=parseInt(document.getElementById("slotBet").value)
-    if(bet>clips||bet<=0)return
-    clips-=bet
-    let r=Math.random()
-    if(r<0.1){
-        clips+=bet*5
-        document.getElementById("slotResult").innerText="JACKPOT! x5"
-    }else if(r<0.3){
-        clips+=bet*2
-        document.getElementById("slotResult").innerText="Win x2"
-    }else{
-        document.getElementById("slotResult").innerText="Lost"
-    }
+let bet=parseInt(document.getElementById("slotBet").value)
+if(bet>clips||bet<=0)return
+clips-=bet
+let icons=["🍒","🍋","⭐","💎"]
+let spinCount=0
+let interval=setInterval(()=>{
+let a=icons[Math.floor(Math.random()*4)]
+let b=icons[Math.floor(Math.random()*4)]
+let c=icons[Math.floor(Math.random()*4)]
+document.getElementById("slotReel").innerText=a+" "+b+" "+c
+spinCount++
+if(spinCount>15){
+clearInterval(interval)
+if(a==b&&b==c){
+clips+=bet*5
+document.getElementById("slotResult").innerText="JACKPOT x5!"
+}else{
+document.getElementById("slotResult").innerText="Lost"
+}
+}
+},100)
 }
 
-// DICE
-function playDice(){
-    let bet=parseInt(document.getElementById("diceBet").value)
-    if(bet>clips||bet<=0)return
-    clips-=bet
-    let roll=Math.floor(Math.random()*6)+1
-    if(roll>=4){
-        clips+=bet*2
-        document.getElementById("diceResult").innerText="Rolled "+roll+" Win!"
-    }else{
-        document.getElementById("diceResult").innerText="Rolled "+roll+" Lost"
-    }
+/* BLACKJACK */
+function playBlackjack(){
+let bet=parseInt(document.getElementById("bjBet").value)
+if(bet>clips||bet<=0)return
+clips-=bet
+let player=Math.floor(Math.random()*11)+10
+let dealer=Math.floor(Math.random()*11)+10
+if(player>21) player=21
+if(dealer>21) dealer=21
+if(player>dealer){
+clips+=bet*2
+document.getElementById("bjResult").innerText="You "+player+" vs Dealer "+dealer+" WIN!"
+}else{
+document.getElementById("bjResult").innerText="You "+player+" vs Dealer "+dealer+" Lost"
+}
 }
 
-// COIN
-function playCoin(){
-    let bet=parseInt(document.getElementById("coinBet").value)
-    if(bet>clips||bet<=0)return
-    clips-=bet
-    if(Math.random()<0.5){
-        clips+=bet*2
-        document.getElementById("coinResult").innerText="Heads! Win!"
-    }else{
-        document.getElementById("coinResult").innerText="Tails! Lost"
-    }
+/* ROULETTE */
+function playRoulette(choice){
+let bet=parseInt(document.getElementById("roulBet").value)
+if(bet>clips||bet<=0)return
+clips-=bet
+let red=Math.random()<0.5
+let resultColor=red?"red":"black"
+if(choice==resultColor){
+clips+=bet*2
+document.getElementById("roulResult").innerText="It was "+resultColor+"! WIN!"
+}else{
+document.getElementById("roulResult").innerText="It was "+resultColor+"! Lost"
+}
 }
 
 update()
