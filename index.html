@@ -2,72 +2,90 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Paper Empire - Quantum</title>
+<title>Paper Empire: Planetary Expansion</title>
 <style>
 body {
-    background: #0a0a0f;
+    background: #0b0f1a;
     color: white;
     font-family: Arial;
-    text-align: center;
+    margin: 0;
 }
-button {
-    padding: 8px 12px;
-    margin: 5px;
-    font-size: 14px;
-    cursor: pointer;
+
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 20px;
 }
-.section {
+
+.panel {
     border: 1px solid #333;
     padding: 15px;
-    margin: 15px;
+    width: 30%;
+    background: #111827;
+    border-radius: 10px;
+}
+
+button {
+    margin: 5px 0;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 10px;
 }
 </style>
 </head>
 <body>
 
-<h1>📎 Paper Empire: Quantum Age</h1>
+<h1>🚀 Paper Empire: Planetary Expansion</h1>
 
-<h2>Paperclips: <span id="clips">0</span></h2>
-<h3>Per Second: <span id="perSec">0</span></h3>
-<h3>Rebirth Points: <span id="rebirthPoints">0</span></h3>
-<h3>Multiplier: x<span id="multi">1</span></h3>
+<div class="container">
 
-<div class="section">
-    <button onclick="makeClip()">Make Paperclip</button>
+<!-- MAIN PANEL -->
+<div class="panel">
+<h2>🌍 Current Planet: <span id="planetName">Earth</span></h2>
+
+<p>Clips: <span id="clips">0</span></p>
+<p>Per Sec: <span id="perSec">0</span></p>
+<p>Multiplier: x<span id="multi">1</span></p>
+
+<button onclick="makeClip()">Make Clip</button>
+
+<h3>Auto Machines</h3>
+Owned: <span id="autoCount">0</span><br>
+<button onclick="buyAuto()">Buy (Cost: <span id="autoCost">10</span>)</button>
+
+<h3>Upgrade</h3>
+Level: <span id="upgradeLevel">0</span><br>
+<button onclick="buyUpgrade()">Upgrade (Cost: <span id="upgradeCost">100</span>)</button>
 </div>
 
-<div class="section">
-    <h3>Auto Clippers</h3>
-    Owned: <span id="autoCount">0</span><br>
-    <button onclick="buyAuto()">Buy (Cost: <span id="autoCost">10</span>)</button>
+<!-- QUANTUM PANEL -->
+<div class="panel">
+<h2>⚛ Quantum Core</h2>
+
+Qubits: <span id="qubits">0</span><br>
+Quantum Ops: <span id="qops">0</span><br>
+
+<button onclick="buyQubit()">Buy Qubit (Cost: <span id="qubitCost">5000</span>)</button>
+<button onclick="runQuantum()">Run Computation</button>
 </div>
 
-<div class="section">
-    <h3>Factory Upgrade</h3>
-    Level: <span id="upgradeLevel">0</span><br>
-    <button onclick="buyUpgrade()">Upgrade (Cost: <span id="upgradeCost">100</span>)</button>
+<!-- PLANET PANEL -->
+<div class="panel">
+<h2>🪐 Planets</h2>
+
+<button onclick="travelPlanet(0)">Earth (Start)</button><br>
+<button onclick="travelPlanet(1)">Mars (50k Clips)</button><br>
+<button onclick="travelPlanet(2)">Neptune (500k Clips)</button><br>
+<button onclick="travelPlanet(3)">Dyson Sphere (5M Clips)</button><br>
+
+<p id="planetInfo"></p>
 </div>
 
-<div class="section">
-    <h3>⚛ Quantum Processing</h3>
-    Qubits: <span id="qubits">0</span><br>
-    Quantum Ops: <span id="qops">0</span><br>
-    <button onclick="buyQubit()">Buy Qubit (Cost: <span id="qubitCost">5000</span>)</button>
-    <button onclick="runQuantum()">Run Quantum Computation</button>
-</div>
-
-<div class="section">
-    <h3>🎮 Mini Hack Game</h3>
-    Guess a number between 1 and 5<br>
-    <input id="guessInput" type="number" min="1" max="5">
-    <button onclick="playMiniGame()">Hack</button>
-    <p id="miniResult"></p>
-</div>
-
-<div class="section">
-    <h3>Rebirth</h3>
-    Requires 10,000 clips<br>
-    <button onclick="rebirth()">Rebirth</button>
 </div>
 
 <script>
@@ -76,30 +94,42 @@ let autoClippers = 0;
 let autoCost = 10;
 let upgradeLevel = 0;
 let upgradeCost = 100;
-let rebirthPoints = 0;
 let multiplier = 1;
 
 let qubits = 0;
 let qops = 0;
 let qubitCost = 5000;
 
+let planetIndex = 0;
+
+const planets = [
+    {name: "Earth", difficulty: 1, requirement: 0},
+    {name: "Mars", difficulty: 2, requirement: 50000},
+    {name: "Neptune", difficulty: 4, requirement: 500000},
+    {name: "Dyson Sphere", difficulty: 8, requirement: 5000000}
+];
+
 function updateUI() {
-    clips = Math.max(0, clips);
     document.getElementById("clips").innerText = Math.floor(clips);
     document.getElementById("autoCount").innerText = autoClippers;
     document.getElementById("autoCost").innerText = Math.floor(autoCost);
     document.getElementById("upgradeLevel").innerText = upgradeLevel;
     document.getElementById("upgradeCost").innerText = Math.floor(upgradeCost);
-    document.getElementById("rebirthPoints").innerText = rebirthPoints;
-    document.getElementById("multi").innerText = multiplier.toFixed(1);
-    document.getElementById("perSec").innerText = (autoClippers * multiplier).toFixed(1);
+    document.getElementById("multi").innerText = multiplier.toFixed(2);
+    document.getElementById("perSec").innerText = 
+        (autoClippers * multiplier / planets[planetIndex].difficulty).toFixed(2);
+
     document.getElementById("qubits").innerText = qubits;
     document.getElementById("qops").innerText = Math.floor(qops);
     document.getElementById("qubitCost").innerText = Math.floor(qubitCost);
+
+    document.getElementById("planetName").innerText = planets[planetIndex].name;
+    document.getElementById("planetInfo").innerText =
+        "Difficulty x" + planets[planetIndex].difficulty;
 }
 
 function makeClip() {
-    clips += 1 * multiplier;
+    clips += (1 * multiplier) / planets[planetIndex].difficulty;
     updateUI();
 }
 
@@ -107,7 +137,7 @@ function buyAuto() {
     if (clips >= autoCost) {
         clips -= autoCost;
         autoClippers++;
-        autoCost *= 1.6;
+        autoCost *= 1.7;
         updateUI();
     }
 }
@@ -133,52 +163,31 @@ function buyQubit() {
 
 function runQuantum() {
     if (qubits > 0) {
-        let gain = qubits * Math.random() * 10;
+        let gain = qubits * Math.random() * 20;
         qops += gain;
-        multiplier += gain / 100;
+        multiplier += gain / 200;
         updateUI();
     }
 }
 
-function playMiniGame() {
-    let guess = parseInt(document.getElementById("guessInput").value);
-    let correct = Math.floor(Math.random() * 5) + 1;
-    
-    if (guess === correct) {
-        let reward = 500 * multiplier;
-        clips += reward;
-        document.getElementById("miniResult").innerText = "Hack Success! +" + Math.floor(reward) + " clips";
-    } else {
-        clips -= 200;
-        document.getElementById("miniResult").innerText = "Hack Failed! -200 clips";
-    }
-    updateUI();
-}
-
-function rebirth() {
-    if (clips >= 10000) {
-        let gained = Math.floor(clips / 10000);
-        rebirthPoints += gained;
-        multiplier = 1 + rebirthPoints * 0.5;
-
+function travelPlanet(index) {
+    if (clips >= planets[index].requirement) {
+        planetIndex = index;
         clips = 0;
         autoClippers = 0;
         autoCost = 10;
         upgradeLevel = 0;
         upgradeCost = 100;
-        qubits = 0;
-        qops = 0;
-        qubitCost = 5000;
-
+        multiplier += index;
         updateUI();
     }
 }
 
-setInterval(function() {
-    clips += autoClippers * multiplier;
+setInterval(function(){
+    clips += (autoClippers * multiplier) / planets[planetIndex].difficulty;
     qops += qubits * 0.5;
     updateUI();
-}, 1000);
+},1000);
 
 updateUI();
 </script>
