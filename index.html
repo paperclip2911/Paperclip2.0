@@ -1,191 +1,883 @@
-<script>
-let user=""
-let clips=0, autos=0, autoCost=50, megas=0, megaCost=500, rebirthMult=1
-let productionBoost=1
-let achievements=[]
-let leaderboard=JSON.parse(localStorage.getItem("leaderboard"))||[]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎰 Paper Clip Casino</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-/* SAVE SYSTEM */
-function save(){
-localStorage.setItem("paper_"+user,JSON.stringify({
-clips,autos,autoCost,megas,megaCost,rebirthMult,productionBoost,achievements
-}))
-}
-function load(){
-let data=JSON.parse(localStorage.getItem("paper_"+user))
-if(data){
-clips=data.clips
-autos=data.autos
-autoCost=data.autoCost
-megas=data.megas
-megaCost=data.megaCost
-rebirthMult=data.rebirthMult
-productionBoost=data.productionBoost||1
-achievements=data.achievements||[]
-}
-}
-function login(){
-user=username.value
-if(!user)return
-load()
-loginScreen.style.display="none"
-game.style.display="block"
-update()
-}
+        body {
+            background: linear-gradient(135deg, #1a2a3a, #0f1a24);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-/* UPDATE LOOP */
-function update(){
-clips=Math.floor(clips)
-clipsSpan=document.getElementById("clips")
-if(clipsSpan) clipsSpan.innerText=clips
-casinoClips.innerText=clips
-document.getElementById("autos").innerText=autos
-document.getElementById("megas").innerText=megas
-document.getElementById("autoCost").innerText=autoCost
-document.getElementById("megaCost").innerText=megaCost
-document.getElementById("perSecond").innerText=
-(autos+megas*10)*rebirthMult*productionBoost
-document.getElementById("rebirthMult").innerText=rebirthMult
-checkAchievements()
-save()
-}
-setInterval(()=>{
-clips+=(autos+megas*10)*rebirthMult*productionBoost
-update()
-},1000)
+        /* Login Screen */
+        #loginScreen {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideIn 0.6s ease;
+        }
 
-/* ACHIEVEMENTS */
-function checkAchievements(){
-if(clips>=1000 && !achievements.includes("1k")){
-achievements.push("1k")
-alert("Achievement: 1,000 Clips!")
-}
-if(rebirthMult>=3 && !achievements.includes("rebirth3")){
-achievements.push("rebirth3")
-alert("Achievement: 3 Rebirths!")
-}
-}
+        #loginScreen h2 {
+            color: #fff;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
 
-/* LEADERBOARD */
-function updateLeaderboard(){
-leaderboard.push({user,score:clips})
-leaderboard.sort((a,b)=>b.score-a.score)
-leaderboard=leaderboard.slice(0,5)
-localStorage.setItem("leaderboard",JSON.stringify(leaderboard))
-}
+        #username {
+            padding: 15px 25px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            outline: none;
+            width: 250px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
 
-/* CLICKER */
-function clickClip(){clips+=1*rebirthMult*productionBoost;update()}
-function buyAuto(){if(clips>=autoCost){clips-=autoCost;autos++;autoCost=Math.floor(autoCost*1.25);update()}}
-function buyMega(){if(clips>=megaCost){clips-=megaCost;megas++;megaCost=Math.floor(megaCost*1.4);update()}}
-function rebirth(){
-if(clips>=1000000){
-updateLeaderboard()
-clips=0;autos=0;megas=0;autoCost=50;megaCost=500
-rebirthMult++;update()
-}
-}
+        #username::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
 
-/* CASINO PERK */
-function grantPerk(){
-productionBoost*=1.2
-alert("Casino Perk! Production Boosted 20%!")
-}
+        #username:focus {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
 
-/* BLACKJACK ADVANCED */
-let deck=[],player=[],dealer=[],splitHand=[]
-let bjActive=false,currentBet=0,doubled=false,splitMode=false
+        button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            color: #1a2a3a;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
 
-function createDeck(){
-let suits=["♠","♥","♦","♣"]
-let ranks=["A","2","3","4","5","6","7","8","9","10","J","Q","K"]
-deck=[]
-for(let s of suits){for(let r of ranks){deck.push({rank:r,suit:s})}}
-deck.sort(()=>Math.random()-0.5)
-}
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+            border-color: white;
+        }
 
-function value(c){
-if(c.rank==="A") return 11
-if(["K","Q","J"].includes(c.rank)) return 10
-return parseInt(c.rank)
-}
+        /* Game Container */
+        #game {
+            max-width: 1400px;
+            width: 100%;
+            display: none;
+            animation: fadeIn 0.8s ease;
+        }
 
-function total(hand){
-let t=0, aces=0
-for(let c of hand){t+=value(c);if(c.rank==="A")aces++}
-while(t>21&&aces>0){t-=10;aces--}
-return t
-}
+        /* Stats Bar */
+        .stats-bar {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-function renderBJ(hideDealer=false){
-playerCards.innerHTML=""
-dealerCards.innerHTML=""
-player.forEach(c=>playerCards.innerHTML+=
-`<div class="card">${c.rank}${c.suit}</div>`)
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+        }
 
-dealer.forEach((c,i)=>{
-if(hideDealer && i===1){
-dealerCards.innerHTML+=`<div class="card">?</div>`
-}else{
-dealerCards.innerHTML+=`<div class="card">${c.rank}${c.suit}</div>`
-}
-})
-playerTotal.innerText=total(player)
-dealerTotal.innerText=hideDealer?"?":total(dealer)
-update()
-}
+        .stat-label {
+            color: #ffd700;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
 
-function startBJ(){
-let bet=parseInt(bjBet.value)
-if(bet>clips||bet<=0)return
-createDeck()
-player=[deck.pop(),deck.pop()]
-dealer=[deck.pop(),deck.pop()]
-clips-=bet
-currentBet=bet
-bjActive=true
-doubled=false
-splitMode=false
-bjResult.innerText=""
-renderBJ(true)
-}
+        .stat-value {
+            color: white;
+            font-size: 2em;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
 
-function hit(){
-if(!bjActive)return
-player.push(deck.pop())
-renderBJ(true)
-if(total(player)>21){bjResult.innerText="Bust!";bjActive=false}
-}
+        .stat-value.smooth {
+            transition: all 0.3s ease-out;
+        }
 
-function stand(){
-if(!bjActive)return
-while(total(dealer)<17){dealer.push(deck.pop())}
-let p=total(player), d=total(dealer)
-renderBJ(false)
-if(d>21||p>d){clips+=currentBet*2;bjResult.innerText="Win!";grantPerk()}
-else if(p===d){clips+=currentBet;bjResult.innerText="Push"}
-else bjResult.innerText="Dealer Wins"
-bjActive=false
-}
+        /* Main Game Area */
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
 
-function doubleDown(){
-if(!bjActive||doubled)return
-if(clips<currentBet)return
-clips-=currentBet
-currentBet*=2
-doubled=true
-player.push(deck.pop())
-renderBJ(true)
-if(total(player)>21){bjResult.innerText="Bust after Double!";bjActive=false;return}
-stand()
-}
+        /* Clicker Section */
+        .clicker-section {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-function split(){
-if(!bjActive)return
-if(player.length===2 && value(player[0])===value(player[1])){
-splitMode=true
-splitHand=[player.pop()]
-alert("Split activated (basic version)")
-}
-}
-</script>
+        .clip-counter {
+            font-size: 3.5em;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .clip-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            border: none;
+            cursor: pointer;
+            font-size: 2em;
+            font-weight: bold;
+            color: #1a2a3a;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+            transition: all 0.1s;
+            animation: float 3s infinite;
+        }
+
+        .clip-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .clip-button:hover {
+            transform: scale(1.05);
+        }
+
+        /* Upgrades Section */
+        .upgrades-section {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .upgrade-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .upgrade-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(10px);
+            border-color: #ffd700;
+        }
+
+        .upgrade-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .upgrade-name {
+            color: #ffd700;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .upgrade-desc {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .upgrade-cost {
+            color: #ffa500;
+            font-size: 1.2em;
+        }
+
+        .upgrade-amount {
+            color: white;
+            font-size: 1.5em;
+            margin-top: 10px;
+        }
+
+        /* Casino Section */
+        .casino-section {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .casino-header {
+            color: #ffd700;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .casino-clips {
+            color: white;
+            font-size: 1.5em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .bet-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .blackjack-table {
+            background: #0d5e3d;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .cards {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            min-height: 100px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: white;
+            color: black;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.3em;
+            font-weight: bold;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        .card[data-suit="♥"], .card[data-suit="♦"] {
+            color: red;
+        }
+
+        .bj-controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .bj-controls button {
+            padding: 10px;
+            font-size: 1em;
+        }
+
+        .bj-result {
+            color: #ffd700;
+            font-size: 1.5em;
+            text-align: center;
+            margin-top: 15px;
+            animation: pulse 1s;
+        }
+
+        /* Rebirth Section */
+        .rebirth-section {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            margin-top: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .rebirth-btn {
+            background: linear-gradient(45deg, #ff1493, #ff00ff);
+            color: white;
+            font-size: 1.5em;
+            padding: 20px 40px;
+        }
+
+        /* Leaderboard */
+        .leaderboard {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .leaderboard h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .floating-number {
+            position: absolute;
+            color: #ffd700;
+            font-weight: bold;
+            animation: floatUp 1s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1000px) {
+            .game-area {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-value {
+                font-size: 1.5em;
+            }
+        }
+
+        /* Achievement Popup */
+        .achievement-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            color: #1a2a3a;
+            padding: 20px;
+            border-radius: 15px;
+            animation: slideIn 0.5s ease;
+            z-index: 1000;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen">
+        <h2>🎰 Paper Clip Casino</h2>
+        <input type="text" id="username" placeholder="Enter your name" autocomplete="off">
+        <br>
+        <button onclick="login()">Start Clipping</button>
+    </div>
+
+    <!-- Main Game -->
+    <div id="game">
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-label">Paper Clips</div>
+                <div class="stat-value" id="clips">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Per Second</div>
+                <div class="stat-value" id="perSecond">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Rebirth Multiplier</div>
+                <div class="stat-value" id="rebirthMult">1x</div>
+            </div>
+        </div>
+
+        <!-- Main Game Area -->
+        <div class="game-area">
+            <!-- Clicker Section -->
+            <div class="clicker-section">
+                <div class="clip-counter" id="clipsDisplay">0</div>
+                <button class="clip-button" onclick="clickClip()">
+                    📎<br>CLIP
+                </button>
+                <div style="color: white; margin-top: 20px;">Click to earn clips!</div>
+            </div>
+
+            <!-- Upgrades Section -->
+            <div class="upgrades-section">
+                <h2 style="color: #ffd700; margin-bottom: 20px;">⬆️ Upgrades</h2>
+                
+                <div class="upgrade-card" onclick="buyAuto()" id="autoUpgrade">
+                    <div class="upgrade-name">🤖 Auto Clipper</div>
+                    <div class="upgrade-desc">Automatically clips 1 paper clip per second</div>
+                    <div class="upgrade-cost">Cost: <span id="autoCost">50</span> clips</div>
+                    <div class="upgrade-amount">Owned: <span id="autos">0</span></div>
+                </div>
+
+                <div class="upgrade-card" onclick="buyMega()" id="megaUpgrade">
+                    <div class="upgrade-name">⚡ Mega Clipper</div>
+                    <div class="upgrade-desc">Produces 10 clips per second</div>
+                    <div class="upgrade-cost">Cost: <span id="megaCost">500</span> clips</div>
+                    <div class="upgrade-amount">Owned: <span id="megas">0</span></div>
+                </div>
+            </div>
+
+            <!-- Casino Section -->
+            <div class="casino-section">
+                <div class="casino-header">🎲 CASINO</div>
+                <div class="casino-clips">Your Clips: <span id="casinoClips">0</span></div>
+                
+                <input type="number" id="bjBet" class="bet-input" placeholder="Bet amount" min="1" value="100">
+                <button onclick="startBJ()" style="width: 100%; margin-bottom: 10px;">Start Blackjack</button>
+
+                <div class="blackjack-table">
+                    <div style="color: white; margin-bottom: 5px;">Dealer:</div>
+                    <div class="cards" id="dealerCards"></div>
+                    <div style="color: white;">Total: <span id="dealerTotal">0</span></div>
+
+                    <div style="color: white; margin: 20px 0 5px;">Player:</div>
+                    <div class="cards" id="playerCards"></div>
+                    <div style="color: white;">Total: <span id="playerTotal">0</span></div>
+
+                    <div class="bj-controls">
+                        <button onclick="hit()">Hit</button>
+                        <button onclick="stand()">Stand</button>
+                        <button onclick="doubleDown()">Double</button>
+                        <button onclick="split()">Split</button>
+                    </div>
+
+                    <div class="bj-result" id="bjResult"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rebirth Section -->
+        <div class="rebirth-section">
+            <button class="rebirth-btn" onclick="rebirth()">🔄 REBIRTH (1M clips)</button>
+            <p style="color: rgba(255,255,255,0.7); margin-top: 15px;">Reset everything for a permanent multiplier!</p>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="leaderboard">
+            <h3>🏆 Leaderboard</h3>
+            <div id="leaderboardList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Game Variables
+        let user = ""
+        let clips = 0, autos = 0, autoCost = 50, megas = 0, megaCost = 500, rebirthMult = 1
+        let productionBoost = 1
+        let achievements = []
+        let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || []
+
+        // DOM Elements
+        let clipsSpan, casinoClips, perSecondSpan, rebirthMultSpan
+        let autoSpan, megaSpan, autoCostSpan, megaCostSpan
+
+        // Smooth clip animation
+        let displayClips = 0
+        let animationFrame
+
+        function animateClips() {
+            if (Math.abs(displayClips - clips) > 0.1) {
+                displayClips += (clips - displayClips) * 0.1
+                if (clipsSpan) {
+                    clipsSpan.innerText = Math.floor(displayClips).toLocaleString()
+                    document.getElementById('clipsDisplay').innerText = Math.floor(displayClips).toLocaleString()
+                }
+                animationFrame = requestAnimationFrame(animateClips)
+            } else {
+                displayClips = clips
+                if (clipsSpan) {
+                    clipsSpan.innerText = Math.floor(clips).toLocaleString()
+                    document.getElementById('clipsDisplay').innerText = Math.floor(clips).toLocaleString()
+                }
+            }
+        }
+
+        // Save System
+        function save() {
+            localStorage.setItem("paper_" + user, JSON.stringify({
+                clips, autos, autoCost, megas, megaCost, rebirthMult, productionBoost, achievements
+            }))
+        }
+
+        function load() {
+            let data = JSON.parse(localStorage.getItem("paper_" + user))
+            if (data) {
+                clips = data.clips
+                autos = data.autos
+                autoCost = data.autoCost
+                megas = data.megas
+                megaCost = data.megaCost
+                rebirthMult = data.rebirthMult
+                productionBoost = data.productionBoost || 1
+                achievements = data.achievements || []
+            }
+        }
+
+        function login() {
+            user = username.value
+            if (!user) return
+            load()
+            loginScreen.style.display = "none"
+            game.style.display = "block"
+            
+            // Initialize DOM references
+            clipsSpan = document.getElementById("clips")
+            casinoClips = document.getElementById("casinoClips")
+            perSecondSpan = document.getElementById("perSecond")
+            rebirthMultSpan = document.getElementById("rebirthMult")
+            autoSpan = document.getElementById("autos")
+            megaSpan = document.getElementById("megas")
+            autoCostSpan = document.getElementById("autoCost")
+            megaCostSpan = document.getElementById("megaCost")
+            
+            update()
+            updateLeaderboardDisplay()
+        }
+
+        // Update Loop
+        function update() {
+            clips = Math.max(0, clips)
+            
+            if (clipsSpan) clipsSpan.innerText = Math.floor(clips).toLocaleString()
+            if (casinoClips) casinoClips.innerText = Math.floor(clips).toLocaleString()
+            if (autoSpan) autoSpan.innerText = autos
+            if (megaSpan) megaSpan.innerText = megas
+            if (autoCostSpan) autoCostSpan.innerText = Math.floor(autoCost)
+            if (megaCostSpan) megaCostSpan.innerText = Math.floor(megaCost)
+            
+            let perSecond = (autos + megas * 10) * rebirthMult * productionBoost
+            if (perSecondSpan) perSecondSpan.innerText = perSecond.toFixed(1)
+            if (rebirthMultSpan) rebirthMultSpan.innerText = rebirthMult.toFixed(1) + "x"
+            
+            // Update upgrade cards availability
+            document.getElementById('autoUpgrade').classList.toggle('disabled', clips < autoCost)
+            document.getElementById('megaUpgrade').classList.toggle('disabled', clips < megaCost)
+            
+            checkAchievements()
+            save()
+        }
+
+        setInterval(() => {
+            clips += (autos + megas * 10) * rebirthMult * productionBoost
+            animateClips()
+            update()
+        }, 1000)
+
+        // Floating number animation
+        function createFloatingNumber(x, y, value) {
+            const float = document.createElement('div')
+            float.className = 'floating-number'
+            float.innerText = '+' + value
+            float.style.left = x + 'px'
+            float.style.top = y + 'px'
+            document.body.appendChild(float)
+            setTimeout(() => float.remove(), 1000)
+        }
+
+        // Achievements
+        function showAchievement(title) {
+            const popup = document.createElement('div')
+            popup.className = 'achievement-popup'
+            popup.innerText = '🏆 Achievement: ' + title
+            document.body.appendChild(popup)
+            setTimeout(() => popup.remove(), 3000)
+        }
+
+        function checkAchievements() {
+            if (clips >= 1000 && !achievements.includes("1k")) {
+                achievements.push("1k")
+                showAchievement("1,000 Clips!")
+            }
+            if (rebirthMult >= 3 && !achievements.includes("rebirth3")) {
+                achievements.push("rebirth3")
+                showAchievement("3 Rebirths!")
+            }
+        }
+
+        // Leaderboard
+        function updateLeaderboard() {
+            leaderboard.push({ user, score: clips })
+            leaderboard.sort((a, b) => b.score - a.score)
+            leaderboard = leaderboard.slice(0, 5)
+            localStorage.setItem("leaderboard", JSON.stringify(leaderboard))
+            updateLeaderboardDisplay()
+        }
+
+        function updateLeaderboardDisplay() {
+            const list = document.getElementById('leaderboardList')
+            if (!list) return
+            list.innerHTML = ''
+            leaderboard.forEach((entry, i) => {
+                list.innerHTML += `
+                    <div class="leaderboard-item">
+                        <span>${i + 1}. ${entry.user}</span>
+                        <span>${Math.floor(entry.score).toLocaleString()}</span>
+                    </div>
+                `
+            })
+        }
+
+        // Clicker
+        function clickClip() {
+            const gain = 1 * rebirthMult * productionBoost
+            clips += gain
+            const rect = document.querySelector('.clip-button').getBoundingClientRect()
+            createFloatingNumber(rect.left + rect.width/2, rect.top, gain.toFixed(0))
+            animateClips()
+            update()
+        }
+
+        // Upgrades
+        function buyAuto() {
+            if (clips >= autoCost) {
+                clips -= autoCost
+                autos++
+                autoCost = Math.floor(autoCost * 1.25)
+                animateClips()
+                update()
+            }
+        }
+
+        function buyMega() {
+            if (clips >= megaCost) {
+                clips -= megaCost
+                megas++
+                megaCost = Math.floor(megaCost * 1.4)
+                animateClips()
+                update()
+            }
+        }
+
+        // Rebirth
+        function rebirth() {
+            if (clips >= 1000000) {
+                updateLeaderboard()
+                clips = 0
+                autos = 0
+                megas = 0
+                autoCost = 50
+                megaCost = 500
+                rebirthMult++
+                animateClips()
+                update()
+                showAchievement('Rebirth ' + rebirthMult + '!')
+            }
+        }
+
+        // Casino Perk
+        function grantPerk() {
+            productionBoost *= 1.2
+            showAchievement('Casino Perk! +20% Production')
+        }
+
+        // Blackjack Game
+        let deck = [], player = [], dealer = [], splitHand = []
+        let bjActive = false, currentBet = 0, doubled = false, splitMode = false
+
+        function createDeck() {
+            let suits = ["♠", "♥", "♦", "♣"]
+            let ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+            deck = []
+            for (let s of suits) {
+                for (let r of ranks) {
+                    deck.push({ rank: r, suit: s })
+                }
+            }
+            deck.sort(() => Math.random() - 0.5)
+        }
+
+        function value(c) {
+            if (c.rank === "A") return 11
+            if (["K", "Q", "J"].includes(c.rank)) return 10
+            return parseInt(c.rank)
+        }
+
+        function total(hand) {
+            let t = 0, aces = 0
+            for (let c of hand) {
+                t += value(c)
+                if (c.rank === "A") aces++
+            }
+            while (t > 21 && aces > 0) {
+                t -= 10
+                aces--
+            }
+            return t
+        }
+
+        function renderBJ(hideDealer = false) {
+            const playerCards = document.getElementById("playerCards")
+            const dealerCards = document.getElementById("dealerCards")
+            
+            playerCards.innerHTML = ""
+            dealerCards.innerHTML = ""
+            
+            player.forEach(c => {
+                playerCards.innerHTML += `<div class="card" data-suit="${c.suit}">${c.rank}${c.suit}</div>`
+            })
+
+            dealer.forEach((c, i) => {
+                if (hideDealer && i === 1) {
+                    dealerCards.innerHTML += `<div class="card">?</div>`
+                } else {
+                    dealerCards.innerHTML += `<div class="card" data-suit="${c.suit}">${c.rank}${c.suit}</div>`
+                }
+            })
+            
+            document.getElementById("playerTotal").innerText = total(player)
+            document.getElementById("dealerTotal").innerText = hideDealer ? "?" : total(dealer)
+        }
+
+        function startBJ() {
+            let bet = parseInt(document.getElementById("bjBet").value)
+            if (bet > clips || bet <= 0) return
+            createDeck()
+            player = [deck.pop(), deck.pop()]
+            dealer = [deck.pop(), deck.pop()]
+            clips -= bet
+            currentBet = bet
+            bjActive = true
+            doubled = false
+            splitMode = false
+            document.getElementById("bjResult").innerText = ""
+            renderBJ(true)
+            animateClips()
+            update()
+        }
+
+        function hit() {
+            if (!bjActive) return
+            player.push(deck.pop())
+            renderBJ(true)
+            if (total(player) > 21) {
+                document.getElementById("bjResult").innerText = "Bust! 💥"
+                bjActive = false
+            }
+        }
+
+        function stand() {
+            if (!bjActive) return
+            while (total(dealer) < 17) {
+                dealer.push(deck.pop())
+            }
+            let p = total(player)
+            let d = total(dealer)
+            renderBJ(false)
+            
+            if (d > 21 || p > d) {
+                clips += currentBet * 2
+                document.getElementById("bjResult").innerText = "Win! 🎉"
+                grantPerk()
+            } else if (p === d) {
+                clips += currentBet
+                document.getElementById("bjResult").innerText = "Push 🤝"
+            } else {
+                document.getElementById("bjResult").innerText = "Dealer Wins 😢"
+            }
+            bjActive = false
+            animateClips()
+            update()
+        }
+
+        function doubleDown() {
+            if (!bjActive || doubled) return
+            if (clips < currentBet) return
+            clips -= currentBet
+            currentBet *= 2
+            doubled = true
+            player.push(deck.pop())
+            renderBJ(true)
+            if (total(player) > 21) {
+                document.getElementById("bjResult").innerText = "Bust after Double! 💥"
+                bjActive = false
+                animateClips()
+                update()
+                return
+            }
+            stand()
+        }
+
+        function split() {
+            if (!bjActive) return
+            if (player.length === 2 && value(player[0]) === value(player[1])) {
+                splitMode = true
+                splitHand = [player.pop()]
+                alert("Split activated (basic version)")
+            }
+        }
+    </script>
+</body>
+</html>
