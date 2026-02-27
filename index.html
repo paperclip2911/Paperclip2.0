@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Paper Empire: Planetary Expansion</title>
+<title>Paper Empire 2.0</title>
 <style>
 body {
     background: #0b0f1a;
@@ -11,19 +11,26 @@ body {
     margin: 0;
 }
 
+h1 {
+    text-align: center;
+    margin-top: 10px;
+}
+
 .container {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
     padding: 20px;
+    flex-wrap: wrap;
 }
 
 .panel {
     border: 1px solid #333;
     padding: 15px;
-    width: 30%;
+    width: 22%;
     background: #111827;
     border-radius: 10px;
+    margin-bottom: 15px;
 }
 
 button {
@@ -32,21 +39,22 @@ button {
     cursor: pointer;
 }
 
-h1 {
-    text-align: center;
-    margin-top: 10px;
+input {
+    padding: 5px;
+    width: 100%;
+    margin-bottom: 5px;
 }
 </style>
 </head>
 <body>
 
-<h1>🚀 Paper Empire: Planetary Expansion</h1>
+<h1>🚀 Paper Empire 2.0</h1>
 
 <div class="container">
 
 <!-- MAIN PANEL -->
 <div class="panel">
-<h2>🌍 Current Planet: <span id="planetName">Earth</span></h2>
+<h2>🌍 Planet: <span id="planetName">Earth</span></h2>
 
 <p>Clips: <span id="clips">0</span></p>
 <p>Per Sec: <span id="perSec">0</span></p>
@@ -78,17 +86,35 @@ Quantum Ops: <span id="qops">0</span><br>
 <div class="panel">
 <h2>🪐 Planets</h2>
 
-<button onclick="travelPlanet(0)">Earth (Start)</button><br>
-<button onclick="travelPlanet(1)">Mars (50k Clips)</button><br>
-<button onclick="travelPlanet(2)">Neptune (500k Clips)</button><br>
-<button onclick="travelPlanet(3)">Dyson Sphere (5M Clips)</button><br>
+<button onclick="travelPlanet(0)">Earth</button><br>
+<button onclick="travelPlanet(1)">Mars (50k)</button><br>
+<button onclick="travelPlanet(2)">Neptune (500k)</button><br>
+<button onclick="travelPlanet(3)">Dyson (5M)</button><br>
 
 <p id="planetInfo"></p>
+</div>
+
+<!-- CASINO PANEL -->
+<div class="panel">
+<h2>🎰 Intergalactic Casino</h2>
+
+<input id="betAmount" type="number" placeholder="Bet amount">
+
+<h3>🎰 Slots</h3>
+<p id="slotDisplay">🍒 🍋 🔔</p>
+<button onclick="spinSlots()">Spin</button>
+
+<h3>🎲 Dice (Win if > 3)</h3>
+<button onclick="rollDice()">Roll</button>
+
+<p id="casinoResult"></p>
 </div>
 
 </div>
 
 <script>
+
+// ===== CORE GAME =====
 let clips = 0;
 let autoClippers = 0;
 let autoCost = 10;
@@ -116,7 +142,7 @@ function updateUI() {
     document.getElementById("upgradeLevel").innerText = upgradeLevel;
     document.getElementById("upgradeCost").innerText = Math.floor(upgradeCost);
     document.getElementById("multi").innerText = multiplier.toFixed(2);
-    document.getElementById("perSec").innerText = 
+    document.getElementById("perSec").innerText =
         (autoClippers * multiplier / planets[planetIndex].difficulty).toFixed(2);
 
     document.getElementById("qubits").innerText = qubits;
@@ -183,30 +209,8 @@ function travelPlanet(index) {
     }
 }
 
-setInterval(function(){
-    clips += (autoClippers * multiplier) / planets[planetIndex].difficulty;
-    qops += qubits * 0.5;
-    updateUI();
-},1000);
-
-updateUI();
-</script>
-<div class="panel">
-<h2>🎰 Intergalactic Casino</h2>
-
-<p>Clips: <span id="casinoClips">0</span></p>
-
-<input id="betAmount" type="number" placeholder="Bet amount">
-
-<h3>🎰 Slots</h3>
-<p id="slotDisplay">🍒 🍋 🔔</p>
-<button onclick="spinSlots()">Spin</button>
-
-<h3>🎲 Dice Duel (Win if > 3)</h3>
-<button onclick="rollDice()">Roll Dice</button>
-
-<p id="casinoResult"></p>
-    function spinSlots() {
+// ===== CASINO SYSTEM =====
+function spinSlots() {
     let bet = parseInt(document.getElementById("betAmount").value);
     if (!bet || bet <= 0 || bet > clips) {
         document.getElementById("casinoResult").innerText = "Invalid bet.";
@@ -256,13 +260,26 @@ function rollDice() {
     if (roll > 3) {
         let reward = bet * (1.8 / difficulty) * multiplier;
         clips += reward;
-        document.getElementById("casinoResult").innerText = "Rolled " + roll + " — You Win!";
+        document.getElementById("casinoResult").innerText =
+            "Rolled " + roll + " — You Win!";
     } else {
-        document.getElementById("casinoResult").innerText = "Rolled " + roll + " — You Lose!";
+        document.getElementById("casinoResult").innerText =
+            "Rolled " + roll + " — You Lose!";
     }
 
     updateUI();
 }
-</div>
+
+// ===== GAME LOOP =====
+setInterval(function(){
+    clips += (autoClippers * multiplier) / planets[planetIndex].difficulty;
+    qops += qubits * 0.5;
+    updateUI();
+},1000);
+
+updateUI();
+
+</script>
+
 </body>
 </html>
