@@ -2,26 +2,36 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Paper Empire 2.0</title>
+<title>Paper Empire 2.1</title>
 <style>
 body {
     background: #0b0f1a;
     color: white;
     font-family: Arial;
     margin: 0;
+    text-align: center;
 }
 
 h1 {
-    text-align: center;
     margin-top: 10px;
+}
+
+.big-button {
+    font-size: 28px;
+    padding: 40px 60px;
+    margin: 20px;
+    border-radius: 20px;
+    background: #1f2937;
+    color: white;
+    border: 2px solid #555;
+    cursor: pointer;
 }
 
 .container {
     display: flex;
-    flex-direction: row;
     justify-content: space-around;
-    padding: 20px;
     flex-wrap: wrap;
+    padding: 20px;
 }
 
 .panel {
@@ -48,65 +58,42 @@ input {
 </head>
 <body>
 
-<h1>🚀 Paper Empire 2.0</h1>
+<h1>🚀 Paper Empire 2.1</h1>
+
+<h2>Clips: <span id="clips">0</span></h2>
+<h3>Per Sec: <span id="perSec">0</span></h3>
+<h3>Multiplier: x<span id="multi">1</span></h3>
+
+<button class="big-button" onclick="bigClick()">📎 CREATE PAPERCLIP</button>
 
 <div class="container">
 
-<!-- MAIN PANEL -->
 <div class="panel">
-<h2>🌍 Planet: <span id="planetName">Earth</span></h2>
+<h2>📜 Quests</h2>
+<p id="questText">Make 100 clips</p>
+<p>Progress: <span id="questProgress">0</span></p>
+</div>
 
-<p>Clips: <span id="clips">0</span></p>
-<p>Per Sec: <span id="perSec">0</span></p>
-<p>Multiplier: x<span id="multi">1</span></p>
+<div class="panel">
+<h2>🏭 Production</h2>
+Auto Machines: <span id="autoCount">0</span><br>
+<button onclick="buyAuto()">Buy (Cost: <span id="autoCost">10</span>)</button><br><br>
 
-<button onclick="makeClip()">Make Clip</button>
-
-<h3>Auto Machines</h3>
-Owned: <span id="autoCount">0</span><br>
-<button onclick="buyAuto()">Buy (Cost: <span id="autoCost">10</span>)</button>
-
-<h3>Upgrade</h3>
-Level: <span id="upgradeLevel">0</span><br>
+Upgrade Level: <span id="upgradeLevel">0</span><br>
 <button onclick="buyUpgrade()">Upgrade (Cost: <span id="upgradeCost">100</span>)</button>
 </div>
 
-<!-- QUANTUM PANEL -->
 <div class="panel">
-<h2>⚛ Quantum Core</h2>
-
+<h2>⚛ Quantum</h2>
 Qubits: <span id="qubits">0</span><br>
-Quantum Ops: <span id="qops">0</span><br>
-
-<button onclick="buyQubit()">Buy Qubit (Cost: <span id="qubitCost">5000</span>)</button>
-<button onclick="runQuantum()">Run Computation</button>
+<button onclick="buyQubit()">Buy (Cost: <span id="qubitCost">5000</span>)</button>
+<button onclick="runQuantum()">Boost</button>
 </div>
 
-<!-- PLANET PANEL -->
 <div class="panel">
-<h2>🪐 Planets</h2>
-
-<button onclick="travelPlanet(0)">Earth</button><br>
-<button onclick="travelPlanet(1)">Mars (50k)</button><br>
-<button onclick="travelPlanet(2)">Neptune (500k)</button><br>
-<button onclick="travelPlanet(3)">Dyson (5M)</button><br>
-
-<p id="planetInfo"></p>
-</div>
-
-<!-- CASINO PANEL -->
-<div class="panel">
-<h2>🎰 Intergalactic Casino</h2>
-
+<h2>🎰 Casino</h2>
 <input id="betAmount" type="number" placeholder="Bet amount">
-
-<h3>🎰 Slots</h3>
-<p id="slotDisplay">🍒 🍋 🔔</p>
-<button onclick="spinSlots()">Spin</button>
-
-<h3>🎲 Dice (Win if > 3)</h3>
-<button onclick="rollDice()">Roll</button>
-
+<button onclick="spinSlots()">Slots</button>
 <p id="casinoResult"></p>
 </div>
 
@@ -114,7 +101,7 @@ Quantum Ops: <span id="qops">0</span><br>
 
 <script>
 
-// ===== CORE GAME =====
+// ===== CORE =====
 let clips = 0;
 let autoClippers = 0;
 let autoCost = 10;
@@ -123,42 +110,37 @@ let upgradeCost = 100;
 let multiplier = 1;
 
 let qubits = 0;
-let qops = 0;
 let qubitCost = 5000;
 
-let planetIndex = 0;
+let clickCombo = 0;
 
-const planets = [
-    {name: "Earth", difficulty: 1, requirement: 0},
-    {name: "Mars", difficulty: 2, requirement: 50000},
-    {name: "Neptune", difficulty: 4, requirement: 500000},
-    {name: "Dyson Sphere", difficulty: 8, requirement: 5000000}
-];
+// ===== QUEST SYSTEM =====
+let questGoal = 100;
+let questRewarded = false;
 
-function updateUI() {
-    document.getElementById("clips").innerText = Math.floor(clips);
-    document.getElementById("autoCount").innerText = autoClippers;
-    document.getElementById("autoCost").innerText = Math.floor(autoCost);
-    document.getElementById("upgradeLevel").innerText = upgradeLevel;
-    document.getElementById("upgradeCost").innerText = Math.floor(upgradeCost);
-    document.getElementById("multi").innerText = multiplier.toFixed(2);
-    document.getElementById("perSec").innerText =
-        (autoClippers * multiplier / planets[planetIndex].difficulty).toFixed(2);
+function checkQuest() {
+    if (clips >= questGoal && !questRewarded) {
+        multiplier += 0.5;
+        clips += questGoal * 0.5;
+        questRewarded = true;
 
-    document.getElementById("qubits").innerText = qubits;
-    document.getElementById("qops").innerText = Math.floor(qops);
-    document.getElementById("qubitCost").innerText = Math.floor(qubitCost);
+        questGoal *= 3;
+        questRewarded = false;
 
-    document.getElementById("planetName").innerText = planets[planetIndex].name;
-    document.getElementById("planetInfo").innerText =
-        "Difficulty x" + planets[planetIndex].difficulty;
+        document.getElementById("questText").innerText =
+            "Make " + questGoal + " clips";
+    }
 }
 
-function makeClip() {
-    clips += (1 * multiplier) / planets[planetIndex].difficulty;
+// ===== BIG BUTTON =====
+function bigClick() {
+    clickCombo++;
+    let comboBonus = 1 + (clickCombo * 0.02);
+    clips += 1 * multiplier * comboBonus;
     updateUI();
 }
 
+// ===== SHOP =====
 function buyAuto() {
     if (clips >= autoCost) {
         clips -= autoCost;
@@ -178,6 +160,7 @@ function buyUpgrade() {
     }
 }
 
+// ===== QUANTUM =====
 function buyQubit() {
     if (clips >= qubitCost) {
         clips -= qubitCost;
@@ -189,27 +172,13 @@ function buyQubit() {
 
 function runQuantum() {
     if (qubits > 0) {
-        let gain = qubits * Math.random() * 20;
-        qops += gain;
-        multiplier += gain / 200;
+        let boost = qubits * Math.random();
+        multiplier += boost;
         updateUI();
     }
 }
 
-function travelPlanet(index) {
-    if (clips >= planets[index].requirement) {
-        planetIndex = index;
-        clips = 0;
-        autoClippers = 0;
-        autoCost = 10;
-        upgradeLevel = 0;
-        upgradeCost = 100;
-        multiplier += index;
-        updateUI();
-    }
-}
-
-// ===== CASINO SYSTEM =====
+// ===== CASINO =====
 function spinSlots() {
     let bet = parseInt(document.getElementById("betAmount").value);
     if (!bet || bet <= 0 || bet > clips) {
@@ -219,63 +188,45 @@ function spinSlots() {
 
     clips -= bet;
 
-    const symbols = ["🍒","🍋","🔔","⭐","💎"];
-    let s1 = symbols[Math.floor(Math.random()*symbols.length)];
-    let s2 = symbols[Math.floor(Math.random()*symbols.length)];
-    let s3 = symbols[Math.floor(Math.random()*symbols.length)];
+    let roll = Math.random();
 
-    document.getElementById("slotDisplay").innerText = s1 + " " + s2 + " " + s3;
-
-    let difficulty = planets[planetIndex].difficulty;
-
-    if (s1 === s2 && s2 === s3) {
-        let reward = bet * (5 / difficulty) * multiplier;
-        clips += reward;
-        document.getElementById("casinoResult").innerText = "JACKPOT x5!";
-    }
-    else if (s1 === s2 || s2 === s3 || s1 === s3) {
-        let reward = bet * (2 / difficulty) * multiplier;
-        clips += reward;
-        document.getElementById("casinoResult").innerText = "Nice! x2!";
-    }
-    else {
+    if (roll < 0.5) {
         document.getElementById("casinoResult").innerText = "Lost.";
     }
-
-    updateUI();
-}
-
-function rollDice() {
-    let bet = parseInt(document.getElementById("betAmount").value);
-    if (!bet || bet <= 0 || bet > clips) {
-        document.getElementById("casinoResult").innerText = "Invalid bet.";
-        return;
+    else if (roll < 0.85) {
+        clips += bet * 2;
+        document.getElementById("casinoResult").innerText = "Win x2!";
     }
-
-    clips -= bet;
-
-    let roll = Math.floor(Math.random() * 6) + 1;
-    let difficulty = planets[planetIndex].difficulty;
-
-    if (roll > 3) {
-        let reward = bet * (1.8 / difficulty) * multiplier;
-        clips += reward;
-        document.getElementById("casinoResult").innerText =
-            "Rolled " + roll + " — You Win!";
-    } else {
-        document.getElementById("casinoResult").innerText =
-            "Rolled " + roll + " — You Lose!";
+    else {
+        clips += bet * 5;
+        document.getElementById("casinoResult").innerText = "JACKPOT x5!";
     }
 
     updateUI();
 }
 
-// ===== GAME LOOP =====
+// ===== LOOP =====
 setInterval(function(){
-    clips += (autoClippers * multiplier) / planets[planetIndex].difficulty;
-    qops += qubits * 0.5;
+    clips += autoClippers * multiplier;
+    clickCombo = 0;
+    checkQuest();
     updateUI();
 },1000);
+
+function updateUI() {
+    document.getElementById("clips").innerText = Math.floor(clips);
+    document.getElementById("autoCount").innerText = autoClippers;
+    document.getElementById("autoCost").innerText = Math.floor(autoCost);
+    document.getElementById("upgradeLevel").innerText = upgradeLevel;
+    document.getElementById("upgradeCost").innerText = Math.floor(upgradeCost);
+    document.getElementById("multi").innerText = multiplier.toFixed(2);
+    document.getElementById("perSec").innerText =
+        (autoClippers * multiplier).toFixed(2);
+    document.getElementById("questProgress").innerText =
+        Math.floor(clips) + " / " + questGoal;
+    document.getElementById("qubits").innerText = qubits;
+    document.getElementById("qubitCost").innerText = Math.floor(qubitCost);
+}
 
 updateUI();
 
