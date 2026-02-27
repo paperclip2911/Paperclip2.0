@@ -74,6 +74,7 @@
             cursor: pointer;
             transition: all 0.3s;
             border: 2px solid transparent;
+            pointer-events: auto;
         }
 
         button:hover {
@@ -84,6 +85,24 @@
 
         button:active {
             transform: translateY(0);
+        }
+
+        /* Casino Button - Top Left */
+        #casinoBtn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            color: #1a2a3a;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 25px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+            display: none;
         }
 
         /* Game Container */
@@ -172,7 +191,6 @@
 
         .clip-button:active {
             transform: scale(0.95);
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.5);
         }
 
         /* Upgrades Section */
@@ -228,23 +246,6 @@
             color: white;
             font-size: 1.5em;
             margin-top: 10px;
-        }
-
-        /* Casino Button */
-        .casino-button {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: linear-gradient(45deg, #ffd700, #ffa500);
-            color: #1a2a3a;
-            border: none;
-            border-radius: 50px;
-            padding: 12px 25px;
-            font-size: 1.2em;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 1000;
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
         }
 
         /* Casino Modal */
@@ -521,11 +522,11 @@
         <h2>🎰 Paper Clip Casino</h2>
         <input type="text" id="username" placeholder="Enter your name" autocomplete="off">
         <br>
-        <button onclick="login()">Start Clipping</button>
+        <button onclick="login()" id="loginBtn">Start Clipping</button>
     </div>
 
-    <!-- Casino Button -->
-    <button class="casino-button" onclick="openCasino()" id="casinoBtn" style="display: none;">🎰 Play Casino</button>
+    <!-- Casino Button - Top Left -->
+    <button id="casinoBtn" onclick="openCasino()">🎰 Casino</button>
 
     <!-- Main Game -->
     <div id="game">
@@ -706,7 +707,9 @@
 
         // Login Function
         function login() {
-            user = document.getElementById("username").value;
+            let usernameInput = document.getElementById("username");
+            user = usernameInput.value.trim();
+            
             if (!user) {
                 alert("Please enter a name!");
                 return;
@@ -742,7 +745,7 @@
             megaCostSpan = document.getElementById("megaCost");
             
             update();
-            updateLeaderboard();
+            updateLeaderboardDisplay();
         }
 
         // Update Display
@@ -751,7 +754,9 @@
             
             if (clipsSpan) clipsSpan.innerText = Math.floor(clips).toLocaleString();
             if (casinoClips) casinoClips.innerText = Math.floor(clips).toLocaleString();
-            document.getElementById("clipsDisplay").innerText = Math.floor(clips).toLocaleString();
+            
+            let clipsDisplay = document.getElementById("clipsDisplay");
+            if (clipsDisplay) clipsDisplay.innerText = Math.floor(clips).toLocaleString();
             
             if (autoSpan) autoSpan.innerText = autos;
             if (megaSpan) megaSpan.innerText = megas;
@@ -763,8 +768,24 @@
             if (rebirthMultSpan) rebirthMultSpan.innerText = rebirthMult.toFixed(1) + "x";
             
             // Update upgrade cards
-            document.getElementById("autoUpgrade").classList.toggle("disabled", clips < autoCost);
-            document.getElementById("megaUpgrade").classList.toggle("disabled", clips < megaCost);
+            let autoUpgrade = document.getElementById("autoUpgrade");
+            let megaUpgrade = document.getElementById("megaUpgrade");
+            
+            if (autoUpgrade) {
+                if (clips < autoCost) {
+                    autoUpgrade.classList.add("disabled");
+                } else {
+                    autoUpgrade.classList.remove("disabled");
+                }
+            }
+            
+            if (megaUpgrade) {
+                if (clips < megaCost) {
+                    megaUpgrade.classList.add("disabled");
+                } else {
+                    megaUpgrade.classList.remove("disabled");
+                }
+            }
             
             // Save game
             save();
@@ -772,15 +793,24 @@
 
         // Auto production
         setInterval(() => {
-            clips += (autos * 10 + megas * 40) * rebirthMult * productionBoost;
-            update();
+            if (user) {
+                clips += (autos * 10 + megas * 40) * rebirthMult * productionBoost;
+                update();
+            }
         }, 1000);
 
         // Save Game
         function save() {
             if (user) {
                 localStorage.setItem("paper_" + user, JSON.stringify({
-                    clips, autos, autoCost, megas, megaCost, rebirthMult, productionBoost, achievements
+                    clips: clips,
+                    autos: autos,
+                    autoCost: autoCost,
+                    megas: megas,
+                    megaCost: megaCost,
+                    rebirthMult: rebirthMult,
+                    productionBoost: productionBoost,
+                    achievements: achievements
                 }));
             }
         }
@@ -794,7 +824,7 @@
             let rect = document.querySelector(".clip-button").getBoundingClientRect();
             let float = document.createElement("div");
             float.className = "floating-number";
-            float.innerText = "+" + Math.floor(gain);
+            float.innerText = "+" Math.floor(gain);
             float.style.left = rect.left + rect.width/2 + "px";
             float.style.top = rect.top + "px";
             document.body.appendChild(float);
@@ -827,7 +857,7 @@
         function rebirth() {
             if (clips >= 1000000) {
                 // Add to leaderboard
-                leaderboard.push({ user, score: clips });
+                leaderboard.push({ user: user, score: clips });
                 leaderboard.sort((a, b) => b.score - a.score);
                 leaderboard = leaderboard.slice(0, 5);
                 localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
@@ -841,13 +871,13 @@
                 rebirthMult++;
                 
                 update();
-                updateLeaderboard();
+                updateLeaderboardDisplay();
                 showAchievement("Rebirth " + rebirthMult + "!");
             }
         }
 
-        // Update Leaderboard
-        function updateLeaderboard() {
+        // Update Leaderboard Display
+        function updateLeaderboardDisplay() {
             let list = document.getElementById("leaderboardList");
             if (!list) return;
             
@@ -882,13 +912,20 @@
         }
 
         function showGame(game) {
-            document.querySelectorAll(".game-btn").forEach(btn => btn.classList.remove("active"));
+            // Remove active class from all game buttons
+            document.querySelectorAll(".game-btn").forEach(btn => {
+                btn.classList.remove("active");
+            });
+            
+            // Add active class to clicked button
             event.target.classList.add("active");
             
+            // Hide all games
             document.getElementById("blackjackGame").style.display = "none";
             document.getElementById("slotsGame").style.display = "none";
             document.getElementById("rouletteGame").style.display = "none";
             
+            // Show selected game
             document.getElementById(game + "Game").style.display = "block";
         }
 
@@ -902,19 +939,24 @@
                     deck.push({ rank: r, suit: s });
                 }
             }
-            deck.sort(() => Math.random() - 0.5);
+            // Shuffle
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
         }
 
-        function value(c) {
+        function getCardValue(c) {
             if (c.rank === "A") return 11;
             if (["K", "Q", "J"].includes(c.rank)) return 10;
             return parseInt(c.rank);
         }
 
-        function total(hand) {
-            let t = 0, aces = 0;
+        function getHandTotal(hand) {
+            let t = 0;
+            let aces = 0;
             for (let c of hand) {
-                t += value(c);
+                t += getCardValue(c);
                 if (c.rank === "A") aces++;
             }
             while (t > 21 && aces > 0) {
@@ -963,15 +1005,15 @@
                 }
             });
             
-            document.getElementById("playerTotal").innerText = total(player);
-            document.getElementById("dealerTotal").innerText = hideDealer ? "?" : total(dealer);
+            document.getElementById("playerTotal").innerText = getHandTotal(player);
+            document.getElementById("dealerTotal").innerText = hideDealer ? "?" : getHandTotal(dealer);
         }
 
         function hit() {
             if (!bjActive) return;
             player.push(deck.pop());
             renderBJ(true);
-            if (total(player) > 21) {
+            if (getHandTotal(player) > 21) {
                 document.getElementById("bjResult").innerText = "Bust!";
                 bjActive = false;
             }
@@ -979,11 +1021,11 @@
 
         function stand() {
             if (!bjActive) return;
-            while (total(dealer) < 17) {
+            while (getHandTotal(dealer) < 17) {
                 dealer.push(deck.pop());
             }
-            let p = total(player);
-            let d = total(dealer);
+            let p = getHandTotal(player);
+            let d = getHandTotal(dealer);
             renderBJ(false);
             
             if (d > 21 || p > d) {
@@ -1010,7 +1052,7 @@
             player.push(deck.pop());
             renderBJ(true);
             
-            if (total(player) > 21) {
+            if (getHandTotal(player) > 21) {
                 document.getElementById("bjResult").innerText = "Bust!";
                 bjActive = false;
                 update();
@@ -1030,26 +1072,4 @@
 
         // Slots
         function spinSlots() {
-            let bet = parseInt(document.getElementById("slotsBet").value);
-            if (bet > clips || bet <= 0) {
-                alert("Invalid bet!");
-                return;
-            }
-            
-            clips -= bet;
-            
-            let symbols = ["🍒", "🍋", "🍊", "🍇", "💎", "7️⃣"];
-            let reel1 = symbols[Math.floor(Math.random() * symbols.length)];
-            let reel2 = symbols[Math.floor(Math.random() * symbols.length)];
-            let reel3 = symbols[Math.floor(Math.random() * symbols.length)];
-            
-            document.getElementById("slot1").innerText = reel1;
-            document.getElementById("slot2").innerText = reel2;
-            document.getElementById("slot3").innerText = reel3;
-            
-            let multiplier = 0;
-            if (reel1 === reel2 && reel2 === reel3) {
-                if (reel1 === "7️⃣") multiplier = 10;
-                else if (reel1 === "💎") multiplier = 7;
-                else multiplier = 5;
-            } else if (reel1
+            let bet = parseInt(document
