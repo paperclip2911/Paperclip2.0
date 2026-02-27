@@ -2,39 +2,27 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Paperclip Empire 5.5</title>
+<title>Paperclip Empire</title>
 <style>
 body{
     margin:0;
-    background:linear-gradient(135deg,#111,#1c1c1c);
+    background:#121212;
     color:#eee;
     font-family:Arial;
-}
-#loginScreen{
-    position:fixed;
-    inset:0;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    background:radial-gradient(circle,#222,#000);
-}
-#loginBox{
-    background:#1e1e1e;
-    padding:30px;
-    border-radius:12px;
-    box-shadow:0 0 20px #000;
-    text-align:center;
-}
-input,button{
-    padding:8px;
-    margin:6px;
 }
 .panel{
     background:#1e1e1e;
     padding:15px;
     margin:10px;
     border-radius:10px;
+}
+.container{
+    display:flex;
+}
+.bigButton{
+    width:200px;
+    height:200px;
+    font-size:20px;
 }
 .card{
     display:inline-block;
@@ -60,23 +48,36 @@ input,button{
 </head>
 <body>
 
-<div id="loginScreen">
-<div id="loginBox">
-<h1>Paperclip Empire</h1>
-<p>Enter Username</p>
-<input id="username">
-<br>
-<button onclick="login()">Enter</button>
-</div>
-</div>
-
-<div id="game" style="display:none;padding:15px">
+<h2 style="padding:10px;">Paperclip Empire</h2>
 <button onclick="openCasino()">🎰 Casino</button>
-<h2>Clips: <span id="clips">0</span></h2>
+
+<div class="container">
+<div class="panel">
+<h3>Clips: <span id="clips">0</span></h3>
+<button class="bigButton" onclick="clickClip()">MAKE PAPERCLIP</button>
+<p>Per Click: <span id="perClick">1</span></p>
+<p>Per Second: <span id="perSecond">0</span></p>
 </div>
 
+<div class="panel">
+<h3>Auto Clickers</h3>
+<button onclick="buyAuto()">Buy Auto (<span id="autoCost">50</span>)</button>
+<p>Owned: <span id="autos">0</span></p>
+
+<h3>Mega Auto Clicker</h3>
+<button onclick="buyMega()">Buy Mega (<span id="megaCost">500</span>)</button>
+<p>Owned: <span id="megas">0</span></p>
+
+<h3>Rebirth</h3>
+<button onclick="rebirth()">Rebirth (1M)</button>
+<p>Multiplier: x<span id="rebirthMult">1</span></p>
+</div>
+</div>
+
+<!-- CASINO -->
 <div id="casinoRoom">
 <button onclick="closeCasino()">Close</button>
+
 <h2>Blackjack</h2>
 Bet <input id="bjBet" type="number" value="50">
 <button onclick="startBJ()">Start</button>
@@ -94,29 +95,86 @@ Bet <input id="bjBet" type="number" value="50">
 </div>
 
 <script>
-let user=""
-let clips=1000
+let clips=0
+let perClick=1
+let autos=0
+let autoCost=50
+let megas=0
+let megaCost=500
+let rebirthMult=1
 
-/* SAVE SYSTEM */
+/* SAVE */
 function save(){
-localStorage.setItem("paper_"+user,JSON.stringify({clips}))
+localStorage.setItem("paperSave",JSON.stringify({
+clips,autos,autoCost,megas,megaCost,rebirthMult
+}))
 }
 function load(){
-let data=JSON.parse(localStorage.getItem("paper_"+user))
-if(data) clips=data.clips
+let data=JSON.parse(localStorage.getItem("paperSave"))
+if(data){
+clips=data.clips
+autos=data.autos
+autoCost=data.autoCost
+megas=data.megas
+megaCost=data.megaCost
+rebirthMult=data.rebirthMult
 }
-function login(){
-user=username.value
-if(!user)return
+}
 load()
-loginScreen.style.display="none"
-game.style.display="block"
-update()
-}
+
 function update(){
 clips=Math.floor(clips)
 document.getElementById("clips").innerText=clips
+document.getElementById("perClick").innerText=perClick
+document.getElementById("autos").innerText=autos
+document.getElementById("megas").innerText=megas
+document.getElementById("autoCost").innerText=autoCost
+document.getElementById("megaCost").innerText=megaCost
+document.getElementById("perSecond").innerText=(autos + megas*10)*rebirthMult
+document.getElementById("rebirthMult").innerText=rebirthMult
 save()
+}
+
+setInterval(()=>{
+clips+=(autos + megas*10)*rebirthMult
+update()
+},1000)
+
+function clickClip(){
+clips+=perClick*rebirthMult
+update()
+}
+
+/* AUTO CLICKER (COST SCALES) */
+function buyAuto(){
+if(clips>=autoCost){
+clips-=autoCost
+autos++
+autoCost=Math.floor(autoCost*1.25)
+update()
+}
+}
+
+/* MEGA AUTO CLICKER */
+function buyMega(){
+if(clips>=megaCost){
+clips-=megaCost
+megas++
+megaCost=Math.floor(megaCost*1.4)
+update()
+}
+}
+
+function rebirth(){
+if(clips>=1000000){
+clips=0
+autos=0
+megas=0
+autoCost=50
+megaCost=500
+rebirthMult++
+update()
+}
 }
 
 /* CASINO */
@@ -124,9 +182,7 @@ function openCasino(){casinoRoom.style.display="block"}
 function closeCasino(){casinoRoom.style.display="none"}
 
 /* BLACKJACK SYSTEM */
-let deck=[]
-let player=[]
-let dealer=[]
+let deck=[],player=[],dealer=[]
 let bjActive=false
 let currentBet=0
 let doubled=false
@@ -196,7 +252,7 @@ if(!bjActive)return
 player.push(deck.pop())
 render()
 if(handTotal(player)>21){
-bjResult.innerText="Bust! Dealer Wins"
+bjResult.innerText="Bust!"
 bjActive=false
 }
 }
@@ -213,7 +269,7 @@ clips+=currentBet*2
 bjResult.innerText="You Win!"
 }else if(p===d){
 clips+=currentBet
-bjResult.innerText="Push!"
+bjResult.innerText="Push"
 }else{
 bjResult.innerText="Dealer Wins"
 }
