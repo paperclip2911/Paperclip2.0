@@ -3,67 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎰 Paper Clip Casino - Full Game</title>
+    <title>🎰 Paper Clip Casino</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
         }
 
-        html, body {
-            height: 100%;
-            overflow: hidden;
+        body {
             background: linear-gradient(135deg, #0a0f1a, #1a2f3f);
-        }
-
-        /* Game Wrapper with Scroll */
-        .game-wrapper {
-            width: 100%;
-            height: 100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
+            min-height: 100vh;
             padding: 20px;
-            scroll-behavior: smooth;
-        }
-
-        .game-wrapper::-webkit-scrollbar {
-            width: 12px;
-        }
-
-        .game-wrapper::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-        }
-
-        .game-wrapper::-webkit-scrollbar-thumb {
-            background: linear-gradient(45deg, gold, orange);
-            border-radius: 10px;
-        }
-
-        /* Animated Background */
-        .bg-animation {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .floating-clip {
-            position: absolute;
-            font-size: 3em;
-            animation: floatClip 15s infinite linear;
-            opacity: 0.1;
-            color: gold;
-        }
-
-        @keyframes floatClip {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.1; }
-            90% { opacity: 0.1; }
-            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
         }
 
         /* Login Screen */
@@ -73,61 +25,52 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(20, 30, 40, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 60px;
-            border-radius: 50px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 0 3px gold, 0 0 50px gold;
+            padding: 40px;
+            border-radius: 30px;
+            border: 3px solid gold;
             text-align: center;
             z-index: 100;
             width: 90%;
-            max-width: 550px;
+            max-width: 400px;
         }
 
         #loginScreen h2 {
             color: gold;
-            font-size: 4em;
-            margin-bottom: 20px;
-            text-shadow: 0 0 20px gold;
+            font-size: 2.5em;
+            margin-bottom: 30px;
         }
 
         #username {
             width: 100%;
-            padding: 20px 25px;
+            padding: 15px;
             font-size: 1.2em;
-            border: none;
-            border-radius: 60px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            outline: none;
             border: 2px solid gold;
-            margin-bottom: 25px;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            margin-bottom: 20px;
         }
 
         #loginBtn {
-            background: linear-gradient(45deg, #ffd700, #ffa500);
-            color: black;
+            width: 100%;
+            padding: 15px;
+            background: gold;
             border: none;
-            border-radius: 60px;
-            padding: 20px 50px;
-            font-size: 1.8em;
+            border-radius: 30px;
+            font-size: 1.5em;
             font-weight: bold;
             cursor: pointer;
-            border: 2px solid white;
-            width: 100%;
         }
 
         #loginBtn:hover {
             transform: scale(1.05);
-            box-shadow: 0 10px 30px gold;
         }
 
         /* Game Container */
         #game {
             display: none;
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            position: relative;
-            z-index: 10;
         }
 
         /* Stats Bar */
@@ -135,19 +78,15 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
-            margin-bottom: 30px;
-            position: sticky;
-            top: 0;
-            z-index: 50;
+            margin-bottom: 20px;
         }
 
         .stat-item {
             background: rgba(20, 30, 40, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
+            border: 2px solid gold;
+            border-radius: 20px;
             padding: 20px;
             text-align: center;
-            border: 2px solid gold;
         }
 
         .stat-label {
@@ -157,48 +96,42 @@
 
         .stat-value {
             color: white;
-            font-size: 2.5em;
+            font-size: 2em;
             font-weight: bold;
         }
 
         /* Main Game Area */
         .game-area {
             display: grid;
-            grid-template-columns: 1fr 1.5fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         /* Clicker Section */
         .clicker-section {
             background: rgba(20, 30, 40, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 40px;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             border: 2px solid gold;
+            border-radius: 30px;
+            padding: 30px;
+            text-align: center;
         }
 
         .clip-counter {
-            font-size: 4em;
             color: white;
-            margin-bottom: 30px;
-            text-shadow: 0 0 30px gold;
+            font-size: 3em;
+            margin-bottom: 20px;
         }
 
         .clip-button {
-            width: 220px;
-            height: 220px;
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #ffd700, #ff8c00);
+            background: gold;
             border: none;
-            cursor: pointer;
-            font-size: 2.2em;
+            font-size: 2em;
             font-weight: bold;
-            color: black;
-            box-shadow: 0 20px 40px gold;
+            cursor: pointer;
             border: 3px solid white;
         }
 
@@ -209,35 +142,22 @@
         /* Upgrades Section */
         .upgrades-section {
             background: rgba(20, 30, 40, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 40px;
-            padding: 30px;
             border: 2px solid gold;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-
-        .upgrades-section::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .upgrades-section::-webkit-scrollbar-thumb {
-            background: gold;
-            border-radius: 10px;
+            border-radius: 30px;
+            padding: 30px;
         }
 
         .upgrade-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 25px;
-            margin-bottom: 20px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid gold;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
             cursor: pointer;
-            border: 2px solid transparent;
         }
 
         .upgrade-card:hover {
-            border-color: gold;
-            transform: translateX(10px);
+            background: rgba(255,255,255,0.2);
         }
 
         .upgrade-card.disabled {
@@ -247,8 +167,21 @@
 
         .upgrade-name {
             color: gold;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        /* Casino Button */
+        .casino-btn {
+            width: 100%;
+            padding: 20px;
+            background: gold;
+            border: none;
+            border-radius: 30px;
             font-size: 1.5em;
             font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
         }
 
         /* Casino Modal */
@@ -259,93 +192,64 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.98);
-            z-index: 1000;
+            background: rgba(0,0,0,0.95);
+            z-index: 200;
             overflow-y: auto;
             padding: 20px;
         }
 
-        #casinoModal::-webkit-scrollbar {
-            width: 12px;
-        }
-
-        #casinoModal::-webkit-scrollbar-thumb {
-            background: gold;
-            border-radius: 10px;
-        }
-
         .casino-content {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 40px auto;
             background: #1a2a3a;
-            padding: 40px;
-            border-radius: 50px;
             border: 3px solid gold;
-            box-shadow: 0 0 50px gold;
+            border-radius: 30px;
+            padding: 30px;
         }
 
         .close-casino {
-            position: sticky;
-            top: 20px;
             float: right;
             background: red;
             color: white;
             border: none;
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             font-size: 2em;
             cursor: pointer;
-            border: 2px solid white;
-            z-index: 1100;
-        }
-
-        .close-casino:hover {
-            background: darkred;
-            transform: rotate(90deg);
         }
 
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr 1fr;
             gap: 30px;
-            margin-top: 40px;
+            margin-top: 30px;
         }
 
-        /* Blackjack Table */
+        /* Blackjack */
         .blackjack-table {
             background: #0d5e3d;
-            padding: 30px;
-            border-radius: 30px;
             border: 2px solid gold;
+            border-radius: 20px;
+            padding: 20px;
         }
 
         .cards {
             display: flex;
             gap: 10px;
-            margin: 20px 0;
-            min-height: 150px;
+            min-height: 120px;
+            margin: 10px 0;
             flex-wrap: wrap;
         }
 
         .card {
             background: white;
-            color: black;
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
-            font-size: 2em;
+            font-size: 1.5em;
             font-weight: bold;
-            min-width: 80px;
+            min-width: 60px;
             text-align: center;
-            box-shadow: 0 5px 10px black;
-        }
-
-        .card.red {
-            color: red;
-        }
-
-        .card.black {
-            color: black;
         }
 
         .bj-controls {
@@ -356,21 +260,20 @@
         }
 
         .bj-controls button {
-            padding: 15px;
+            padding: 10px;
             background: gold;
             border: none;
             border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 1.2em;
         }
 
-        /* Plinko Board */
+        /* Plinko */
         .plinko-board {
             background: #0d5e3d;
-            padding: 30px;
-            border-radius: 30px;
             border: 2px solid gold;
+            border-radius: 20px;
+            padding: 20px;
             text-align: center;
         }
 
@@ -389,46 +292,30 @@
         }
 
         .plinko-peg {
-            width: 40px;
-            height: 40px;
-            background: gold;
-            border-radius: 50%;
-            box-shadow: 0 0 10px gold;
-        }
-
-        .plinko-ball {
             width: 30px;
             height: 30px;
-            background: white;
+            background: gold;
             border-radius: 50%;
-            position: relative;
-            animation: drop 2s ease-in;
-        }
-
-        @keyframes drop {
-            0% { transform: translateY(-200px); }
-            100% { transform: translateY(0); }
         }
 
         .plinko-slots {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-top: 30px;
+            gap: 10px;
+            margin-top: 20px;
         }
 
         .plinko-slot {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             background: rgba(0,0,0,0.5);
             border: 2px solid gold;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5em;
-            font-weight: bold;
             color: gold;
+            font-weight: bold;
         }
 
         .plinko-slot.highlight {
@@ -439,55 +326,46 @@
         /* Rebirth Section */
         .rebirth-section {
             background: rgba(20, 30, 40, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 40px;
-            padding: 40px;
-            margin: 30px 0;
-            text-align: center;
             border: 2px solid gold;
+            border-radius: 30px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
         }
 
         .rebirth-btn {
-            background: linear-gradient(45deg, #ff1493, #ff00ff);
+            background: linear-gradient(45deg, purple, pink);
             color: white;
-            font-size: 2em;
-            padding: 20px 50px;
             border: none;
-            border-radius: 60px;
+            padding: 20px 40px;
+            border-radius: 30px;
+            font-size: 1.5em;
+            font-weight: bold;
             cursor: pointer;
-            border: 3px solid white;
-        }
-
-        .rebirth-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 20px 40px rgba(255, 0, 255, 0.5);
         }
 
         /* Leaderboard */
         .leaderboard {
             background: rgba(20, 30, 40, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            padding: 30px;
             border: 2px solid gold;
+            border-radius: 20px;
+            padding: 20px;
         }
 
         .leaderboard h2 {
             color: gold;
-            font-size: 2em;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .leaderboard-item {
+            color: white;
+            padding: 10px;
+            border-bottom: 1px solid gold;
             display: flex;
             justify-content: space-between;
-            color: white;
-            padding: 15px;
-            border-bottom: 1px solid gold;
-            font-size: 1.2em;
         }
 
-        /* Floating Number Animation */
+        /* Floating Number */
         .floating-number {
             position: fixed;
             color: gold;
@@ -495,8 +373,7 @@
             font-weight: bold;
             animation: floatUp 1s ease-out forwards;
             pointer-events: none;
-            z-index: 2000;
-            text-shadow: 2px 2px 2px black;
+            z-index: 1000;
         }
 
         @keyframes floatUp {
@@ -504,19 +381,16 @@
             100% { transform: translateY(-100px); opacity: 0; }
         }
 
-        .achievement-popup {
+        .achievement {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: linear-gradient(135deg, gold, orange);
+            background: gold;
             color: black;
-            padding: 20px 30px;
-            border-radius: 50px;
-            z-index: 3000;
-            font-weight: bold;
-            font-size: 1.3em;
-            border: 2px solid white;
+            padding: 15px 30px;
+            border-radius: 30px;
             animation: slideIn 0.5s;
+            z-index: 1001;
         }
 
         @keyframes slideIn {
@@ -524,163 +398,114 @@
             to { transform: translateX(0); }
         }
 
-        .welcome-message {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: gold;
-            color: black;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1.2em;
-            animation: slideIn 0.5s;
-            z-index: 100;
-            border: 2px solid white;
-        }
-
-        /* Progress Bar */
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            margin: 20px 0;
-            overflow: hidden;
-            border: 1px solid gold;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, gold, orange);
-            transition: width 0.3s;
+        input {
+            color: white;
         }
     </style>
 </head>
 <body>
-    <!-- Animated Background -->
-    <div class="bg-animation" id="bgAnimation"></div>
-
     <!-- Login Screen -->
     <div id="loginScreen">
-        <h2>🎰 PAPER CLIP</h2>
-        <h2 style="font-size: 2.5em; margin-top: -20px;">CASINO</h2>
-        <div style="color: white; margin-bottom: 30px;">Enter your name to start</div>
-        
-        <input type="text" id="username" placeholder="Your name..." maxlength="20">
-        <button id="loginBtn" onclick="login()">🎲 PLAY NOW</button>
-        <div id="loginError" style="color: #ff6b6b; margin-top: 15px;"></div>
+        <h2>🎰 PAPER CLIP CASINO</h2>
+        <input type="text" id="username" placeholder="Enter your name" autocomplete="off">
+        <button id="loginBtn" onclick="login()">PLAY NOW</button>
+        <div id="loginError" style="color: red; margin-top: 10px;"></div>
     </div>
 
     <!-- Main Game -->
-    <div class="game-wrapper" id="gameWrapper">
-        <div id="game">
-            <!-- Stats Bar -->
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="stat-label">PAPER CLIPS</div>
-                    <div class="stat-value" id="clips">0</div>
+    <div id="game">
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-label">PAPER CLIPS</div>
+                <div class="stat-value" id="clips">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">PER SECOND</div>
+                <div class="stat-value" id="perSecond">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">MULTIPLIER</div>
+                <div class="stat-value" id="rebirthMult">1x</div>
+            </div>
+        </div>
+
+        <!-- Main Game Area -->
+        <div class="game-area">
+            <!-- Clicker -->
+            <div class="clicker-section">
+                <div class="clip-counter" id="clipsDisplay">0</div>
+                <button class="clip-button" onclick="clickClip(event)">📎<br>CLICK</button>
+            </div>
+
+            <!-- Upgrades -->
+            <div class="upgrades-section">
+                <h2 style="color: gold; text-align: center;">⬆️ UPGRADES</h2>
+                
+                <div class="upgrade-card" onclick="buyAuto()" id="autoUpgrade">
+                    <div class="upgrade-name">🤖 AUTO CLIPPER</div>
+                    <div style="color: white;">+1/sec</div>
+                    <div style="color: orange;">Cost: <span id="autoCost">50</span></div>
+                    <div style="color: white;">Owned: <span id="autos">0</span></div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-label">PER SECOND</div>
-                    <div class="stat-value" id="perSecond">0</div>
+
+                <div class="upgrade-card" onclick="buyMega()" id="megaUpgrade">
+                    <div class="upgrade-name">⚡ MEGA CLIPPER</div>
+                    <div style="color: white;">+5/sec</div>
+                    <div style="color: orange;">Cost: <span id="megaCost">300</span></div>
+                    <div style="color: white;">Owned: <span id="megas">0</span></div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-label">MULTIPLIER</div>
-                    <div class="stat-value" id="rebirthMult">1x</div>
+
+                <div class="upgrade-card" onclick="buySuper()" id="superUpgrade">
+                    <div class="upgrade-name">💎 SUPER CLIPPER</div>
+                    <div style="color: white;">+25/sec</div>
+                    <div style="color: orange;">Cost: <span id="superCost">2000</span></div>
+                    <div style="color: white;">Owned: <span id="supers">0</span></div>
                 </div>
             </div>
 
-            <!-- Main Game Area -->
-            <div class="game-area">
-                <!-- Clicker -->
-                <div class="clicker-section">
-                    <div class="clip-counter" id="clipsDisplay">0</div>
-                    <button class="clip-button" onclick="clickClip(event)">📎<br>CLICK</button>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-                    </div>
-                    <div style="color: white;">To Rebirth: <span id="rebirthProgress">0/1M</span></div>
-                </div>
-
-                <!-- Upgrades -->
-                <div class="upgrades-section">
-                    <h2 style="color: gold; margin-bottom: 30px; font-size: 2.5em; text-align: center;">⬆️ UPGRADES</h2>
-                    
-                    <div class="upgrade-card" onclick="buyAuto()" id="autoUpgrade">
-                        <div class="upgrade-name">🤖 AUTO CLIPPER</div>
-                        <div style="color: white; font-size: 1.2em;">+1 clip/sec</div>
-                        <div style="color: orange; font-size: 1.3em; margin: 10px 0;">COST: <span id="autoCost">50</span></div>
-                        <div style="color: white; font-size: 1.8em;">OWNED: <span id="autos">0</span></div>
-                    </div>
-
-                    <div class="upgrade-card" onclick="buyMega()" id="megaUpgrade">
-                        <div class="upgrade-name">⚡ MEGA CLIPPER</div>
-                        <div style="color: white; font-size: 1.2em;">+5 clips/sec</div>
-                        <div style="color: orange; font-size: 1.3em; margin: 10px 0;">COST: <span id="megaCost">300</span></div>
-                        <div style="color: white; font-size: 1.8em;">OWNED: <span id="megas">0</span></div>
-                    </div>
-
-                    <div class="upgrade-card" onclick="buySuper()" id="superUpgrade">
-                        <div class="upgrade-name">💎 SUPER CLIPPER</div>
-                        <div style="color: white; font-size: 1.2em;">+25 clips/sec</div>
-                        <div style="color: orange; font-size: 1.3em; margin: 10px 0;">COST: <span id="superCost">2000</span></div>
-                        <div style="color: white; font-size: 1.8em;">OWNED: <span id="supers">0</span></div>
-                    </div>
-
-                    <div class="upgrade-card" onclick="buyUltra()" id="ultraUpgrade">
-                        <div class="upgrade-name">🚀 ULTRA CLIPPER</div>
-                        <div style="color: white; font-size: 1.2em;">+100 clips/sec</div>
-                        <div style="color: orange; font-size: 1.3em; margin: 10px 0;">COST: <span id="ultraCost">10000</span></div>
-                        <div style="color: white; font-size: 1.8em;">OWNED: <span id="ultras">0</span></div>
-                    </div>
-                </div>
-
-                <!-- Casino Button -->
-                <div class="clicker-section">
-                    <h2 style="color: gold; font-size: 2.5em;">🎰 CASINO</h2>
-                    <p style="color: white; font-size: 1.3em; margin: 30px 0;">Play Blackjack & Plinko!</p>
-                    <button onclick="openCasino()" style="background: gold; padding: 25px 40px; border: none; border-radius: 60px; font-size: 1.8em; font-weight: bold; cursor: pointer; border: 3px solid white; width: 100%;">OPEN CASINO</button>
-                    <div style="color: gold; margin-top: 30px; font-size: 1.3em;">Current Boost: <span id="boostDisplay">1x</span></div>
-                </div>
+            <!-- Casino Info -->
+            <div class="clicker-section">
+                <h2 style="color: gold;">🎰 CASINO</h2>
+                <p style="color: white; margin: 20px 0;">Play Blackjack & Plinko!</p>
+                <button class="casino-btn" onclick="openCasino()">OPEN CASINO</button>
+                <div style="color: gold; margin-top: 20px;">Boost: <span id="boostDisplay">1x</span></div>
             </div>
+        </div>
 
-            <!-- Rebirth -->
-            <div class="rebirth-section">
-                <button class="rebirth-btn" onclick="rebirth()" id="rebirthBtn">🔄 REBIRTH (1,000,000)</button>
-            </div>
+        <!-- Rebirth -->
+        <div class="rebirth-section">
+            <button class="rebirth-btn" onclick="rebirth()">🔄 REBIRTH (1,000,000)</button>
+        </div>
 
-            <!-- Leaderboard -->
-            <div class="leaderboard">
-                <h2>🏆 TOP PLAYERS</h2>
-                <div id="leaderboardList"></div>
-            </div>
+        <!-- Leaderboard -->
+        <div class="leaderboard">
+            <h2>🏆 TOP PLAYERS</h2>
+            <div id="leaderboardList"></div>
         </div>
     </div>
 
     <!-- Casino Modal -->
     <div id="casinoModal">
-        <button class="close-casino" onclick="closeCasino()">✖</button>
         <div class="casino-content">
+            <button class="close-casino" onclick="closeCasino()">✖</button>
             <h1 style="color: gold; text-align: center; font-size: 3em;">🎰 CASINO</h1>
-            <div style="color: white; font-size: 2em; text-align: center; margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 20px;">CLIPS: <span id="casinoClips">0</span></div>
+            <div style="color: white; font-size: 2em; text-align: center; margin: 20px 0;">CLIPS: <span id="casinoClips">0</span></div>
 
             <div class="games-grid">
                 <!-- Blackjack -->
                 <div class="blackjack-table">
-                    <h2 style="color: gold; text-align: center; font-size: 2em;">♠️ BLACKJACK</h2>
+                    <h2 style="color: gold; text-align: center;">♠️ BLACKJACK</h2>
                     
-                    <div style="margin: 20px 0;">
-                        <input type="number" id="bjBet" style="width: 100%; padding: 15px; border-radius: 10px; font-size: 1.2em;" value="100" min="1">
-                    </div>
+                    <input type="number" id="bjBet" style="width: 100%; padding: 10px; margin: 10px 0;" value="100">
 
-                    <div style="color: white; font-size: 1.3em;">DEALER:</div>
+                    <div style="color: white;">DEALER:</div>
                     <div class="cards" id="dealerCards"></div>
-                    <div style="color: white;">Total: <span id="dealerTotal">0</span></div>
+                    <div style="color: white;" id="dealerTotal">0</div>
 
                     <div style="color: white; margin-top: 20px;">PLAYER:</div>
                     <div class="cards" id="playerCards"></div>
-                    <div style="color: white;">Total: <span id="playerTotal">0</span></div>
+                    <div style="color: white;" id="playerTotal">0</div>
 
                     <div class="bj-controls">
                         <button onclick="hit()">HIT</button>
@@ -689,24 +514,22 @@
                         <button onclick="split()">SPLIT</button>
                     </div>
 
-                    <button onclick="startBJ()" style="width: 100%; padding: 15px; background: gold; border: none; border-radius: 10px; font-weight: bold; font-size: 1.2em; margin-top: 10px; cursor: pointer;">DEAL CARDS</button>
-                    <div id="bjResult" style="color: gold; text-align: center; margin-top: 10px; font-size: 1.5em;"></div>
+                    <button onclick="startBJ()" style="width: 100%; padding: 15px; background: gold; border: none; border-radius: 10px; font-weight: bold;">DEAL</button>
+                    <div id="bjResult" style="color: gold; text-align: center; margin-top: 10px;"></div>
                 </div>
 
                 <!-- Plinko -->
                 <div class="plinko-board">
-                    <h2 style="color: gold; text-align: center; font-size: 2em;">📌 PLINKO</h2>
+                    <h2 style="color: gold; text-align: center;">📌 PLINKO</h2>
                     
-                    <div style="margin: 20px 0;">
-                        <input type="number" id="plinkoBet" style="width: 100%; padding: 15px; border-radius: 10px; font-size: 1.2em;" value="50" min="1">
-                    </div>
+                    <input type="number" id="plinkoBet" style="width: 100%; padding: 10px; margin: 10px 0;" value="50">
 
                     <div class="plinko-grid" id="plinkoGrid"></div>
 
                     <div class="plinko-slots" id="plinkoSlots"></div>
 
-                    <button onclick="dropPlinko()" style="width: 100%; padding: 20px; background: gold; border: none; border-radius: 30px; font-weight: bold; font-size: 1.5em; margin: 20px 0; cursor: pointer;">🎮 DROP BALL</button>
-                    <div id="plinkoResult" style="color: gold; font-size: 1.8em; text-align: center;"></div>
+                    <button onclick="dropPlinko()" style="width: 100%; padding: 15px; background: gold; border: none; border-radius: 10px; font-weight: bold; margin: 10px 0;">DROP BALL</button>
+                    <div id="plinkoResult" style="color: gold; font-size: 1.5em;"></div>
                 </div>
             </div>
         </div>
@@ -722,8 +545,6 @@
         let megaCost = 300;
         let supers = 0;
         let superCost = 2000;
-        let ultras = 0;
-        let ultraCost = 10000;
         let rebirthMult = 1;
         let productionBoost = 1;
         let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
@@ -736,29 +557,13 @@
         let currentBet = 0;
         let doubled = false;
 
-        // Create animated background
-        function createBackground() {
-            let bg = document.getElementById('bgAnimation');
-            for (let i = 0; i < 30; i++) {
-                let clip = document.createElement('div');
-                clip.className = 'floating-clip';
-                clip.innerHTML = '📎';
-                clip.style.left = Math.random() * 100 + '%';
-                clip.style.animationDelay = Math.random() * 10 + 's';
-                clip.style.animationDuration = (Math.random() * 10 + 10) + 's';
-                clip.style.fontSize = (Math.random() * 4 + 2) + 'em';
-                bg.appendChild(clip);
-            }
-        }
-        createBackground();
-
-        // Login function
+        // Login Function
         function login() {
-            let usernameInput = document.getElementById('username');
-            user = usernameInput.value.trim();
+            let input = document.getElementById('username');
+            user = input.value.trim();
             
             if (!user) {
-                document.getElementById('loginError').innerText = '❌ Please enter your name!';
+                document.getElementById('loginError').innerText = 'Please enter a name!';
                 return;
             }
             
@@ -773,27 +578,17 @@
                 megaCost = data.megaCost || 300;
                 supers = data.supers || 0;
                 superCost = data.superCost || 2000;
-                ultras = data.ultras || 0;
-                ultraCost = data.ultraCost || 10000;
                 rebirthMult = data.rebirthMult || 1;
                 productionBoost = data.productionBoost || 1;
             }
             
-            // Hide login, show game
             document.getElementById('loginScreen').style.display = 'none';
-            
-            // Show welcome message
-            let welcome = document.createElement('div');
-            welcome.className = 'welcome-message';
-            welcome.innerText = '🎉 Welcome, ' + user + '!';
-            document.body.appendChild(welcome);
-            setTimeout(() => welcome.remove(), 3000);
-            
             update();
             updateLeaderboard();
+            showMessage('Welcome ' + user + '!');
         }
 
-        // Update display
+        // Update Display
         function update() {
             clips = Math.max(0, clips);
             
@@ -805,40 +600,32 @@
             document.getElementById('autos').innerText = autos;
             document.getElementById('megas').innerText = megas;
             document.getElementById('supers').innerText = supers;
-            document.getElementById('ultras').innerText = ultras;
             
             document.getElementById('autoCost').innerText = Math.floor(autoCost);
             document.getElementById('megaCost').innerText = Math.floor(megaCost);
             document.getElementById('superCost').innerText = Math.floor(superCost);
-            document.getElementById('ultraCost').innerText = Math.floor(ultraCost);
             
-            let perSecond = (autos * 1 + megas * 5 + supers * 25 + ultras * 100) * rebirthMult * productionBoost;
+            let perSecond = (autos * 1 + megas * 5 + supers * 25) * rebirthMult * productionBoost;
             document.getElementById('perSecond').innerText = perSecond.toFixed(1);
             document.getElementById('rebirthMult').innerText = rebirthMult.toFixed(1) + 'x';
-            
-            // Progress to rebirth
-            let rebirthProgress = Math.min(100, (clips / 1000000) * 100);
-            document.getElementById('progressFill').style.width = rebirthProgress + '%';
-            document.getElementById('rebirthProgress').innerText = Math.floor(clips).toLocaleString() + '/1,000,000';
             
             // Update disabled state
             document.getElementById('autoUpgrade').className = clips >= autoCost ? 'upgrade-card' : 'upgrade-card disabled';
             document.getElementById('megaUpgrade').className = clips >= megaCost ? 'upgrade-card' : 'upgrade-card disabled';
             document.getElementById('superUpgrade').className = clips >= superCost ? 'upgrade-card' : 'upgrade-card disabled';
-            document.getElementById('ultraUpgrade').className = clips >= ultraCost ? 'upgrade-card' : 'upgrade-card disabled';
             
             // Save game
             if (user) {
                 localStorage.setItem('paper_' + user, JSON.stringify({
-                    clips, autos, autoCost, megas, megaCost, supers, superCost, ultras, ultraCost, rebirthMult, productionBoost
+                    clips, autos, autoCost, megas, megaCost, supers, superCost, rebirthMult, productionBoost
                 }));
             }
         }
 
-        // Auto production
+        // Auto Production
         setInterval(() => {
             if (user) {
-                clips += (autos * 1 + megas * 5 + supers * 25 + ultras * 100) * rebirthMult * productionBoost;
+                clips += (autos * 1 + megas * 5 + supers * 25) * rebirthMult * productionBoost;
                 update();
             }
         }, 1000);
@@ -848,23 +635,19 @@
             let gain = 1 * rebirthMult * productionBoost;
             clips += gain;
             
-            // Floating numbers
-            for (let i = 0; i < 3; i++) {
-                setTimeout(() => {
-                    let float = document.createElement('div');
-                    float.className = 'floating-number';
-                    float.innerText = '+' + Math.floor(gain);
-                    float.style.left = (event.clientX + (Math.random() - 0.5) * 100) + 'px';
-                    float.style.top = event.clientY + 'px';
-                    document.body.appendChild(float);
-                    setTimeout(() => float.remove(), 1000);
-                }, i * 100);
-            }
+            // Floating number
+            let float = document.createElement('div');
+            float.className = 'floating-number';
+            float.innerText = '+' + Math.floor(gain);
+            float.style.left = event.clientX + 'px';
+            float.style.top = event.clientY + 'px';
+            document.body.appendChild(float);
+            setTimeout(() => float.remove(), 1000);
             
             update();
         }
 
-        // Buy upgrades
+        // Buy Upgrades
         function buyAuto() {
             if (clips >= autoCost) {
                 clips -= autoCost;
@@ -892,15 +675,6 @@
             }
         }
 
-        function buyUltra() {
-            if (clips >= ultraCost) {
-                clips -= ultraCost;
-                ultras++;
-                ultraCost = Math.floor(ultraCost * 1.8);
-                update();
-            }
-        }
-
         // Rebirth
         function rebirth() {
             if (clips >= 1000000) {
@@ -915,24 +689,22 @@
                 autos = 0;
                 megas = 0;
                 supers = 0;
-                ultras = 0;
                 autoCost = 50;
                 megaCost = 300;
                 superCost = 2000;
-                ultraCost = 10000;
                 rebirthMult++;
                 
                 update();
                 updateLeaderboard();
-                showAchievement('REBIRTH ' + rebirthMult + '!');
+                showMessage('REBIRTH ' + rebirthMult + '!');
             }
         }
 
-        // Update leaderboard
+        // Update Leaderboard
         function updateLeaderboard() {
             let html = '';
             if (leaderboard.length === 0) {
-                html = '<div style="color: white; text-align: center;">No players yet</div>';
+                html = '<div class="leaderboard-item">No players yet</div>';
             } else {
                 leaderboard.forEach((entry, i) => {
                     html += `<div class="leaderboard-item"><span>${i+1}. ${entry.name}</span><span>${Math.floor(entry.score).toLocaleString()}</span></div>`;
@@ -941,16 +713,16 @@
             document.getElementById('leaderboardList').innerHTML = html;
         }
 
-        // Show achievement
-        function showAchievement(text) {
-            let popup = document.createElement('div');
-            popup.className = 'achievement-popup';
-            popup.innerText = '🏆 ' + text;
-            document.body.appendChild(popup);
-            setTimeout(() => popup.remove(), 3000);
+        // Show Message
+        function showMessage(text) {
+            let msg = document.createElement('div');
+            msg.className = 'achievement';
+            msg.innerText = '🏆 ' + text;
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 3000);
         }
 
-        // Casino functions
+        // Casino Functions
         function openCasino() {
             document.getElementById('casinoModal').style.display = 'block';
             createPlinkoBoard();
@@ -992,4 +764,181 @@
                 if (card.rank === 'A') aces++;
             }
             while (total > 21 && aces > 0) {
-                total -= 10
+                total -= 10;
+                aces--;
+            }
+            return total;
+        }
+
+        function startBJ() {
+            let bet = parseInt(document.getElementById('bjBet').value);
+            if (bet > clips || bet <= 0) {
+                alert('Invalid bet!');
+                return;
+            }
+            
+            createDeck();
+            player = [deck.pop(), deck.pop()];
+            dealer = [deck.pop(), deck.pop()];
+            clips -= bet;
+            currentBet = bet;
+            bjActive = true;
+            doubled = false;
+            
+            renderBJ(true);
+            update();
+        }
+
+        function renderBJ(hideDealer) {
+            let playerCards = document.getElementById('playerCards');
+            let dealerCards = document.getElementById('dealerCards');
+            
+            playerCards.innerHTML = '';
+            dealerCards.innerHTML = '';
+            
+            player.forEach(card => {
+                playerCards.innerHTML += `<div class="card">${card.rank}${card.suit}</div>`;
+            });
+            
+            dealer.forEach((card, index) => {
+                if (hideDealer && index === 1) {
+                    dealerCards.innerHTML += `<div class="card">?</div>`;
+                } else {
+                    dealerCards.innerHTML += `<div class="card">${card.rank}${card.suit}</div>`;
+                }
+            });
+            
+            document.getElementById('playerTotal').innerText = 'Total: ' + getHandTotal(player);
+            document.getElementById('dealerTotal').innerText = hideDealer ? 'Total: ?' : 'Total: ' + getHandTotal(dealer);
+        }
+
+        function hit() {
+            if (!bjActive) return;
+            player.push(deck.pop());
+            renderBJ(true);
+            if (getHandTotal(player) > 21) {
+                document.getElementById('bjResult').innerText = 'BUST!';
+                bjActive = false;
+            }
+        }
+
+        function stand() {
+            if (!bjActive) return;
+            while (getHandTotal(dealer) < 17) {
+                dealer.push(deck.pop());
+            }
+            let playerTotal = getHandTotal(player);
+            let dealerTotal = getHandTotal(dealer);
+            renderBJ(false);
+            
+            if (dealerTotal > 21 || playerTotal > dealerTotal) {
+                clips += currentBet * 2;
+                document.getElementById('bjResult').innerText = 'YOU WIN! 🎉';
+                productionBoost *= 1.2;
+                showMessage('+20% BOOST!');
+            } else if (playerTotal === dealerTotal) {
+                clips += currentBet;
+                document.getElementById('bjResult').innerText = 'PUSH';
+            } else {
+                document.getElementById('bjResult').innerText = 'DEALER WINS';
+            }
+            bjActive = false;
+            update();
+        }
+
+        function doubleDown() {
+            if (!bjActive || doubled) return;
+            if (clips < currentBet) return;
+            
+            clips -= currentBet;
+            currentBet *= 2;
+            doubled = true;
+            player.push(deck.pop());
+            renderBJ(true);
+            
+            if (getHandTotal(player) > 21) {
+                document.getElementById('bjResult').innerText = 'BUST!';
+                bjActive = false;
+                update();
+                return;
+            }
+            stand();
+        }
+
+        function split() {
+            alert('Split coming soon!');
+        }
+
+        // Plinko Functions
+        function createPlinkoBoard() {
+            let grid = document.getElementById('plinkoGrid');
+            let slots = document.getElementById('plinkoSlots');
+            
+            // Create pegs
+            grid.innerHTML = '';
+            for (let row = 0; row < 8; row++) {
+                let rowDiv = document.createElement('div');
+                rowDiv.className = 'plinko-row';
+                for (let peg = 0; peg <= row; peg++) {
+                    let pegDiv = document.createElement('div');
+                    pegDiv.className = 'plinko-peg';
+                    rowDiv.appendChild(pegDiv);
+                }
+                grid.appendChild(rowDiv);
+            }
+            
+            // Create slots
+            slots.innerHTML = '';
+            let multipliers = [10, 5, 3, 2, 1, 2, 3, 5, 10];
+            for (let i = 0; i < 9; i++) {
+                let slot = document.createElement('div');
+                slot.className = 'plinko-slot';
+                slot.id = 'plinkoSlot' + i;
+                slot.innerText = multipliers[i] + 'x';
+                slots.appendChild(slot);
+            }
+        }
+
+        function dropPlinko() {
+            let bet = parseInt(document.getElementById('plinkoBet').value);
+            if (bet > clips || bet <= 0) {
+                alert('Invalid bet!');
+                return;
+            }
+            
+            clips -= bet;
+            
+            // Simulate ball drop
+            let position = 4;
+            for (let row = 0; row < 8; row++) {
+                position += Math.random() > 0.5 ? 1 : -1;
+                position = Math.max(0, Math.min(8, position));
+            }
+            
+            let multipliers = [10, 5, 3, 2, 1, 2, 3, 5, 10];
+            let multiplier = multipliers[position];
+            
+            // Highlight slot
+            for (let i = 0; i < 9; i++) {
+                document.getElementById('plinkoSlot' + i).classList.remove('highlight');
+            }
+            document.getElementById('plinkoSlot' + position).classList.add('highlight');
+            
+            let winnings = bet * multiplier;
+            clips += winnings;
+            
+            document.getElementById('plinkoResult').innerText = `${multiplier}x WINNER! +${winnings}`;
+            
+            if (multiplier >= 5) {
+                showMessage('PLINKO JACKPOT!');
+            }
+            
+            update();
+            
+            setTimeout(() => {
+                document.getElementById('plinkoSlot' + position).classList.remove('highlight');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
