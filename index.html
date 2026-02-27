@@ -2,53 +2,71 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Paper Empire</title>
+<title>Paper Empire - Quantum</title>
 <style>
 body {
-    background: #111;
+    background: #0a0a0f;
     color: white;
     font-family: Arial;
     text-align: center;
 }
 button {
-    padding: 10px 15px;
+    padding: 8px 12px;
     margin: 5px;
-    font-size: 16px;
+    font-size: 14px;
     cursor: pointer;
 }
-.container {
-    margin-top: 20px;
+.section {
+    border: 1px solid #333;
+    padding: 15px;
+    margin: 15px;
 }
 </style>
 </head>
 <body>
 
-<h1>📎 Paper Empire</h1>
+<h1>📎 Paper Empire: Quantum Age</h1>
 
 <h2>Paperclips: <span id="clips">0</span></h2>
 <h3>Per Second: <span id="perSec">0</span></h3>
 <h3>Rebirth Points: <span id="rebirthPoints">0</span></h3>
 <h3>Multiplier: x<span id="multi">1</span></h3>
 
-<div class="container">
+<div class="section">
     <button onclick="makeClip()">Make Paperclip</button>
 </div>
 
-<div class="container">
+<div class="section">
     <h3>Auto Clippers</h3>
-    <p>Owned: <span id="autoCount">0</span></p>
-    <button onclick="buyAuto()">Buy Auto Clipper (Cost: <span id="autoCost">10</span>)</button>
+    Owned: <span id="autoCount">0</span><br>
+    <button onclick="buyAuto()">Buy (Cost: <span id="autoCost">10</span>)</button>
 </div>
 
-<div class="container">
+<div class="section">
     <h3>Factory Upgrade</h3>
-    <p>Level: <span id="upgradeLevel">0</span></p>
+    Level: <span id="upgradeLevel">0</span><br>
     <button onclick="buyUpgrade()">Upgrade (Cost: <span id="upgradeCost">100</span>)</button>
 </div>
 
-<div class="container">
+<div class="section">
+    <h3>⚛ Quantum Processing</h3>
+    Qubits: <span id="qubits">0</span><br>
+    Quantum Ops: <span id="qops">0</span><br>
+    <button onclick="buyQubit()">Buy Qubit (Cost: <span id="qubitCost">5000</span>)</button>
+    <button onclick="runQuantum()">Run Quantum Computation</button>
+</div>
+
+<div class="section">
+    <h3>🎮 Mini Hack Game</h3>
+    Guess a number between 1 and 5<br>
+    <input id="guessInput" type="number" min="1" max="5">
+    <button onclick="playMiniGame()">Hack</button>
+    <p id="miniResult"></p>
+</div>
+
+<div class="section">
     <h3>Rebirth</h3>
-    <p>Requires 10,000 clips</p>
+    Requires 10,000 clips<br>
     <button onclick="rebirth()">Rebirth</button>
 </div>
 
@@ -61,7 +79,12 @@ let upgradeCost = 100;
 let rebirthPoints = 0;
 let multiplier = 1;
 
+let qubits = 0;
+let qops = 0;
+let qubitCost = 5000;
+
 function updateUI() {
+    clips = Math.max(0, clips);
     document.getElementById("clips").innerText = Math.floor(clips);
     document.getElementById("autoCount").innerText = autoClippers;
     document.getElementById("autoCost").innerText = Math.floor(autoCost);
@@ -70,6 +93,9 @@ function updateUI() {
     document.getElementById("rebirthPoints").innerText = rebirthPoints;
     document.getElementById("multi").innerText = multiplier.toFixed(1);
     document.getElementById("perSec").innerText = (autoClippers * multiplier).toFixed(1);
+    document.getElementById("qubits").innerText = qubits;
+    document.getElementById("qops").innerText = Math.floor(qops);
+    document.getElementById("qubitCost").innerText = Math.floor(qubitCost);
 }
 
 function makeClip() {
@@ -81,7 +107,7 @@ function buyAuto() {
     if (clips >= autoCost) {
         clips -= autoCost;
         autoClippers++;
-        autoCost *= 1.5;
+        autoCost *= 1.6;
         updateUI();
     }
 }
@@ -96,24 +122,61 @@ function buyUpgrade() {
     }
 }
 
+function buyQubit() {
+    if (clips >= qubitCost) {
+        clips -= qubitCost;
+        qubits++;
+        qubitCost *= 2.5;
+        updateUI();
+    }
+}
+
+function runQuantum() {
+    if (qubits > 0) {
+        let gain = qubits * Math.random() * 10;
+        qops += gain;
+        multiplier += gain / 100;
+        updateUI();
+    }
+}
+
+function playMiniGame() {
+    let guess = parseInt(document.getElementById("guessInput").value);
+    let correct = Math.floor(Math.random() * 5) + 1;
+    
+    if (guess === correct) {
+        let reward = 500 * multiplier;
+        clips += reward;
+        document.getElementById("miniResult").innerText = "Hack Success! +" + Math.floor(reward) + " clips";
+    } else {
+        clips -= 200;
+        document.getElementById("miniResult").innerText = "Hack Failed! -200 clips";
+    }
+    updateUI();
+}
+
 function rebirth() {
     if (clips >= 10000) {
         let gained = Math.floor(clips / 10000);
         rebirthPoints += gained;
         multiplier = 1 + rebirthPoints * 0.5;
-        
+
         clips = 0;
         autoClippers = 0;
         autoCost = 10;
         upgradeLevel = 0;
         upgradeCost = 100;
-        
+        qubits = 0;
+        qops = 0;
+        qubitCost = 5000;
+
         updateUI();
     }
 }
 
 setInterval(function() {
     clips += autoClippers * multiplier;
+    qops += qubits * 0.5;
     updateUI();
 }, 1000);
 
