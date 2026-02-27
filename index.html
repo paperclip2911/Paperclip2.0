@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Paper Empire</title>
+<style>
+body {
+    background: #111;
+    color: white;
+    font-family: Arial;
+    text-align: center;
+}
+button {
+    padding: 10px 15px;
+    margin: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.container {
+    margin-top: 20px;
+}
+</style>
+</head>
+<body>
+
+<h1>📎 Paper Empire</h1>
+
+<h2>Paperclips: <span id="clips">0</span></h2>
+<h3>Per Second: <span id="perSec">0</span></h3>
+<h3>Rebirth Points: <span id="rebirthPoints">0</span></h3>
+<h3>Multiplier: x<span id="multi">1</span></h3>
+
+<div class="container">
+    <button onclick="makeClip()">Make Paperclip</button>
+</div>
+
+<div class="container">
+    <h3>Auto Clippers</h3>
+    <p>Owned: <span id="autoCount">0</span></p>
+    <button onclick="buyAuto()">Buy Auto Clipper (Cost: <span id="autoCost">10</span>)</button>
+</div>
+
+<div class="container">
+    <h3>Factory Upgrade</h3>
+    <p>Level: <span id="upgradeLevel">0</span></p>
+    <button onclick="buyUpgrade()">Upgrade (Cost: <span id="upgradeCost">100</span>)</button>
+</div>
+
+<div class="container">
+    <h3>Rebirth</h3>
+    <p>Requires 10,000 clips</p>
+    <button onclick="rebirth()">Rebirth</button>
+</div>
+
+<script>
+let clips = 0;
+let autoClippers = 0;
+let autoCost = 10;
+let upgradeLevel = 0;
+let upgradeCost = 100;
+let rebirthPoints = 0;
+let multiplier = 1;
+
+function updateUI() {
+    document.getElementById("clips").innerText = Math.floor(clips);
+    document.getElementById("autoCount").innerText = autoClippers;
+    document.getElementById("autoCost").innerText = Math.floor(autoCost);
+    document.getElementById("upgradeLevel").innerText = upgradeLevel;
+    document.getElementById("upgradeCost").innerText = Math.floor(upgradeCost);
+    document.getElementById("rebirthPoints").innerText = rebirthPoints;
+    document.getElementById("multi").innerText = multiplier.toFixed(1);
+    document.getElementById("perSec").innerText = (autoClippers * multiplier).toFixed(1);
+}
+
+function makeClip() {
+    clips += 1 * multiplier;
+    updateUI();
+}
+
+function buyAuto() {
+    if (clips >= autoCost) {
+        clips -= autoCost;
+        autoClippers++;
+        autoCost *= 1.5;
+        updateUI();
+    }
+}
+
+function buyUpgrade() {
+    if (clips >= upgradeCost) {
+        clips -= upgradeCost;
+        upgradeLevel++;
+        multiplier += 0.5;
+        upgradeCost *= 2;
+        updateUI();
+    }
+}
+
+function rebirth() {
+    if (clips >= 10000) {
+        let gained = Math.floor(clips / 10000);
+        rebirthPoints += gained;
+        multiplier = 1 + rebirthPoints * 0.5;
+        
+        clips = 0;
+        autoClippers = 0;
+        autoCost = 10;
+        upgradeLevel = 0;
+        upgradeCost = 100;
+        
+        updateUI();
+    }
+}
+
+setInterval(function() {
+    clips += autoClippers * multiplier;
+    updateUI();
+}, 1000);
+
+updateUI();
+</script>
+
+</body>
+</html>
