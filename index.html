@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎰 Paper Clip Casino - Fixed Blackjack & Random Events</title>
+    <title>🎰 Paper Clip Casino - Fixed</title>
     <style>
         * {
             margin: 0;
@@ -18,63 +18,31 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
             position: relative;
-        }
-
-        /* Animated Background */
-        .bg-animation {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-        }
-
-        .floating-clip {
-            position: absolute;
-            font-size: 3em;
-            animation: floatClip 8s infinite linear;
-            opacity: 0.2;
-        }
-
-        @keyframes floatClip {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.2; }
-            90% { opacity: 0.2; }
-            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
         }
 
         /* Login Screen */
         #loginScreen {
-            background: rgba(20, 30, 40, 0.8);
+            background: rgba(20, 30, 40, 0.95);
             backdrop-filter: blur(20px);
             padding: 60px;
             border-radius: 50px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 0 3px gold, 0 0 30px gold;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 0 3px gold;
             text-align: center;
-            border: 1px solid rgba(255, 215, 0, 0.8);
-            animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1);
             width: 90%;
             max-width: 550px;
-            position: relative;
-            z-index: 10;
-        }
-
-        @keyframes slideInUp {
-            0% { opacity: 0; transform: translateY(100px) scale(0.8); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
+            z-index: 100;
         }
 
         #loginScreen h2 {
             color: gold;
             font-size: 4em;
             margin-bottom: 20px;
-            text-shadow: 0 0 20px gold;
         }
 
         #username {
             width: 100%;
-            padding: 20px 25px;
+            padding: 20px;
             font-size: 1.2em;
             border: none;
             border-radius: 60px;
@@ -86,7 +54,7 @@
         }
 
         #loginBtn {
-            background: linear-gradient(45deg, #ffd700, #ffa500);
+            background: gold;
             color: black;
             border: none;
             border-radius: 60px;
@@ -100,7 +68,12 @@
 
         #loginBtn:hover {
             transform: scale(1.05);
-            box-shadow: 0 10px 30px gold;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            margin-top: 15px;
+            font-size: 1.1em;
         }
 
         /* Game Container */
@@ -109,23 +82,8 @@
             width: 100%;
             max-width: 1400px;
             padding: 20px;
-            position: relative;
-            z-index: 10;
             height: 100vh;
             overflow-y: auto;
-        }
-
-        #game::-webkit-scrollbar {
-            width: 12px;
-        }
-
-        #game::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.3);
-        }
-
-        #game::-webkit-scrollbar-thumb {
-            background: gold;
-            border-radius: 10px;
         }
 
         /* Stats Bar */
@@ -134,14 +92,10 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             margin-bottom: 30px;
-            position: sticky;
-            top: 0;
-            z-index: 50;
         }
 
         .stat-item {
             background: rgba(20, 30, 40, 0.7);
-            backdrop-filter: blur(10px);
             border-radius: 30px;
             padding: 25px;
             text-align: center;
@@ -151,7 +105,6 @@
         .stat-label {
             color: gold;
             font-size: 1.1em;
-            margin-bottom: 10px;
         }
 
         .stat-value {
@@ -163,15 +116,13 @@
         /* Main Game Area */
         .game-area {
             display: grid;
-            grid-template-columns: 1fr 1.5fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 20px;
             margin-bottom: 30px;
         }
 
-        /* Clicker Section */
         .clicker-section {
             background: rgba(20, 30, 40, 0.7);
-            backdrop-filter: blur(10px);
             border-radius: 40px;
             padding: 40px;
             display: flex;
@@ -184,20 +135,18 @@
             font-size: 5em;
             color: white;
             margin-bottom: 30px;
-            text-shadow: 0 0 30px gold;
         }
 
         .clip-button {
             width: 250px;
             height: 250px;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #ffd700, #ff8c00);
+            background: gold;
             border: none;
             cursor: pointer;
             font-size: 2.5em;
             font-weight: bold;
             color: black;
-            box-shadow: 0 20px 40px gold;
             border: 3px solid white;
         }
 
@@ -205,15 +154,11 @@
             transform: scale(0.95);
         }
 
-        /* Upgrades Section */
         .upgrades-section {
             background: rgba(20, 30, 40, 0.7);
-            backdrop-filter: blur(10px);
             border-radius: 40px;
             padding: 40px;
             border: 2px solid gold;
-            max-height: 600px;
-            overflow-y: auto;
         }
 
         .upgrade-card {
@@ -222,12 +167,10 @@
             padding: 25px;
             margin-bottom: 20px;
             cursor: pointer;
-            border: 2px solid transparent;
         }
 
         .upgrade-card:hover {
-            border-color: gold;
-            transform: translateX(10px);
+            border: 2px solid gold;
         }
 
         .upgrade-card.disabled {
@@ -241,26 +184,6 @@
             font-weight: bold;
         }
 
-        /* Random Event Banner */
-        .event-banner {
-            background: linear-gradient(45deg, purple, blue, gold);
-            color: white;
-            padding: 20px;
-            border-radius: 30px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 1.5em;
-            font-weight: bold;
-            animation: pulse 1s;
-            border: 2px solid white;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
         /* Casino Modal */
         #casinoModal {
             display: none;
@@ -271,33 +194,29 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.95);
             z-index: 2000;
-            justify-content: center;
-            align-items: center;
             overflow-y: auto;
+            padding: 20px;
         }
 
         .casino-content {
-            background: linear-gradient(135deg, #1a2a3a, #0f1a24);
+            max-width: 800px;
+            margin: 40px auto;
+            background: #1a2a3a;
             padding: 40px;
             border-radius: 50px;
-            max-width: 1000px;
-            width: 95%;
             border: 3px solid gold;
-            position: relative;
         }
 
         .close-casino {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+            float: right;
             background: red;
-            border: none;
             color: white;
-            font-size: 2em;
-            cursor: pointer;
+            border: none;
             width: 50px;
             height: 50px;
             border-radius: 50%;
+            font-size: 2em;
+            cursor: pointer;
         }
 
         /* Blackjack Table */
@@ -312,19 +231,18 @@
             display: flex;
             gap: 10px;
             margin: 20px 0;
-            min-height: 150px;
+            min-height: 120px;
             flex-wrap: wrap;
         }
 
         .card {
             background: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
             font-size: 2em;
             font-weight: bold;
-            min-width: 80px;
+            min-width: 70px;
             text-align: center;
-            box-shadow: 0 5px 10px black;
         }
 
         .card.red {
@@ -359,7 +277,6 @@
         /* Rebirth Section */
         .rebirth-section {
             background: rgba(20, 30, 40, 0.7);
-            backdrop-filter: blur(10px);
             border-radius: 40px;
             padding: 40px;
             margin-top: 20px;
@@ -370,87 +287,95 @@
         .rebirth-btn {
             background: linear-gradient(45deg, #ff1493, #ff00ff);
             color: white;
-            font-size: 2.2em;
-            padding: 25px 60px;
+            font-size: 2em;
+            padding: 20px 40px;
             border: none;
             border-radius: 80px;
             cursor: pointer;
-            border: 3px solid white;
+            border: 2px solid white;
+        }
+
+        .event-banner {
+            background: linear-gradient(45deg, purple, blue);
+            color: white;
+            padding: 20px;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            border: 2px solid gold;
         }
 
         .floating-number {
-            position: absolute;
+            position: fixed;
             color: gold;
-            font-weight: bold;
             font-size: 2.5em;
-            animation: floatNumber 1.5s ease-out forwards;
+            font-weight: bold;
+            animation: floatUp 1s ease-out forwards;
             pointer-events: none;
             z-index: 3000;
         }
 
-        @keyframes floatNumber {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-150px) scale(2); }
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
         }
 
         .achievement-popup {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: linear-gradient(135deg, gold, orange);
+            background: gold;
             color: black;
-            padding: 25px 40px;
+            padding: 20px 30px;
             border-radius: 50px;
             z-index: 4000;
             font-weight: bold;
-            font-size: 1.5em;
-            border: 3px solid white;
-            animation: slideIn 0.5s;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
-
-        .welcome-message {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: gold;
-            color: black;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1.2em;
-            z-index: 100;
+            font-size: 1.3em;
             border: 2px solid white;
+        }
+
+        .leaderboard {
+            background: rgba(20, 30, 40, 0.7);
+            border-radius: 30px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 2px solid gold;
+        }
+
+        .leaderboard h2 {
+            color: gold;
+            margin-bottom: 20px;
+        }
+
+        .leaderboard-item {
+            color: white;
+            padding: 10px;
+            border-bottom: 1px solid gold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        input {
+            color: white;
         }
     </style>
 </head>
 <body>
-    <!-- Animated Background -->
-    <div class="bg-animation" id="bgAnimation"></div>
-
     <!-- Login Screen -->
     <div id="loginScreen">
         <h2>🎰 PAPER CLIP</h2>
         <h2 style="font-size: 2.5em; margin-top: -20px;">CASINO</h2>
-        <div class="subtitle">Enter your name to start playing</div>
+        <div style="color: white; margin-bottom: 30px;">Enter your name to start</div>
         
-        <div class="input-group">
-            <input type="text" id="username" placeholder="Your name..." maxlength="20">
-        </div>
-        
-        <button id="loginBtn" onclick="login()">🎲 PLAY NOW</button>
+        <input type="text" id="username" placeholder="Your name..." maxlength="20" autocomplete="off">
+        <button id="loginBtn">🎲 PLAY NOW</button>
         <div class="error-message" id="loginError"></div>
     </div>
 
     <!-- Main Game -->
     <div id="game">
-        <!-- Random Event Banner -->
-        <div id="eventBanner" class="event-banner" style="display: none;"></div>
-
         <div class="stats-bar">
             <div class="stat-item">
                 <div class="stat-label">PAPER CLIPS</div>
@@ -475,29 +400,28 @@
 
             <!-- Upgrades -->
             <div class="upgrades-section">
-                <h2 style="color: gold; margin-bottom: 30px; font-size: 2.5em;">⬆️ UPGRADES</h2>
+                <h2 style="color: gold; margin-bottom: 30px; text-align: center;">⬆️ UPGRADES</h2>
                 
                 <div class="upgrade-card" onclick="buyAuto()" id="autoUpgrade">
                     <div class="upgrade-name">🤖 AUTO CLIPPER</div>
-                    <div style="color: white; font-size: 1.2em;">+10 clips/sec</div>
-                    <div class="upgrade-cost" style="color: orange; font-size: 1.5em; margin: 15px 0;">COST: <span id="autoCost">50</span></div>
-                    <div class="upgrade-amount" style="color: white; font-size: 2em;">OWNED: <span id="autos">0</span></div>
+                    <div style="color: white;">+10 clips/sec</div>
+                    <div style="color: orange; font-size: 1.2em; margin: 10px 0;">COST: <span id="autoCost">50</span></div>
+                    <div style="color: white; font-size: 1.5em;">OWNED: <span id="autos">0</span></div>
                 </div>
 
                 <div class="upgrade-card" onclick="buyMega()" id="megaUpgrade">
                     <div class="upgrade-name">⚡ MEGA CLIPPER</div>
-                    <div style="color: white; font-size: 1.2em;">+40 clips/sec</div>
-                    <div class="upgrade-cost" style="color: orange; font-size: 1.5em; margin: 15px 0;">COST: <span id="megaCost">300</span></div>
-                    <div class="upgrade-amount" style="color: white; font-size: 2em;">OWNED: <span id="megas">0</span></div>
+                    <div style="color: white;">+40 clips/sec</div>
+                    <div style="color: orange; font-size: 1.2em; margin: 10px 0;">COST: <span id="megaCost">300</span></div>
+                    <div style="color: white; font-size: 1.5em;">OWNED: <span id="megas">0</span></div>
                 </div>
             </div>
 
             <!-- Casino Button -->
             <div class="clicker-section">
                 <h2 style="color: gold; font-size: 2.5em;">🎰 CASINO</h2>
-                <p style="color: white; font-size: 1.3em; margin: 30px 0;">Win big and get boosts!</p>
-                <button onclick="openCasino()" style="background: gold; border: none; padding: 25px 50px; border-radius: 80px; font-size: 2em; font-weight: bold; cursor: pointer; border: 3px solid white;">🎲 PLAY NOW</button>
-                <div style="color: gold; margin-top: 20px;">Next event: <span id="eventTimer">60s</span></div>
+                <p style="color: white; margin: 30px 0;">Play Blackjack!</p>
+                <button onclick="openCasino()" style="background: gold; padding: 20px 40px; border: none; border-radius: 50px; font-size: 1.5em; font-weight: bold; cursor: pointer; border: 2px solid white;">OPEN CASINO</button>
             </div>
         </div>
 
@@ -507,9 +431,9 @@
         </div>
 
         <!-- Leaderboard -->
-        <div class="leaderboard" style="background: rgba(20,30,40,0.7); backdrop-filter: blur(10px); border-radius: 30px; padding: 30px; margin-top: 30px; border: 2px solid gold;">
-            <h2 style="color: gold; margin-bottom: 20px;">🏆 TOP PLAYERS</h2>
-            <div id="leaderboardList" style="color: white; font-size: 1.3em;"></div>
+        <div class="leaderboard">
+            <h2>🏆 TOP PLAYERS</h2>
+            <div id="leaderboardList"></div>
         </div>
     </div>
 
@@ -517,41 +441,46 @@
     <div id="casinoModal">
         <div class="casino-content">
             <button class="close-casino" onclick="closeCasino()">✖</button>
-            <h1 style="color: gold; font-size: 3em; text-align: center; margin-bottom: 20px;">🎰 CASINO</h1>
-            <div style="color: white; font-size: 2em; text-align: center; margin-bottom: 30px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 20px;">CLIPS: <span id="casinoClips">0</span></div>
+            <h1 style="color: gold; text-align: center; font-size: 3em;">🎰 CASINO</h1>
+            <div style="color: white; font-size: 2em; text-align: center; margin: 20px 0;">CLIPS: <span id="casinoClips">0</span></div>
             
-            <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
-                <!-- Blackjack -->
-                <div class="blackjack-table">
-                    <h2 style="color: gold; margin-bottom: 20px; text-align: center;">♠️ BLACKJACK</h2>
-                    
-                    <div style="margin-bottom: 20px;">
-                        <input type="number" id="bjBet" style="width:100%; padding:15px; border-radius:15px; font-size:1.2em;" value="100" min="1">
-                    </div>
+            <!-- Blackjack -->
+            <div class="blackjack-table">
+                <h2 style="color: gold; text-align: center;">♠️ BLACKJACK</h2>
+                
+                <input type="number" id="bjBet" style="width:100%; padding:15px; margin:10px 0; border-radius:10px;" value="100">
 
-                    <div style="color: white; font-size: 1.3em;">DEALER:</div>
-                    <div class="cards" id="dealerCards"></div>
-                    <div style="color: white; font-size: 1.3em;" id="dealerTotal">0</div>
+                <div style="color: white;">DEALER:</div>
+                <div class="cards" id="dealerCards"></div>
+                <div style="color: white;" id="dealerTotal">0</div>
 
-                    <div style="color: white; font-size: 1.3em; margin-top: 20px;">PLAYER:</div>
-                    <div class="cards" id="playerCards"></div>
-                    <div style="color: white; font-size: 1.3em;" id="playerTotal">0</div>
+                <div style="color: white; margin-top:20px;">PLAYER:</div>
+                <div class="cards" id="playerCards"></div>
+                <div style="color: white;" id="playerTotal">0</div>
 
-                    <div class="bj-controls">
-                        <button onclick="hit()" id="hitBtn" disabled>HIT</button>
-                        <button onclick="stand()" id="standBtn" disabled>STAND</button>
-                        <button onclick="doubleDown()" id="doubleBtn" disabled>DOUBLE</button>
-                        <button onclick="split()" id="splitBtn" disabled>SPLIT</button>
-                    </div>
-
-                    <button onclick="startBJ()" id="dealBtn" style="width: 100%; padding: 15px; background: gold; border: none; border-radius: 10px; font-weight: bold; font-size: 1.2em; margin-top: 10px;">DEAL CARDS</button>
-                    <div id="bjResult" style="color: gold; text-align: center; margin-top: 10px; font-size: 1.5em;"></div>
+                <div class="bj-controls">
+                    <button onclick="hit()" id="hitBtn" disabled>HIT</button>
+                    <button onclick="stand()" id="standBtn" disabled>STAND</button>
+                    <button onclick="doubleDown()" id="doubleBtn" disabled>DOUBLE</button>
+                    <button onclick="split()" id="splitBtn" disabled>SPLIT</button>
                 </div>
+
+                <button onclick="startBJ()" id="dealBtn" style="width:100%; padding:15px; background:gold; border:none; border-radius:10px; font-weight:bold;">DEAL CARDS</button>
+                <div id="bjResult" style="color: gold; text-align: center; margin-top: 10px;"></div>
             </div>
         </div>
     </div>
 
     <script>
+        // Make sure DOM is loaded before adding event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get login button and add event listener
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', login);
+            }
+        });
+
         // Game variables
         let user = '';
         let clips = 0;
@@ -571,28 +500,15 @@
         let currentBet = 0;
         let doubled = false;
 
-        // Random event timer
-        let eventTimer = 60;
-        let eventInterval;
-
-        // Create animated background
-        function createBackground() {
-            let bg = document.getElementById('bgAnimation');
-            for (let i = 0; i < 20; i++) {
-                let clip = document.createElement('div');
-                clip.className = 'floating-clip';
-                clip.innerHTML = '📎';
-                clip.style.left = Math.random() * 100 + '%';
-                clip.style.animationDelay = Math.random() * 5 + 's';
-                clip.style.fontSize = (Math.random() * 4 + 2) + 'em';
-                bg.appendChild(clip);
-            }
-        }
-        createBackground();
-
         // Login function
         function login() {
+            console.log('Login function called');
             let usernameInput = document.getElementById('username');
+            if (!usernameInput) {
+                console.error('Username input not found');
+                return;
+            }
+            
             user = usernameInput.value.trim();
             
             if (!user) {
@@ -603,88 +519,64 @@
             // Load saved data
             let saved = localStorage.getItem('paper_' + user);
             if (saved) {
-                let data = JSON.parse(saved);
-                clips = data.clips || 0;
-                autos = data.autos || 0;
-                autoCost = data.autoCost || 50;
-                megas = data.megas || 0;
-                megaCost = data.megaCost || 300;
-                rebirthMult = data.rebirthMult || 1;
-                productionBoost = data.productionBoost || 1;
+                try {
+                    let data = JSON.parse(saved);
+                    clips = data.clips || 0;
+                    autos = data.autos || 0;
+                    autoCost = data.autoCost || 50;
+                    megas = data.megas || 0;
+                    megaCost = data.megaCost || 300;
+                    rebirthMult = data.rebirthMult || 1;
+                    productionBoost = data.productionBoost || 1;
+                } catch (e) {
+                    console.error('Error loading saved data', e);
+                }
             }
             
             // Hide login, show game
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('game').style.display = 'block';
             
-            // Show welcome message
-            let welcome = document.createElement('div');
-            welcome.className = 'welcome-message';
-            welcome.innerText = '🎉 Welcome, ' + user + '!';
-            document.body.appendChild(welcome);
-            setTimeout(() => welcome.remove(), 3000);
-            
             // Start random events
             startRandomEvents();
             
             update();
             updateLeaderboard();
+            
+            // Show welcome message
+            showAchievement('Welcome ' + user + '!');
         }
 
         // Random Events
         function startRandomEvents() {
-            eventInterval = setInterval(() => {
-                triggerRandomEvent();
-            }, 60000); // Every 60 seconds
-
-            // Update timer display
             setInterval(() => {
-                if (eventTimer > 0) {
-                    eventTimer--;
-                    document.getElementById('eventTimer').innerText = eventTimer + 's';
-                } else {
-                    eventTimer = 60;
-                }
-            }, 1000);
+                triggerRandomEvent();
+            }, 60000);
         }
 
         function triggerRandomEvent() {
             let events = [
-                { name: '📦 Clip Windfall', gain: clips * 0.1, message: 'Wind blows in extra clips! +10%' },
-                { name: '⚡ Production Surge', gain: productionBoost * 0.5, message: 'Machines work faster! +50% production for 30s' },
-                { name: '💰 Casino Bonus', gain: 1000, message: 'Casino gives you free chips! +1000 clips' },
-                { name: '🎰 Lucky Charm', gain: rebirthMult * 0.2, message: 'Your luck increases! +20% multiplier' },
-                { name: '📎 Clip Rain', gain: 5000, message: 'It\'s raining paper clips! +5000' }
+                { name: 'Windfall', gain: clips * 0.1, message: 'Wind blows in clips! +10%' },
+                { name: 'Bonus', gain: 1000, message: 'Free chips! +1000' }
             ];
 
             let event = events[Math.floor(Math.random() * events.length)];
             
-            // Show event banner
-            let banner = document.getElementById('eventBanner');
-            banner.style.display = 'block';
+            // Create banner
+            let banner = document.createElement('div');
+            banner.className = 'event-banner';
+            banner.innerText = '🎉 ' + event.message;
+            document.getElementById('game').insertBefore(banner, document.getElementById('game').firstChild);
             
-            if (event.name === '⚡ Production Surge') {
-                productionBoost *= 1.5;
-                setTimeout(() => {
-                    productionBoost /= 1.5;
-                    banner.innerText = '⚡ Production surge ended!';
-                    setTimeout(() => banner.style.display = 'none', 3000);
-                }, 30000);
-                banner.innerText = '⚡ ' + event.message;
-            } else if (event.name === '🎰 Lucky Charm') {
-                rebirthMult *= 1.2;
-                banner.innerText = '🎰 ' + event.message;
-            } else {
-                clips += event.gain;
-                banner.innerText = '🎉 ' + event.message;
-            }
-
-            showAchievement('RANDOM EVENT: ' + event.name);
+            clips += event.gain;
             
             setTimeout(() => {
-                banner.style.display = 'none';
+                if (banner.parentNode) {
+                    banner.remove();
+                }
             }, 5000);
 
+            showAchievement('EVENT: ' + event.name);
             update();
         }
 
@@ -692,22 +584,39 @@
         function update() {
             clips = Math.max(0, clips);
             
-            document.getElementById('clips').innerText = Math.floor(clips).toLocaleString();
-            document.getElementById('clipsDisplay').innerText = Math.floor(clips).toLocaleString();
-            document.getElementById('casinoClips').innerText = Math.floor(clips).toLocaleString();
+            let clipsElem = document.getElementById('clips');
+            let clipsDisplay = document.getElementById('clipsDisplay');
+            let casinoClips = document.getElementById('casinoClips');
+            let autosElem = document.getElementById('autos');
+            let megasElem = document.getElementById('megas');
+            let autoCostElem = document.getElementById('autoCost');
+            let megaCostElem = document.getElementById('megaCost');
+            let perSecondElem = document.getElementById('perSecond');
+            let rebirthMultElem = document.getElementById('rebirthMult');
             
-            document.getElementById('autos').innerText = autos;
-            document.getElementById('megas').innerText = megas;
-            document.getElementById('autoCost').innerText = Math.floor(autoCost);
-            document.getElementById('megaCost').innerText = Math.floor(megaCost);
+            if (clipsElem) clipsElem.innerText = Math.floor(clips).toLocaleString();
+            if (clipsDisplay) clipsDisplay.innerText = Math.floor(clips).toLocaleString();
+            if (casinoClips) casinoClips.innerText = Math.floor(clips).toLocaleString();
+            
+            if (autosElem) autosElem.innerText = autos;
+            if (megasElem) megasElem.innerText = megas;
+            if (autoCostElem) autoCostElem.innerText = Math.floor(autoCost);
+            if (megaCostElem) megaCostElem.innerText = Math.floor(megaCost);
             
             let perSecond = (autos * 10 + megas * 40) * rebirthMult * productionBoost;
-            document.getElementById('perSecond').innerText = perSecond.toFixed(1);
-            document.getElementById('rebirthMult').innerText = rebirthMult.toFixed(1) + 'x';
+            if (perSecondElem) perSecondElem.innerText = perSecond.toFixed(1);
+            if (rebirthMultElem) rebirthMultElem.innerText = rebirthMult.toFixed(1) + 'x';
             
             // Update disabled state
-            document.getElementById('autoUpgrade').className = clips >= autoCost ? 'upgrade-card' : 'upgrade-card disabled';
-            document.getElementById('megaUpgrade').className = clips >= megaCost ? 'upgrade-card' : 'upgrade-card disabled';
+            let autoUpgrade = document.getElementById('autoUpgrade');
+            let megaUpgrade = document.getElementById('megaUpgrade');
+            
+            if (autoUpgrade) {
+                autoUpgrade.className = clips >= autoCost ? 'upgrade-card' : 'upgrade-card disabled';
+            }
+            if (megaUpgrade) {
+                megaUpgrade.className = clips >= megaCost ? 'upgrade-card' : 'upgrade-card disabled';
+            }
             
             // Save game
             if (user) {
@@ -731,17 +640,13 @@
             clips += gain;
             
             // Floating number
-            for (let i = 0; i < 3; i++) {
-                setTimeout(() => {
-                    let float = document.createElement('div');
-                    float.className = 'floating-number';
-                    float.innerText = '+' + Math.floor(gain);
-                    float.style.left = (event.clientX + (Math.random() - 0.5) * 100) + 'px';
-                    float.style.top = event.clientY + 'px';
-                    document.body.appendChild(float);
-                    setTimeout(() => float.remove(), 1500);
-                }, i * 100);
-            }
+            let float = document.createElement('div');
+            float.className = 'floating-number';
+            float.innerText = '+' + Math.floor(gain);
+            float.style.left = event.clientX + 'px';
+            float.style.top = event.clientY + 'px';
+            document.body.appendChild(float);
+            setTimeout(() => float.remove(), 1000);
             
             update();
         }
@@ -793,18 +698,18 @@
 
         // Update leaderboard
         function updateLeaderboard() {
+            let list = document.getElementById('leaderboardList');
+            if (!list) return;
+            
             let html = '';
             if (leaderboard.length === 0) {
-                html = '<div style="padding: 20px; text-align: center;">No players yet</div>';
+                html = '<div class="leaderboard-item">No players yet</div>';
             } else {
                 leaderboard.forEach((entry, i) => {
-                    html += `<div style="display:flex; justify-content:space-between; padding:15px; border-bottom:1px solid gold;">
-                        <span>${i+1}. ${entry.name}</span>
-                        <span>${Math.floor(entry.score).toLocaleString()}</span>
-                    </div>`;
+                    html += `<div class="leaderboard-item"><span>${i+1}. ${entry.name}</span><span>${Math.floor(entry.score).toLocaleString()}</span></div>`;
                 });
             }
-            document.getElementById('leaderboardList').innerHTML = html;
+            list.innerHTML = html;
         }
 
         // Show achievement
@@ -818,7 +723,7 @@
 
         // Casino functions
         function openCasino() {
-            document.getElementById('casinoModal').style.display = 'flex';
+            document.getElementById('casinoModal').style.display = 'block';
             update();
         }
 
@@ -867,6 +772,8 @@
             let playerCards = document.getElementById('playerCards');
             let dealerCards = document.getElementById('dealerCards');
             
+            if (!playerCards || !dealerCards) return;
+            
             playerCards.innerHTML = '';
             dealerCards.innerHTML = '';
             
@@ -876,7 +783,7 @@
                 playerCards.innerHTML += `<div class="card ${color}">${card.rank}${card.suit}</div>`;
             });
             
-            // Render dealer cards (hide second card if game is active)
+            // Render dealer cards
             dealer.forEach((card, index) => {
                 if (bjActive && index === 1) {
                     dealerCards.innerHTML += `<div class="card">?</div>`;
@@ -886,7 +793,6 @@
                 }
             });
             
-            // Update totals
             document.getElementById('playerTotal').innerText = 'Total: ' + getHandTotal(player);
             if (bjActive) {
                 document.getElementById('dealerTotal').innerText = 'Total: ?';
@@ -932,7 +838,6 @@
                 document.getElementById('bjResult').innerText = 'BUST! You lose!';
                 bjActive = false;
                 
-                // Disable buttons
                 document.getElementById('hitBtn').disabled = true;
                 document.getElementById('standBtn').disabled = true;
                 document.getElementById('doubleBtn').disabled = true;
@@ -944,7 +849,6 @@
         function stand() {
             if (!bjActive) return;
             
-            // Dealer draws until 17 or higher
             while (getHandTotal(dealer) < 17) {
                 dealer.push(deck.pop());
             }
@@ -954,21 +858,19 @@
             
             renderBJ();
             
-            // Determine winner
             if (dealerTotal > 21 || playerTotal > dealerTotal) {
                 clips += currentBet * 2;
-                document.getElementById('bjResult').innerText = 'YOU WIN! 🎉 +' + (currentBet * 2);
+                document.getElementById('bjResult').innerText = 'YOU WIN! 🎉';
                 grantPerk();
             } else if (playerTotal === dealerTotal) {
                 clips += currentBet;
-                document.getElementById('bjResult').innerText = 'PUSH! Bet returned';
+                document.getElementById('bjResult').innerText = 'PUSH';
             } else {
-                document.getElementById('bjResult').innerText = 'DEALER WINS! You lose';
+                document.getElementById('bjResult').innerText = 'DEALER WINS';
             }
             
             bjActive = false;
             
-            // Disable buttons
             document.getElementById('hitBtn').disabled = true;
             document.getElementById('standBtn').disabled = true;
             document.getElementById('doubleBtn').disabled = true;
@@ -986,12 +888,11 @@
             currentBet *= 2;
             doubled = true;
             
-            // Hit one card
             player.push(deck.pop());
             renderBJ();
             
             if (getHandTotal(player) > 21) {
-                document.getElementById('bjResult').innerText = 'BUST! You lose!';
+                document.getElementById('bjResult').innerText = 'BUST!';
                 bjActive = false;
                 
                 document.getElementById('hitBtn').disabled = true;
@@ -1003,4 +904,17 @@
                 return;
             }
             
-           
+            stand();
+        }
+
+        function split() {
+            alert('Split coming soon!');
+        }
+
+        function grantPerk() {
+            productionBoost *= 1.2;
+            showAchievement('+20% BOOST!');
+        }
+    </script>
+</body>
+</html>
