@@ -191,6 +191,78 @@ setInterval(function(){
 
 updateUI();
 </script>
+<div class="panel">
+<h2>🎰 Intergalactic Casino</h2>
 
+<p>Clips: <span id="casinoClips">0</span></p>
+
+<input id="betAmount" type="number" placeholder="Bet amount">
+
+<h3>🎰 Slots</h3>
+<p id="slotDisplay">🍒 🍋 🔔</p>
+<button onclick="spinSlots()">Spin</button>
+
+<h3>🎲 Dice Duel (Win if > 3)</h3>
+<button onclick="rollDice()">Roll Dice</button>
+
+<p id="casinoResult"></p>
+    function spinSlots() {
+    let bet = parseInt(document.getElementById("betAmount").value);
+    if (!bet || bet <= 0 || bet > clips) {
+        document.getElementById("casinoResult").innerText = "Invalid bet.";
+        return;
+    }
+
+    clips -= bet;
+
+    const symbols = ["🍒","🍋","🔔","⭐","💎"];
+    let s1 = symbols[Math.floor(Math.random()*symbols.length)];
+    let s2 = symbols[Math.floor(Math.random()*symbols.length)];
+    let s3 = symbols[Math.floor(Math.random()*symbols.length)];
+
+    document.getElementById("slotDisplay").innerText = s1 + " " + s2 + " " + s3;
+
+    let difficulty = planets[planetIndex].difficulty;
+
+    if (s1 === s2 && s2 === s3) {
+        let reward = bet * (5 / difficulty) * multiplier;
+        clips += reward;
+        document.getElementById("casinoResult").innerText = "JACKPOT x5!";
+    }
+    else if (s1 === s2 || s2 === s3 || s1 === s3) {
+        let reward = bet * (2 / difficulty) * multiplier;
+        clips += reward;
+        document.getElementById("casinoResult").innerText = "Nice! x2!";
+    }
+    else {
+        document.getElementById("casinoResult").innerText = "Lost.";
+    }
+
+    updateUI();
+}
+
+function rollDice() {
+    let bet = parseInt(document.getElementById("betAmount").value);
+    if (!bet || bet <= 0 || bet > clips) {
+        document.getElementById("casinoResult").innerText = "Invalid bet.";
+        return;
+    }
+
+    clips -= bet;
+
+    let roll = Math.floor(Math.random() * 6) + 1;
+    let difficulty = planets[planetIndex].difficulty;
+
+    if (roll > 3) {
+        let reward = bet * (1.8 / difficulty) * multiplier;
+        clips += reward;
+        document.getElementById("casinoResult").innerText = "Rolled " + roll + " — You Win!";
+    } else {
+        document.getElementById("casinoResult").innerText = "Rolled " + roll + " — You Lose!";
+    }
+
+    updateUI();
+}
+</div>
 </body>
 </html>
