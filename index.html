@@ -2,230 +2,264 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Paper Empire 2.1</title>
+<title>Paper Empire 2.2</title>
 <style>
 body {
-    background: #0b0f1a;
-    color: white;
-    font-family: Arial;
-    margin: 0;
-    text-align: center;
+    background:#0b0f1a;
+    color:white;
+    font-family:Arial;
+    margin:0;
+    text-align:center;
 }
 
-h1 {
-    margin-top: 10px;
+.top-button{
+    position:absolute;
+    top:10px;
+    left:10px;
+    padding:8px 12px;
+    cursor:pointer;
 }
 
-.big-button {
-    font-size: 28px;
-    padding: 40px 60px;
-    margin: 20px;
-    border-radius: 20px;
-    background: #1f2937;
-    color: white;
-    border: 2px solid #555;
-    cursor: pointer;
+.big-button{
+    font-size:28px;
+    padding:40px 60px;
+    margin:20px;
+    border-radius:20px;
+    background:#1f2937;
+    color:white;
+    border:2px solid #555;
+    cursor:pointer;
 }
 
-.container {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    padding: 20px;
+.container{
+    display:flex;
+    justify-content:space-around;
+    flex-wrap:wrap;
+    padding:20px;
 }
 
-.panel {
-    border: 1px solid #333;
-    padding: 15px;
-    width: 22%;
-    background: #111827;
-    border-radius: 10px;
-    margin-bottom: 15px;
+.panel{
+    background:#111827;
+    padding:15px;
+    border-radius:10px;
+    width:22%;
+    margin-bottom:15px;
 }
 
-button {
-    margin: 5px 0;
-    padding: 6px 10px;
-    cursor: pointer;
+.hidden{
+    display:none;
 }
 
-input {
-    padding: 5px;
-    width: 100%;
-    margin-bottom: 5px;
+button{
+    margin:5px;
+    padding:6px 10px;
+    cursor:pointer;
+}
+
+input{
+    padding:5px;
+    width:80%;
 }
 </style>
 </head>
 <body>
 
-<h1>🚀 Paper Empire 2.1</h1>
+<button class="top-button" onclick="enterCasino()">🎰 Casino</button>
+
+<h1>🚀 Paper Empire 2.2</h1>
+
+<div id="mainGame">
 
 <h2>Clips: <span id="clips">0</span></h2>
 <h3>Per Sec: <span id="perSec">0</span></h3>
-<h3>Multiplier: x<span id="multi">1</span></h3>
+<h3>Total Boost: +<span id="percentBoost">0</span>%</h3>
 
 <button class="big-button" onclick="bigClick()">📎 CREATE PAPERCLIP</button>
 
 <div class="container">
 
 <div class="panel">
-<h2>📜 Quests</h2>
+<h2>📜 Quest</h2>
 <p id="questText">Make 100 clips</p>
-<p>Progress: <span id="questProgress">0</span></p>
+<p id="questProgress">0 / 100</p>
 </div>
 
 <div class="panel">
 <h2>🏭 Production</h2>
-Auto Machines: <span id="autoCount">0</span><br>
-<button onclick="buyAuto()">Buy (Cost: <span id="autoCost">10</span>)</button><br><br>
-
-Upgrade Level: <span id="upgradeLevel">0</span><br>
-<button onclick="buyUpgrade()">Upgrade (Cost: <span id="upgradeCost">100</span>)</button>
+Auto: <span id="autoCount">0</span><br>
+<button onclick="buyAuto()">Buy (<span id="autoCost">10</span>)</button>
 </div>
 
 <div class="panel">
 <h2>⚛ Quantum</h2>
 Qubits: <span id="qubits">0</span><br>
-<button onclick="buyQubit()">Buy (Cost: <span id="qubitCost">5000</span>)</button>
-<button onclick="runQuantum()">Boost</button>
+<button onclick="buyQubit()">Buy (<span id="qubitCost">5000</span>)</button>
 </div>
 
-<div class="panel">
-<h2>🎰 Casino</h2>
-<input id="betAmount" type="number" placeholder="Bet amount">
-<button onclick="spinSlots()">Slots</button>
-<p id="casinoResult"></p>
 </div>
+</div>
+
+<!-- CASINO ROOM -->
+<div id="casinoRoom" class="hidden">
+
+<h1>🎰 GALACTIC CASINO</h1>
+<button onclick="exitCasino()">⬅ Back</button>
+
+<h2>Your Clips: <span id="casinoClips">0</span></h2>
+<h3>Permanent Boost: +<span id="casinoBoost">0</span>%</h3>
+
+<input id="betAmount" type="number" placeholder="Bet">
+
+<h3>🎰 Slots</h3>
+<p id="slotDisplay">🍒 🍋 🔔</p>
+<button onclick="spinSlots()">Spin</button>
+
+<h3>🎲 Dice (Roll 5-6 to win)</h3>
+<button onclick="rollDice()">Roll</button>
+
+<p id="casinoResult"></p>
 
 </div>
 
 <script>
 
-// ===== CORE =====
-let clips = 0;
-let autoClippers = 0;
-let autoCost = 10;
-let upgradeLevel = 0;
-let upgradeCost = 100;
-let multiplier = 1;
+// CORE
+let clips=0;
+let auto=0;
+let autoCost=10;
+let qubits=0;
+let qubitCost=5000;
+let multiplier=1;
+let percentBoost=0;
 
-let qubits = 0;
-let qubitCost = 5000;
+// QUEST
+let questGoal=100;
 
-let clickCombo = 0;
+// CASINO
+let casinoBoost=0;
 
-// ===== QUEST SYSTEM =====
-let questGoal = 100;
-let questRewarded = false;
-
-function checkQuest() {
-    if (clips >= questGoal && !questRewarded) {
-        multiplier += 0.5;
-        clips += questGoal * 0.5;
-        questRewarded = true;
-
-        questGoal *= 3;
-        questRewarded = false;
-
-        document.getElementById("questText").innerText =
-            "Make " + questGoal + " clips";
-    }
-}
-
-// ===== BIG BUTTON =====
-function bigClick() {
-    clickCombo++;
-    let comboBonus = 1 + (clickCombo * 0.02);
-    clips += 1 * multiplier * comboBonus;
+// BIG CLICK
+function bigClick(){
+    clips += 1 * multiplier * (1 + percentBoost/100);
     updateUI();
 }
 
-// ===== SHOP =====
-function buyAuto() {
-    if (clips >= autoCost) {
-        clips -= autoCost;
-        autoClippers++;
-        autoCost *= 1.7;
+// SHOP
+function buyAuto(){
+    if(clips>=autoCost){
+        clips-=autoCost;
+        auto++;
+        autoCost*=1.7;
         updateUI();
     }
 }
 
-function buyUpgrade() {
-    if (clips >= upgradeCost) {
-        clips -= upgradeCost;
-        upgradeLevel++;
-        multiplier += 0.5;
-        upgradeCost *= 2;
-        updateUI();
-    }
-}
-
-// ===== QUANTUM =====
-function buyQubit() {
-    if (clips >= qubitCost) {
-        clips -= qubitCost;
+function buyQubit(){
+    if(clips>=qubitCost){
+        clips-=qubitCost;
         qubits++;
-        qubitCost *= 2.5;
+        qubitCost*=2.5;
         updateUI();
     }
 }
 
-function runQuantum() {
-    if (qubits > 0) {
-        let boost = qubits * Math.random();
-        multiplier += boost;
-        updateUI();
+// QUEST
+function checkQuest(){
+    if(clips>=questGoal){
+        clips+=questGoal;
+        percentBoost+=5;
+        questGoal*=3;
+        document.getElementById("questText").innerText="Make "+questGoal+" clips";
     }
 }
 
-// ===== CASINO =====
-function spinSlots() {
-    let bet = parseInt(document.getElementById("betAmount").value);
-    if (!bet || bet <= 0 || bet > clips) {
-        document.getElementById("casinoResult").innerText = "Invalid bet.";
+// CASINO NAV
+function enterCasino(){
+    document.getElementById("mainGame").classList.add("hidden");
+    document.getElementById("casinoRoom").classList.remove("hidden");
+    updateUI();
+}
+
+function exitCasino(){
+    document.getElementById("mainGame").classList.remove("hidden");
+    document.getElementById("casinoRoom").classList.add("hidden");
+}
+
+// CASINO GAMES
+function spinSlots(){
+    let bet=parseInt(document.getElementById("betAmount").value);
+    if(!bet||bet<=0||bet>clips){
+        document.getElementById("casinoResult").innerText="Invalid bet";
         return;
     }
 
-    clips -= bet;
+    clips-=bet;
 
-    let roll = Math.random();
+    const symbols=["🍒","🍋","🔔","⭐","💎"];
+    let s1=symbols[Math.floor(Math.random()*symbols.length)];
+    let s2=symbols[Math.floor(Math.random()*symbols.length)];
+    let s3=symbols[Math.floor(Math.random()*symbols.length)];
 
-    if (roll < 0.5) {
-        document.getElementById("casinoResult").innerText = "Lost.";
+    document.getElementById("slotDisplay").innerText=s1+" "+s2+" "+s3;
+
+    if(s1===s2&&s2===s3){
+        casinoBoost+=10;
+        document.getElementById("casinoResult").innerText="JACKPOT! +10% permanent boost!";
     }
-    else if (roll < 0.85) {
-        clips += bet * 2;
-        document.getElementById("casinoResult").innerText = "Win x2!";
+    else if(s1===s2||s2===s3||s1===s3){
+        casinoBoost+=3;
+        document.getElementById("casinoResult").innerText="Nice! +3% boost!";
     }
-    else {
-        clips += bet * 5;
-        document.getElementById("casinoResult").innerText = "JACKPOT x5!";
+    else{
+        document.getElementById("casinoResult").innerText="Lost.";
     }
 
+    percentBoost=casinoBoost;
     updateUI();
 }
 
-// ===== LOOP =====
+function rollDice(){
+    let bet=parseInt(document.getElementById("betAmount").value);
+    if(!bet||bet<=0||bet>clips){
+        document.getElementById("casinoResult").innerText="Invalid bet";
+        return;
+    }
+
+    clips-=bet;
+
+    let roll=Math.floor(Math.random()*6)+1;
+
+    if(roll>=5){
+        casinoBoost+=5;
+        document.getElementById("casinoResult").innerText="Rolled "+roll+"! +5% boost!";
+    }else{
+        document.getElementById("casinoResult").innerText="Rolled "+roll+" — Lost.";
+    }
+
+    percentBoost=casinoBoost;
+    updateUI();
+}
+
+// LOOP
 setInterval(function(){
-    clips += autoClippers * multiplier;
-    clickCombo = 0;
+    clips+=auto*multiplier*(1+percentBoost/100);
     checkQuest();
     updateUI();
 },1000);
 
-function updateUI() {
-    document.getElementById("clips").innerText = Math.floor(clips);
-    document.getElementById("autoCount").innerText = autoClippers;
-    document.getElementById("autoCost").innerText = Math.floor(autoCost);
-    document.getElementById("upgradeLevel").innerText = upgradeLevel;
-    document.getElementById("upgradeCost").innerText = Math.floor(upgradeCost);
-    document.getElementById("multi").innerText = multiplier.toFixed(2);
-    document.getElementById("perSec").innerText =
-        (autoClippers * multiplier).toFixed(2);
-    document.getElementById("questProgress").innerText =
-        Math.floor(clips) + " / " + questGoal;
-    document.getElementById("qubits").innerText = qubits;
-    document.getElementById("qubitCost").innerText = Math.floor(qubitCost);
+function updateUI(){
+    document.getElementById("clips").innerText=Math.floor(clips);
+    document.getElementById("perSec").innerText=
+        (auto*multiplier*(1+percentBoost/100)).toFixed(2);
+    document.getElementById("percentBoost").innerText=percentBoost;
+    document.getElementById("autoCount").innerText=auto;
+    document.getElementById("autoCost").innerText=Math.floor(autoCost);
+    document.getElementById("qubits").innerText=qubits;
+    document.getElementById("qubitCost").innerText=Math.floor(qubitCost);
+    document.getElementById("questProgress").innerText=
+        Math.floor(clips)+" / "+questGoal;
+    document.getElementById("casinoClips").innerText=Math.floor(clips);
+    document.getElementById("casinoBoost").innerText=casinoBoost;
 }
 
 updateUI();
