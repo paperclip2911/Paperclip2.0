@@ -2,281 +2,242 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Paperclip Empire 5.0</title>
+<title>Paperclip Empire 5.5</title>
 <style>
 body{
     margin:0;
-    background:#121212;
-    color:#e0e0e0;
+    background:linear-gradient(135deg,#111,#1c1c1c);
+    color:#eee;
     font-family:Arial;
 }
 #loginScreen{
     position:fixed;
     inset:0;
-    background:#111;
     display:flex;
     justify-content:center;
     align-items:center;
     flex-direction:column;
+    background:radial-gradient(circle,#222,#000);
+}
+#loginBox{
+    background:#1e1e1e;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 0 20px #000;
+    text-align:center;
 }
 input,button{
-    padding:6px;
-    margin:4px;
-}
-.container{
-    display:flex;
-    padding:15px;
+    padding:8px;
+    margin:6px;
 }
 .panel{
     background:#1e1e1e;
     padding:15px;
     margin:10px;
     border-radius:10px;
-    width:33%;
 }
-.bigButton{
-    width:200px;
-    height:200px;
-    font-size:20px;
+.card{
+    display:inline-block;
+    width:60px;
+    height:90px;
+    background:white;
+    color:black;
+    border-radius:8px;
+    text-align:center;
+    line-height:90px;
+    font-weight:bold;
+    margin:5px;
 }
 #casinoRoom{
     position:fixed;
     inset:0;
     background:#181818;
     display:none;
-    overflow:auto;
     padding:20px;
-}
-.card{
-    display:inline-block;
-    padding:10px;
-    margin:5px;
-    background:white;
-    color:black;
-    border-radius:6px;
-}
-.plinkoBoard{
-    margin-top:10px;
-}
-.plinkoSlot{
-    display:inline-block;
-    width:60px;
+    overflow:auto;
 }
 </style>
 </head>
 <body>
 
 <div id="loginScreen">
-<h2>Login</h2>
-<input id="username" placeholder="Enter username">
+<div id="loginBox">
+<h1>Paperclip Empire</h1>
+<p>Enter Username</p>
+<input id="username">
+<br>
 <button onclick="login()">Enter</button>
 </div>
+</div>
 
-<div id="game" style="display:none">
-
+<div id="game" style="display:none;padding:15px">
 <button onclick="openCasino()">🎰 Casino</button>
-
-<div class="container">
-<div class="panel">
-<h2>Paperclips</h2>
-<h3 id="clips">0</h3>
-<button class="bigButton" onclick="clickClip()">MAKE PAPERCLIP</button>
-<p>Per Click: <span id="perClick">1</span></p>
-<p>Per Second: <span id="perSecond">0</span></p>
+<h2>Clips: <span id="clips">0</span></h2>
 </div>
 
-<div class="panel">
-<h2>Production</h2>
-<button onclick="buyAuto()">Buy Auto (50)</button>
-<p>Autos: <span id="autos">0</span></p>
-<button onclick="rebirth()">Rebirth (1M)</button>
-<p>Rebirth Mult: x<span id="rebirthMult">1</span></p>
-</div>
-</div>
-</div>
-
-<!-- CASINO -->
 <div id="casinoRoom">
 <button onclick="closeCasino()">Close</button>
-<h2>Casino</h2>
-<p>Clips: <span id="casinoClips"></span></p>
-
-<h3>🎰 Slots</h3>
-Bet <input id="slotBet" type="number" value="10">
-<button onclick="playSlots()">Spin</button>
-<p id="slotResult"></p>
-
-<h3>🎲 Dice</h3>
-Bet <input id="diceBet" type="number" value="10">
-<button onclick="playDice()">Roll</button>
-<p id="diceResult"></p>
-
-<h3>🪙 Coin Flip</h3>
-Bet <input id="coinBet" type="number" value="10">
-<button onclick="playCoin()">Flip</button>
-<p id="coinResult"></p>
-
-<h3>🃏 Blackjack</h3>
-Bet <input id="bjBet" type="number" value="10">
+<h2>Blackjack</h2>
+Bet <input id="bjBet" type="number" value="50">
 <button onclick="startBJ()">Start</button>
 <button onclick="hit()">Hit</button>
 <button onclick="stand()">Stand</button>
-<div id="playerCards"></div>
+<button onclick="doubleDown()">Double Down</button>
+
+<h3>Dealer (<span id="dealerTotal">0</span>)</h3>
 <div id="dealerCards"></div>
+
+<h3>Player (<span id="playerTotal">0</span>)</h3>
+<div id="playerCards"></div>
+
 <p id="bjResult"></p>
-
-<h3>🎡 Roulette</h3>
-Bet <input id="roulBet" type="number" value="10">
-<button onclick="playRoulette('red')">Red</button>
-<button onclick="playRoulette('black')">Black</button>
-<p id="roulResult"></p>
-
-<h3>🟡 Plinko</h3>
-Bet <input id="plinkoBet" type="number" value="10">
-<button onclick="playPlinko()">Drop</button>
-<div class="plinkoBoard" id="plinkoBoard"></div>
-<p id="plinkoResult"></p>
-
 </div>
 
 <script>
 let user=""
-let clips=0, perClick=1, autos=0, rebirthMult=1
-let bjPlayer=[], bjDealer=[], bjActive=false
+let clips=1000
 
+/* SAVE SYSTEM */
 function save(){
-localStorage.setItem("paper_"+user,JSON.stringify({clips,perClick,autos,rebirthMult}))
+localStorage.setItem("paper_"+user,JSON.stringify({clips}))
 }
-
 function load(){
 let data=JSON.parse(localStorage.getItem("paper_"+user))
-if(data){
-clips=data.clips
-perClick=data.perClick
-autos=data.autos
-rebirthMult=data.rebirthMult
+if(data) clips=data.clips
 }
-}
-
 function login(){
-user=document.getElementById("username").value
+user=username.value
 if(!user)return
 load()
-document.getElementById("loginScreen").style.display="none"
-document.getElementById("game").style.display="block"
+loginScreen.style.display="none"
+game.style.display="block"
 update()
 }
-
 function update(){
-document.getElementById("clips").innerText=Math.floor(clips)
-document.getElementById("perClick").innerText=perClick
-document.getElementById("autos").innerText=autos
-document.getElementById("perSecond").innerText=autos*rebirthMult
-document.getElementById("rebirthMult").innerText=rebirthMult
-document.getElementById("casinoClips").innerText=Math.floor(clips)
+clips=Math.floor(clips)
+document.getElementById("clips").innerText=clips
 save()
 }
 
-setInterval(()=>{
-clips+=autos*rebirthMult
+/* CASINO */
+function openCasino(){casinoRoom.style.display="block"}
+function closeCasino(){casinoRoom.style.display="none"}
+
+/* BLACKJACK SYSTEM */
+let deck=[]
+let player=[]
+let dealer=[]
+let bjActive=false
+let currentBet=0
+let doubled=false
+
+function createDeck(){
+let suits=["♠","♥","♦","♣"]
+let ranks=["A","2","3","4","5","6","7","8","9","10","J","Q","K"]
+deck=[]
+for(let s of suits){
+for(let r of ranks){
+deck.push({rank:r,suit:s})
+}
+}
+deck.sort(()=>Math.random()-0.5)
+}
+
+function cardValue(card){
+if(card.rank==="A") return 11
+if(["K","Q","J"].includes(card.rank)) return 10
+return parseInt(card.rank)
+}
+
+function handTotal(hand){
+let total=0
+let aces=0
+for(let c of hand){
+total+=cardValue(c)
+if(c.rank==="A") aces++
+}
+while(total>21 && aces>0){
+total-=10
+aces--
+}
+return total
+}
+
+function render(){
+playerCards.innerHTML=""
+dealerCards.innerHTML=""
+player.forEach(c=>{
+playerCards.innerHTML+=`<div class="card">${c.rank}${c.suit}</div>`
+})
+dealer.forEach(c=>{
+dealerCards.innerHTML+=`<div class="card">${c.rank}${c.suit}</div>`
+})
+playerTotal.innerText=handTotal(player)
+dealerTotal.innerText=handTotal(dealer)
 update()
-},1000)
-
-function clickClip(){clips+=perClick*rebirthMult;update()}
-function buyAuto(){if(clips>=50){clips-=50;autos++}}
-function rebirth(){if(clips>=1000000){clips=0;autos=0;perClick=1;rebirthMult++}}
-
-function openCasino(){document.getElementById("casinoRoom").style.display="block"}
-function closeCasino(){document.getElementById("casinoRoom").style.display="none"}
-
-/* BASIC GAMES */
-function playSlots(){
-let bet=parseInt(slotBet.value)
-if(bet>clips||bet<=0)return
-clips-=bet
-if(Math.random()<0.2){clips+=bet*3;slotResult.innerText="Win!"}
-else slotResult.innerText="Lost"
-}
-
-function playDice(){
-let bet=parseInt(diceBet.value)
-if(bet>clips||bet<=0)return
-clips-=bet
-let roll=Math.floor(Math.random()*6)+1
-if(roll>=4){clips+=bet*2;diceResult.innerText="Rolled "+roll+" Win!"}
-else diceResult.innerText="Rolled "+roll+" Lost"
-}
-
-function playCoin(){
-let bet=parseInt(coinBet.value)
-if(bet>clips||bet<=0)return
-clips-=bet
-if(Math.random()<0.5){clips+=bet*2;coinResult.innerText="Win!"}
-else coinResult.innerText="Lost"
-}
-
-/* BLACKJACK */
-function card(){return Math.floor(Math.random()*11)+1}
-function total(hand){return hand.reduce((a,b)=>a+b,0)}
-
-function renderCards(){
-playerCards.innerHTML="Player: "
-bjPlayer.forEach(c=>playerCards.innerHTML+=`<div class="card">${c}</div>`)
-dealerCards.innerHTML="Dealer: "
-bjDealer.forEach(c=>dealerCards.innerHTML+=`<div class="card">${c}</div>`)
 }
 
 function startBJ(){
 let bet=parseInt(bjBet.value)
 if(bet>clips||bet<=0)return
+createDeck()
+player=[deck.pop(),deck.pop()]
+dealer=[deck.pop(),deck.pop()]
 clips-=bet
-bjPlayer=[card(),card()]
-bjDealer=[card()]
+currentBet=bet
 bjActive=true
-renderCards()
+doubled=false
+bjResult.innerText=""
+render()
 }
 
 function hit(){
 if(!bjActive)return
-bjPlayer.push(card())
-renderCards()
-if(total(bjPlayer)>21){bjResult.innerText="Bust!";bjActive=false}
+player.push(deck.pop())
+render()
+if(handTotal(player)>21){
+bjResult.innerText="Bust! Dealer Wins"
+bjActive=false
+}
 }
 
 function stand(){
 if(!bjActive)return
-bjDealer.push(card())
-renderCards()
-let p=total(bjPlayer), d=total(bjDealer)
-if(d<17) d+=card()
-if(p>d||d>21){clips+=parseInt(bjBet.value)*2;bjResult.innerText="Win!"}
-else bjResult.innerText="Lost"
+while(handTotal(dealer)<17){
+dealer.push(deck.pop())
+}
+let p=handTotal(player)
+let d=handTotal(dealer)
+if(d>21||p>d){
+clips+=currentBet*2
+bjResult.innerText="You Win!"
+}else if(p===d){
+clips+=currentBet
+bjResult.innerText="Push!"
+}else{
+bjResult.innerText="Dealer Wins"
+}
 bjActive=false
+render()
 }
 
-/* ROULETTE */
-function playRoulette(choice){
-let bet=parseInt(roulBet.value)
-if(bet>clips||bet<=0)return
-clips-=bet
-let result=Math.random()<0.5?"red":"black"
-if(choice==result){clips+=bet*2;roulResult.innerText="Win "+result}
-else roulResult.innerText="Lost "+result
+function doubleDown(){
+if(!bjActive||doubled)return
+if(clips<currentBet)return
+clips-=currentBet
+currentBet*=2
+doubled=true
+player.push(deck.pop())
+render()
+if(handTotal(player)>21){
+bjResult.innerText="Bust after Double!"
+bjActive=false
+return
+}
+stand()
 }
 
-/* PLINKO */
-function playPlinko(){
-let bet=parseInt(plinkoBet.value)
-if(bet>clips||bet<=0)return
-clips-=bet
-let multipliers=[0,0.5,1,2,5]
-let index=Math.floor(Math.random()*multipliers.length)
-let win=bet*multipliers[index]
-clips+=win
-plinkoBoard.innerHTML=""
-multipliers.forEach(m=>plinkoBoard.innerHTML+=`<div class="plinkoSlot">${m}x</div>`)
-plinkoResult.innerText="Ball landed on "+multipliers[index]+"x"
-}
+update()
 </script>
 </body>
 </html>
