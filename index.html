@@ -1,1299 +1,598 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎰 Paper Clip Casino - All Games</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #0f0c1f, #1a2f3f);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        /* Login Screen */
-        #loginScreen {
-            background: rgba(20, 30, 40, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 60px;
-            border-radius: 50px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 0 3px gold;
-            text-align: center;
-            width: 90%;
-            max-width: 550px;
-            z-index: 100;
-        }
-
-        #loginScreen h2 {
-            color: gold;
-            font-size: 4em;
-            margin-bottom: 20px;
-        }
-
-        #username {
-            width: 100%;
-            padding: 20px;
-            font-size: 1.2em;
-            border: none;
-            border-radius: 60px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            outline: none;
-            border: 2px solid gold;
-            margin-bottom: 25px;
-        }
-
-        #loginBtn {
-            background: gold;
-            color: black;
-            border: none;
-            border-radius: 60px;
-            padding: 20px 50px;
-            font-size: 1.8em;
-            font-weight: bold;
-            cursor: pointer;
-            border: 2px solid white;
-            width: 100%;
-        }
-
-        #loginBtn:hover {
-            transform: scale(1.05);
-        }
-
-        /* Game Container */
-        #game {
-            display: none;
-            width: 100%;
-            max-width: 1400px;
-            padding: 20px;
-            height: 100vh;
-            overflow-y: auto;
-        }
-
-        /* Stats Bar */
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-        }
-
-        .stat-item {
-            background: rgba(20, 30, 40, 0.95);
-            border-radius: 30px;
-            padding: 20px;
-            text-align: center;
-            border: 2px solid gold;
-        }
-
-        .stat-label {
-            color: gold;
-            font-size: 1.1em;
-        }
-
-        .stat-value {
-            color: white;
-            font-size: 2.5em;
-            font-weight: bold;
-        }
-
-        /* Main Game Area */
-        .game-area {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .clicker-section {
-            background: rgba(20, 30, 40, 0.95);
-            border-radius: 40px;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border: 2px solid gold;
-        }
-
-        .clip-counter {
-            font-size: 4em;
-            color: white;
-            margin-bottom: 30px;
-        }
-
-        .clip-button {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: gold;
-            border: none;
-            cursor: pointer;
-            font-size: 2em;
-            font-weight: bold;
-            color: black;
-            border: 3px solid white;
-        }
-
-        .clip-button:active {
-            transform: scale(0.95);
-        }
-
-        .upgrades-section {
-            background: rgba(20, 30, 40, 0.95);
-            border-radius: 40px;
-            padding: 30px;
-            border: 2px solid gold;
-        }
-
-        .upgrade-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 15px;
-            cursor: pointer;
-        }
-
-        .upgrade-card:hover {
-            border: 2px solid gold;
-        }
-
-        .upgrade-card.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .upgrade-name {
-            color: gold;
-            font-size: 1.3em;
-            font-weight: bold;
-        }
-
-        /* Casino Modal */
-        #casinoModal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.98);
-            z-index: 2000;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .casino-content {
-            max-width: 1200px;
-            margin: 40px auto;
-            background: #1a2a3a;
-            padding: 40px;
-            border-radius: 50px;
-            border: 3px solid gold;
-        }
-
-        .close-casino {
-            float: right;
-            background: red;
-            color: white;
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 2em;
-            cursor: pointer;
-        }
-
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-            margin-top: 40px;
-        }
-
-        /* Game Cards */
-        .game-card {
-            background: #0d5e3d;
-            padding: 25px;
-            border-radius: 30px;
-            border: 2px solid gold;
-        }
-
-        .game-card h2 {
-            color: gold;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .game-card input {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 10px;
-            font-size: 1.2em;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border: 1px solid gold;
-        }
-
-        .game-card button {
-            width: 100%;
-            padding: 15px;
-            margin: 5px 0;
-            background: gold;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1.1em;
-        }
-
-        .game-card button:hover {
-            transform: scale(1.02);
-        }
-
-        /* Blackjack */
-        .cards {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-            min-height: 100px;
-            flex-wrap: wrap;
-        }
-
-        .card {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 1.8em;
-            font-weight: bold;
-            min-width: 60px;
-            text-align: center;
-        }
-
-        .card.red {
-            color: red;
-        }
-
-        .card.black {
-            color: black;
-        }
-
-        .bj-controls {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        /* Plinko */
-        .plinko-grid {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            margin: 20px 0;
-        }
-
-        .plinko-row {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-
-        .plinko-peg {
-            width: 30px;
-            height: 30px;
-            background: gold;
-            border-radius: 50%;
-        }
-
-        .plinko-slots {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .plinko-slot {
-            width: 70px;
-            height: 70px;
-            background: rgba(0,0,0,0.5);
-            border: 2px solid gold;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: gold;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-
-        .plinko-slot.highlight {
-            background: gold;
-            color: black;
-        }
-
-        /* Roulette */
-        .roulette-wheel {
-            text-align: center;
-        }
-
-        .roulette-numbers {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .roulette-number {
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .red { background: #ff4444; color: white; }
-        .black { background: #333; color: white; }
-        .green { background: #00aa00; color: white; }
-
-        /* Dice */
-        .dice-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        .dice {
-            width: 70px;
-            height: 70px;
-            background: white;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5em;
-            font-weight: bold;
-        }
-
-        /* Slots */
-        .slot-machine {
-            text-align: center;
-        }
-
-        .slot-reels {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .slot-reel {
-            width: 80px;
-            height: 80px;
-            background: white;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3em;
-        }
-
-        /* Crash Game */
-        .crash-game {
-            text-align: center;
-        }
-
-        .crash-multiplier {
-            font-size: 4em;
-            color: gold;
-            margin: 20px 0;
-        }
-
-        /* Rebirth Section */
-        .rebirth-section {
-            background: rgba(20, 30, 40, 0.95);
-            border-radius: 40px;
-            padding: 30px;
-            margin-top: 20px;
-            text-align: center;
-            border: 2px solid gold;
-        }
-
-        .rebirth-btn {
-            background: linear-gradient(45deg, #ff1493, #ff00ff);
-            color: white;
-            font-size: 2em;
-            padding: 20px 40px;
-            border: none;
-            border-radius: 60px;
-            cursor: pointer;
-            border: 2px solid white;
-        }
-
-        .event-banner {
-            background: linear-gradient(45deg, purple, blue);
-            color: white;
-            padding: 15px;
-            border-radius: 30px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 1.3em;
-            border: 2px solid gold;
-        }
-
-        .floating-number {
-            position: fixed;
-            color: gold;
-            font-size: 2em;
-            animation: floatUp 1s ease-out forwards;
-            pointer-events: none;
-            z-index: 3000;
-        }
-
-        @keyframes floatUp {
-            0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-100px); opacity: 0; }
-        }
-
-        .achievement-popup {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: gold;
-            color: black;
-            padding: 15px 25px;
-            border-radius: 50px;
-            z-index: 4000;
-            font-weight: bold;
-            border: 2px solid white;
-        }
-
-        .leaderboard {
-            background: rgba(20, 30, 40, 0.95);
-            border-radius: 30px;
-            padding: 30px;
-            margin-top: 30px;
-            border: 2px solid gold;
-        }
-
-        .leaderboard h2 {
-            color: gold;
-            margin-bottom: 20px;
-        }
-
-        .leaderboard-item {
-            color: white;
-            padding: 10px;
-            border-bottom: 1px solid gold;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .result {
-            color: gold;
-            text-align: center;
-            margin-top: 15px;
-            font-size: 1.3em;
-            min-height: 40px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍄 Mycelium Empire</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0a08;
+  --dirt1: #1a1208;
+  --dirt2: #211708;
+  --dirt3: #2a1e0a;
+  --panel: rgba(26,18,8,0.95);
+  --panel2: rgba(34,24,10,0.9);
+  --border: #3d2a10;
+  --border2: #5a3f18;
+  --spore: #c8ff00;
+  --spore2: #88bb00;
+  --glow: #00ffaa;
+  --glow2: #00cc88;
+  --amber: #ffaa22;
+  --amber2: #ff7700;
+  --purple: #cc44ff;
+  --purple2: #8800cc;
+  --text: #e8d5a0;
+  --text2: #9a7a44;
+  --red: #ff4444;
+  --pink: #ff88cc;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  width:100%; min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Crimson Text', Georgia, serif;
+  overflow-x:hidden;
+  cursor:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20'><circle cx='10' cy='10' r='4' fill='%23c8ff00' opacity='0.8'/></svg>") 10 10, auto;
+}
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:0;
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(0,255,100,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(200,100,0,0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(0,200,100,0.03) 0%, transparent 70%);
+  pointer-events:none;
+}
+canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.4; }
+.wrap {
+  position:relative; z-index:1;
+  display:grid;
+  grid-template-columns: 260px 1fr 300px;
+  grid-template-rows: auto 1fr auto;
+  min-height:100vh;
+}
+@media(max-width:960px){
+  .wrap { grid-template-columns:1fr; }
+  .sidebar-left, .sidebar-right { display:none; }
+}
+.topbar {
+  grid-column:1/-1;
+  background:linear-gradient(180deg, #0a0805 0%, rgba(10,8,5,0.97) 100%);
+  border-bottom:2px solid var(--border2);
+  padding:12px 24px;
+  display:flex; align-items:center; gap:20px;
+  position:sticky; top:0; z-index:200;
+  box-shadow:0 4px 30px rgba(0,0,0,0.8);
+}
+.game-logo {
+  font-family:'Cinzel', serif;
+  font-size:20px; font-weight:900;
+  color:var(--spore);
+  text-shadow:0 0 20px rgba(200,255,0,0.5);
+  white-space:nowrap;
+  letter-spacing:1px;
+}
+.top-stat {
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:5px 14px;
+  text-align:center;
+}
+.top-stat .lbl { font-size:10px; color:var(--text2); letter-spacing:1px; text-transform:uppercase; display:block; }
+.top-stat .val { font-family:'Cinzel',serif; font-size:14px; color:var(--spore); }
+.ascend-btn {
+  margin-left:auto;
+  padding:8px 20px;
+  border-radius:6px;
+  border:2px solid var(--purple);
+  background:rgba(136,0,204,0.12);
+  color:var(--purple);
+  font-family:'Cinzel',serif;
+  font-size:12px; font-weight:700;
+  cursor:pointer;
+  transition:all 0.2s;
+  white-space:nowrap;
+  letter-spacing:1px;
+}
+.ascend-btn:hover:not(:disabled) { background:rgba(136,0,204,0.3); box-shadow:0 0 15px rgba(204,68,255,0.3); }
+.ascend-btn:disabled { opacity:0.3; cursor:not-allowed; }
+.sidebar-left {
+  border-right:1px solid var(--border);
+  padding:16px;
+  overflow-y:auto;
+  background:linear-gradient(180deg, rgba(20,14,5,0.8) 0%, rgba(16,11,4,0.9) 100%);
+}
+.main {
+  display:flex; flex-direction:column; align-items:center;
+  padding:24px 20px 80px;
+  overflow-y:auto;
+  gap:18px;
+}
+.sidebar-right {
+  border-left:1px solid var(--border);
+  padding:16px;
+  overflow-y:auto;
+  background:linear-gradient(180deg, rgba(20,14,5,0.8) 0%, rgba(16,11,4,0.9) 100%);
+}
+.sec-head {
+  font-family:'Cinzel',serif;
+  font-size:11px; letter-spacing:2px;
+  color:var(--text2);
+  text-transform:uppercase;
+  border-bottom:1px solid var(--border);
+  padding-bottom:8px; margin-bottom:12px;
+  display:flex; align-items:center; gap:6px;
+}
+.shroom-stage {
+  position:relative;
+  width:220px; height:220px;
+  cursor:pointer;
+  user-select:none;
+}
+.shroom-ground {
+  position:absolute;
+  bottom:0; left:50%; transform:translateX(-50%);
+  width:180px; height:30px;
+  background:radial-gradient(ellipse, #3a2508 0%, transparent 70%);
+  border-radius:50%;
+}
+.shroom-stem {
+  position:absolute;
+  bottom:30px; left:50%; transform:translateX(-50%);
+  width:28px; height:90px;
+  background:linear-gradient(180deg, #d4c080 0%, #a89050 50%, #8a7040 100%);
+  border-radius:14px 14px 8px 8px;
+  box-shadow:inset -4px 0 8px rgba(0,0,0,0.3), inset 2px 0 6px rgba(255,255,255,0.1);
+}
+.shroom-stem::after {
+  content:'';
+  position:absolute;
+  top:40%; left:0; right:0; height:4px;
+  background:rgba(255,255,255,0.15);
+  border-radius:2px;
+}
+.shroom-cap {
+  position:absolute;
+  bottom:110px; left:50%; transform:translateX(-50%);
+  width:160px; height:100px;
+  border-radius:80px 80px 10px 10px;
+  background:radial-gradient(ellipse at 35% 35%, #ff4422, #cc1100 50%, #881100);
+  box-shadow:
+    0 0 30px rgba(255,68,0,0.4),
+    0 0 60px rgba(255,68,0,0.15),
+    inset -15px -10px 30px rgba(0,0,0,0.4),
+    inset 8px 6px 20px rgba(255,150,100,0.2);
+  transition:transform 0.1s, box-shadow 0.1s;
+}
+.shroom-cap:hover {
+  box-shadow:0 0 50px rgba(255,68,0,0.6),0 0 80px rgba(255,68,0,0.2),inset -15px -10px 30px rgba(0,0,0,0.4);
+}
+.shroom-cap:active { transform:scale(0.94) translateX(-50%) !important; }
+.spot {
+  position:absolute;
+  background:rgba(255,255,255,0.7);
+  border-radius:50%;
+  box-shadow:0 0 6px rgba(255,255,255,0.5);
+}
+.shroom-gills {
+  position:absolute;
+  bottom:108px; left:50%; transform:translateX(-50%);
+  width:160px; height:18px;
+  background:linear-gradient(180deg, #cc9966 0%, #aa7744 100%);
+  border-radius:0 0 8px 8px;
+  overflow:hidden;
+}
+.gill-line {
+  position:absolute;
+  width:1px; height:100%;
+  background:rgba(0,0,0,0.3);
+  top:0;
+}
+.spore-particle {
+  position:absolute;
+  width:4px; height:4px;
+  border-radius:50%;
+  background:var(--spore);
+  box-shadow:0 0 6px var(--spore);
+  pointer-events:none;
+  animation:sporeFloat 3s ease-in infinite;
+  opacity:0;
+}
+@keyframes sporeFloat {
+  0%   { opacity:0; transform:translateY(0) translateX(0) scale(1); }
+  20%  { opacity:0.8; }
+  100% { opacity:0; transform:translateY(-120px) translateX(var(--drift)) scale(0.3); }
+}
+.res-panel {
+  background:var(--panel);
+  border:1px solid var(--border2);
+  border-radius:12px;
+  padding:20px 24px;
+  text-align:center;
+  width:100%; max-width:400px;
+  box-shadow:0 0 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  position:relative;
+  overflow:hidden;
+}
+.res-panel::before {
+  content:'';
+  position:absolute; inset:0;
+  background:radial-gradient(ellipse at 50% 0%, rgba(200,255,0,0.04) 0%, transparent 60%);
+  pointer-events:none;
+}
+.spore-count {
+  font-family:'Cinzel',serif;
+  font-size:42px; font-weight:900;
+  color:var(--spore);
+  text-shadow:0 0 30px rgba(200,255,0,0.5);
+  line-height:1;
+}
+.spore-label { font-size:14px; color:var(--text2); margin-top:4px; font-style:italic; }
+.auto-rate { font-size:15px; color:var(--glow); margin-top:10px; font-weight:600; }
+.click-rate { font-size:12px; color:var(--text2); margin-top:3px; }
+.stage-panel {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px 20px;
+  width:100%; max-width:400px;
+}
+.stage-name { font-family:'Cinzel',serif; font-size:16px; color:var(--amber); margin-bottom:6px; }
+.stage-bar-bg {
+  height:8px; background:rgba(255,255,255,0.06);
+  border-radius:4px; overflow:hidden; margin-bottom:5px;
+}
+.stage-bar-fill {
+  height:100%;
+  background:linear-gradient(90deg, var(--spore2), var(--spore));
+  border-radius:4px;
+  transition:width 0.5s;
+  box-shadow:0 0 8px rgba(200,255,0,0.4);
+}
+.stage-desc { font-size:12px; color:var(--text2); font-style:italic; }
+.log-panel {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px;
+  width:100%; max-width:400px;
+}
+.log-entry { font-size:12px; color:var(--text2); line-height:1.9; }
+.upg-card {
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:10px 12px;
+  margin-bottom:8px;
+  cursor:pointer;
+  transition:all 0.15s;
+  position:relative;
+  overflow:hidden;
+}
+.upg-card::before {
+  content:'';
+  position:absolute; top:0; left:0; width:3px; height:100%;
+  background:var(--spore);
+  opacity:0;
+  transition:opacity 0.2s;
+}
+.upg-card.affordable::before { opacity:1; }
+.upg-card.affordable { border-color:var(--border2); }
+.upg-card:hover:not(.bought):not(.hidden-upg) { transform:translateX(4px); border-color:var(--amber); }
+.upg-card.bought { opacity:0.45; cursor:default; }
+.upg-card.bought::after { content:'✓'; position:absolute; right:10px; top:50%; transform:translateY(-50%); color:var(--glow); font-size:16px; font-weight:900; }
+.upg-icon { font-size:20px; float:left; margin-right:8px; line-height:1.2; }
+.upg-name { font-family:'Cinzel',serif; font-size:12px; color:var(--text); }
+.upg-desc { font-size:11px; color:var(--text2); margin-top:2px; font-style:italic; }
+.upg-cost { font-size:11px; color:var(--amber); margin-top:3px; font-family:'Cinzel',serif; }
+.bld-card {
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px;
+  margin-bottom:10px;
+  cursor:pointer;
+  transition:all 0.15s;
+  position:relative;
+  overflow:hidden;
+}
+.bld-card:hover:not(.locked) { border-color:var(--glow2); background:rgba(0,200,100,0.04); }
+.bld-card.affordable { border-color:var(--glow); box-shadow:0 0 15px rgba(0,255,170,0.08); }
+.bld-card.locked { opacity:0.3; cursor:not-allowed; filter:saturate(0); }
+.bld-top { display:flex; align-items:center; gap:10px; }
+.bld-icon { font-size:26px; flex-shrink:0; }
+.bld-info { flex:1; }
+.bld-name { font-family:'Cinzel',serif; font-size:13px; color:var(--text); }
+.bld-desc { font-size:11px; color:var(--text2); margin-top:2px; font-style:italic; }
+.bld-bottom { display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
+.bld-count { font-family:'Cinzel',serif; font-size:24px; font-weight:900; color:var(--glow); }
+.bld-cost { font-family:'Cinzel',serif; font-size:11px; color:var(--amber); }
+.bld-cps { font-size:11px; color:var(--glow2); }
+.bld-prog { height:2px; background:rgba(0,255,170,0.1); border-radius:1px; margin-top:6px; overflow:hidden; }
+.bld-prog-fill { height:100%; background:var(--glow2); border-radius:1px; transition:width 0.4s; }
+.ach-card {
+  display:flex; gap:8px; align-items:flex-start;
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:8px 10px;
+  margin-bottom:6px;
+  transition:all 0.3s;
+}
+.ach-card.unlocked { border-color:var(--amber2); background:rgba(255,150,0,0.05); }
+.ach-card.locked { opacity:0.3; filter:saturate(0.2); }
+.ach-icon { font-size:18px; flex-shrink:0; }
+.ach-name { font-family:'Cinzel',serif; font-size:11px; color:var(--text); }
+.ach-desc { font-size:10px; color:var(--text2); font-style:italic; }
+.float-txt {
+  position:fixed;
+  pointer-events:none;
+  z-index:999;
+  font-family:'Cinzel',serif;
+  font-weight:700;
+  font-size:15px;
+  color:var(--spore);
+  text-shadow:0 0 12px rgba(200,255,0,0.8);
+  animation:floatUp 1.3s ease-out forwards;
+}
+@keyframes floatUp {
+  0%   { opacity:1; transform:translateY(0) scale(1); }
+  70%  { opacity:1; transform:translateY(-70px) scale(1.1); }
+  100% { opacity:0; transform:translateY(-100px) scale(0.8); }
+}
+.gold-shroom {
+  position:fixed;
+  font-size:44px;
+  cursor:pointer;
+  z-index:500;
+  animation:shroomBounce 0.6s ease-in-out infinite alternate;
+  filter:drop-shadow(0 0 20px #ffaa22) drop-shadow(0 0 8px #ffff00);
+  user-select:none;
+}
+@keyframes shroomBounce {
+  from { transform:scale(1) rotate(-8deg); }
+  to   { transform:scale(1.2) rotate(8deg); }
+}
+.notif {
+  position:fixed; bottom:24px; right:24px;
+  background:var(--panel);
+  border:2px solid var(--amber2);
+  border-radius:10px;
+  padding:12px 18px;
+  font-size:13px; font-weight:600;
+  z-index:1000;
+  max-width:280px;
+  animation:notifSlide 0.4s ease;
+  box-shadow:0 0 30px rgba(255,150,0,0.2);
+  color:var(--text);
+}
+@keyframes notifSlide { from{transform:translateX(110%)} to{transform:translateX(0)} }
+.ascend-panel {
+  background:rgba(136,0,204,0.06);
+  border:1px solid rgba(136,0,204,0.25);
+  border-radius:10px;
+  padding:12px;
+  margin-top:10px;
+  font-size:11px; color:var(--text2);
+  font-style:italic; line-height:1.6;
+}
+.ascend-panel strong { color:var(--purple); font-style:normal; }
+.ticker {
+  grid-column:1/-1;
+  position:fixed; bottom:0; left:0; right:0;
+  background:rgba(10,8,5,0.96);
+  border-top:1px solid var(--border);
+  padding:6px 20px;
+  font-size:12px; color:var(--text2);
+  font-style:italic;
+  z-index:100; white-space:nowrap; overflow:hidden;
+}
+.ticker-inner { display:inline-block; animation:tickerScroll 40s linear infinite; }
+@keyframes tickerScroll { from{transform:translateX(100vw)} to{transform:translateX(-100%)} }
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+</style>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div id="loginScreen">
-        <h2>🎰 PAPER CLIP</h2>
-        <h2 style="font-size: 2.5em; margin-top: -20px;">CASINO</h2>
-        <input type="text" id="username" placeholder="Your name..." autocomplete="off">
-        <button id="loginBtn">🎲 PLAY NOW</button>
-        <div id="loginError" style="color: red; margin-top: 10px;"></div>
+
+<canvas id="roots"></canvas>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="game-logo">🍄 Mycelium Empire</div>
+    <div class="top-stat"><span class="lbl">Spores</span><span class="val" id="tSpores">0</span></div>
+    <div class="top-stat"><span class="lbl">Per Sec</span><span class="val" id="tSPS">0</span></div>
+    <div class="top-stat"><span class="lbl">Harvest ×</span><span class="val" id="tMult">1.00</span></div>
+    <div class="top-stat"><span class="lbl">All-Time</span><span class="val" id="tLife">0</span></div>
+    <button class="ascend-btn" id="ascBtn" disabled onclick="doAscend()">🌀 Ascend</button>
+  </div>
+
+  <div class="sidebar-left">
+    <div class="sec-head">🔬 Research</div>
+    <div id="upgList"></div>
+    <div class="sec-head" style="margin-top:12px">🏅 Discoveries</div>
+    <div id="achList"></div>
+    <div class="ascend-panel">
+      <strong>🌀 Ascension</strong><br>
+      Reach <strong>1 Quadrillion spores</strong> lifetime to Ascend.<br>
+      Sacrifice all progress for a permanent <strong id="ascMultPrev">×1.00</strong> harvest multiplier.<br>
+      Each Ascension is harder — but the rewards compound forever.
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="res-panel">
+      <div class="spore-count" id="sporeCount">0</div>
+      <div class="spore-label">✨ Spores</div>
+      <div class="auto-rate">🍄 <span id="spsDisplay">0</span> spores / second</div>
+      <div class="click-rate">👆 <span id="spcDisplay">1</span> per tap</div>
     </div>
 
-    <!-- Main Game -->
-    <div id="game">
-        <div class="stats-bar">
-            <div class="stat-item">
-                <div class="stat-label">PAPER CLIPS</div>
-                <div class="stat-value" id="clips">0</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">PER SECOND</div>
-                <div class="stat-value" id="perSecond">0</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">MULTIPLIER</div>
-                <div class="stat-value" id="rebirthMult">1x</div>
-            </div>
-        </div>
-
-        <div class="game-area">
-            <div class="clicker-section">
-                <div class="clip-counter" id="clipsDisplay">0</div>
-                <button class="clip-button" onclick="clickClip(event)">📎<br>CLICK</button>
-            </div>
-
-            <div class="upgrades-section">
-                <h2 style="color: gold; text-align: center;">⬆️ UPGRADES</h2>
-                
-                <div class="upgrade-card" onclick="buyAuto()" id="autoUpgrade">
-                    <div class="upgrade-name">🤖 AUTO CLIPPER</div>
-                    <div style="color: white;">+10 clips/sec</div>
-                    <div style="color: orange;">Cost: <span id="autoCost">50</span></div>
-                    <div style="color: white;">Owned: <span id="autos">0</span></div>
-                </div>
-
-                <div class="upgrade-card" onclick="buyMega()" id="megaUpgrade">
-                    <div class="upgrade-name">⚡ MEGA CLIPPER</div>
-                    <div style="color: white;">+40 clips/sec</div>
-                    <div style="color: orange;">Cost: <span id="megaCost">300</span></div>
-                    <div style="color: white;">Owned: <span id="megas">0</span></div>
-                </div>
-            </div>
-
-            <div class="clicker-section">
-                <h2 style="color: gold;">🎰 CASINO</h2>
-                <p style="color: white; margin: 20px 0;">7 Exciting Games!</p>
-                <button onclick="openCasino()" style="background: gold; padding: 20px 40px; border: none; border-radius: 50px; font-size: 1.5em; font-weight: bold; cursor: pointer;">OPEN CASINO</button>
-            </div>
-        </div>
-
-        <div class="rebirth-section">
-            <button class="rebirth-btn" onclick="rebirth()">🔄 REBIRTH (1,000,000)</button>
-        </div>
-
-        <div class="leaderboard">
-            <h2>🏆 TOP PLAYERS</h2>
-            <div id="leaderboardList"></div>
-        </div>
+    <div class="shroom-stage" id="shroomStage" onclick="onClickShroom(event)">
+      <div class="spore-particle" style="left:40%;bottom:115px;animation-delay:0s;--drift:-20px"></div>
+      <div class="spore-particle" style="left:50%;bottom:118px;animation-delay:0.8s;--drift:10px"></div>
+      <div class="spore-particle" style="left:60%;bottom:115px;animation-delay:1.5s;--drift:-5px"></div>
+      <div class="spore-particle" style="left:45%;bottom:112px;animation-delay:2.2s;--drift:25px"></div>
+      <div class="spore-particle" style="left:55%;bottom:116px;animation-delay:0.4s;--drift:-30px"></div>
+      <div class="shroom-gills" id="shroomGills">
+        <div class="gill-line" style="left:10%"></div>
+        <div class="gill-line" style="left:20%"></div>
+        <div class="gill-line" style="left:30%"></div>
+        <div class="gill-line" style="left:40%"></div>
+        <div class="gill-line" style="left:50%"></div>
+        <div class="gill-line" style="left:60%"></div>
+        <div class="gill-line" style="left:70%"></div>
+        <div class="gill-line" style="left:80%"></div>
+        <div class="gill-line" style="left:90%"></div>
+      </div>
+      <div class="shroom-cap" id="shroomCap">
+        <div class="spot" style="width:22px;height:16px;top:20%;left:20%"></div>
+        <div class="spot" style="width:14px;height:11px;top:15%;left:55%"></div>
+        <div class="spot" style="width:18px;height:13px;top:40%;left:65%"></div>
+        <div class="spot" style="width:10px;height:8px;top:50%;left:30%"></div>
+        <div class="spot" style="width:8px;height:6px;top:25%;left:38%"></div>
+      </div>
+      <div class="shroom-stem"></div>
+      <div class="shroom-ground"></div>
     </div>
 
-    <!-- Casino Modal -->
-    <div id="casinoModal">
-        <div class="casino-content">
-            <button class="close-casino" onclick="closeCasino()">✖</button>
-            <h1 style="color: gold; text-align: center; font-size: 3em;">🎰 CASINO</h1>
-            <div style="color: white; font-size: 2em; text-align: center; margin: 20px 0;">CLIPS: <span id="casinoClips">0</span></div>
-            
-            <div class="games-grid">
-                <!-- Blackjack -->
-                <div class="game-card">
-                    <h2>♠️ BLACKJACK</h2>
-                    <input type="number" id="bjBet" value="100">
-                    
-                    <div style="color: white;">DEALER:</div>
-                    <div class="cards" id="dealerCards"></div>
-                    <div style="color: white;" id="dealerTotal">0</div>
-
-                    <div style="color: white; margin-top:10px;">PLAYER:</div>
-                    <div class="cards" id="playerCards"></div>
-                    <div style="color: white;" id="playerTotal">0</div>
-
-                    <div class="bj-controls">
-                        <button onclick="hit()" id="hitBtn" disabled>HIT</button>
-                        <button onclick="stand()" id="standBtn" disabled>STAND</button>
-                        <button onclick="doubleDown()" id="doubleBtn" disabled>DOUBLE</button>
-                        <button onclick="split()" disabled>SPLIT</button>
-                    </div>
-
-                    <button onclick="startBJ()" id="dealBtn">DEAL CARDS</button>
-                    <div id="bjResult" class="result"></div>
-                </div>
-
-                <!-- Plinko -->
-                <div class="game-card">
-                    <h2>📌 PLINKO</h2>
-                    <input type="number" id="plinkoBet" value="50">
-                    
-                    <div class="plinko-grid" id="plinkoGrid"></div>
-                    <div class="plinko-slots" id="plinkoSlots"></div>
-
-                    <button onclick="dropPlinko()">DROP BALL</button>
-                    <div id="plinkoResult" class="result"></div>
-                </div>
-
-                <!-- Roulette -->
-                <div class="game-card">
-                    <h2>🎲 ROULETTE</h2>
-                    <input type="number" id="rouletteBet" value="50">
-                    
-                    <div class="roulette-numbers">
-                        <div class="roulette-number red" onclick="betRoulette('red')">RED</div>
-                        <div class="roulette-number black" onclick="betRoulette('black')">BLACK</div>
-                        <div class="roulette-number green" onclick="betRoulette('green')">GREEN</div>
-                    </div>
-                    
-                    <div class="roulette-numbers">
-                        <div class="roulette-number red" onclick="betRoulette(1)">1</div>
-                        <div class="roulette-number black" onclick="betRoulette(2)">2</div>
-                        <div class="roulette-number red" onclick="betRoulette(3)">3</div>
-                        <div class="roulette-number black" onclick="betRoulette(4)">4</div>
-                        <div class="roulette-number red" onclick="betRoulette(5)">5</div>
-                        <div class="roulette-number black" onclick="betRoulette(6)">6</div>
-                    </div>
-                    
-                    <div id="rouletteResult" class="result"></div>
-                </div>
-
-                <!-- Dice -->
-                <div class="game-card">
-                    <h2>🎲 DICE</h2>
-                    <input type="number" id="diceBet" value="50">
-                    
-                    <div class="dice-container">
-                        <div class="dice" id="dice1">⚀</div>
-                        <div class="dice" id="dice2">⚀</div>
-                    </div>
-                    
-                    <button onclick="rollDice('under7')">UNDER 7</button>
-                    <button onclick="rollDice('over7')">OVER 7</button>
-                    <button onclick="rollDice('exact7')">EXACT 7</button>
-                    
-                    <div id="diceResult" class="result"></div>
-                </div>
-
-                <!-- Slots -->
-                <div class="game-card">
-                    <h2>🎰 SLOTS</h2>
-                    <input type="number" id="slotsBet" value="50">
-                    
-                    <div class="slot-reels">
-                        <div class="slot-reel" id="slot1">🍒</div>
-                        <div class="slot-reel" id="slot2">🍒</div>
-                        <div class="slot-reel" id="slot3">🍒</div>
-                    </div>
-                    
-                    <button onclick="spinSlots()">SPIN</button>
-                    <div id="slotsResult" class="result"></div>
-                </div>
-
-                <!-- Crash Game -->
-                <div class="game-card">
-                    <h2>📈 CRASH</h2>
-                    <input type="number" id="crashBet" value="50">
-                    
-                    <div class="crash-multiplier" id="crashMultiplier">1.00x</div>
-                    
-                    <button onclick="startCrash()" id="crashBtn">START</button>
-                    <button onclick="cashOut()" id="cashoutBtn" disabled>CASH OUT</button>
-                    
-                    <div id="crashResult" class="result"></div>
-                </div>
-
-                <!-- Coin Flip -->
-                <div class="game-card">
-                    <h2>🪙 COIN FLIP</h2>
-                    <input type="number" id="coinBet" value="50">
-                    
-                    <button onclick="flipCoin('heads')">HEADS</button>
-                    <button onclick="flipCoin('tails')">TAILS</button>
-                    
-                    <div id="coinResult" class="result"></div>
-                </div>
-            </div>
-        </div>
+    <div class="stage-panel">
+      <div class="stage-name" id="stageName">🌱 Lone Spore</div>
+      <div class="stage-bar-bg"><div class="stage-bar-fill" id="stageBar" style="width:0%"></div></div>
+      <div class="stage-desc" id="stageDesc">The forest floor awaits your dominion...</div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('loginBtn').addEventListener('click', login);
-        });
+    <div class="log-panel">
+      <div class="sec-head">📜 Chronicle</div>
+      <div id="logDiv" style="max-height:130px;overflow-y:auto"></div>
+    </div>
+  </div>
 
-        // Game variables
-        let user = '';
-        let clips = 0;
-        let autos = 0;
-        let autoCost = 50;
-        let megas = 0;
-        let megaCost = 300;
-        let rebirthMult = 1;
-        let productionBoost = 1;
-        let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+  <div class="sidebar-right">
+    <div class="sec-head">🏗️ Colonies</div>
+    <div id="bldList"></div>
+  </div>
+</div>
 
-        // Blackjack variables
-        let deck = [];
-        let player = [];
-        let dealer = [];
-        let bjActive = false;
-        let currentBet = 0;
+<div class="ticker"><div class="ticker-inner" id="tickerText">🍄 The forest stirs... spores drift on ancient winds... your empire begins with a single click.</div></div>
 
-        // Crash variables
-        let crashInterval;
-        let crashMultiplier = 1.0;
-        let crashActive = false;
-        let crashBet = 0;
+<script>
+const rc=document.getElementById('roots');
+const rx=rc.getContext('2d');
+function resizeRoots(){rc.width=window.innerWidth;rc.height=window.innerHeight;}
+resizeRoots();window.addEventListener('resize',resizeRoots);
+const rootNodes=[];
+for(let i=0;i<60;i++)rootNodes.push({x:Math.random()*9999,y:Math.random()*9999,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,pulse:Math.random()*Math.PI*2});
+let rootTime=0;
+function drawRoots(){
+  rootTime+=0.008;
+  rx.clearRect(0,0,rc.width,rc.height);
+  rootNodes.forEach(n=>{
+    n.x=(n.x+n.vx+rc.width*2)%(rc.width*2)-rc.width*0.5;
+    n.y=(n.y+n.vy+rc.height*2)%(rc.height*2)-rc.height*0.5;
+    n.pulse+=0.02;
+  });
+  for(let i=0;i<rootNodes.length;i++){
+    for(let j=i+1;j<rootNodes.length;j++){
+      const dx=rootNodes[i].x-rootNodes[j].x,dy=rootNodes[i].y-rootNodes[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<180){
+        const a=(1-d/180)*0.25*(0.5+0.5*Math.sin(rootNodes[i].pulse));
+        rx.beginPath();
+        rx.moveTo(rootNodes[i].x,rootNodes[i].y);
+        const mx=(rootNodes[i].x+rootNodes[j].x)/2+dy*0.2;
+        const my=(rootNodes[i].y+rootNodes[j].y)/2-dx*0.2;
+        rx.quadraticCurveTo(mx,my,rootNodes[j].x,rootNodes[j].y);
+        rx.strokeStyle=`rgba(100,220,80,${a})`;
+        rx.lineWidth=0.8;
+        rx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(drawRoots);
+}
+drawRoots();
 
-        function login() {
-            let input = document.getElementById('username');
-            user = input.value.trim();
-            
-            if (!user) {
-                document.getElementById('loginError').innerText = 'Enter your name!';
-                return;
-            }
-            
-            let saved = localStorage.getItem('paper_' + user);
-            if (saved) {
-                let data = JSON.parse(saved);
-                clips = data.clips || 0;
-                autos = data.autos || 0;
-                autoCost = data.autoCost || 50;
-                megas = data.megas || 0;
-                megaCost = data.megaCost || 300;
-                rebirthMult = data.rebirthMult || 1;
-                productionBoost = data.productionBoost || 1;
-            }
-            
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('game').style.display = 'block';
-            
-            update();
-            updateLeaderboard();
-            startRandomEvents();
-            createPlinkoBoard();
-        }
+function fmt(n){
+  if(n<1e3)return Math.floor(n).toLocaleString();
+  const S=['','K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc','UD','DD','TD','QaD','QiD'];
+  let i=0,v=n;
+  while(v>=1000&&i<S.length-1){v/=1000;i++;}
+  return v.toFixed(i>0?2:0)+' '+S[i];
+}
 
-        // Random Events
-        function startRandomEvents() {
-            setInterval(() => {
-                let events = ['bonus', 'boost', 'clips'];
-                let event = events[Math.floor(Math.random() * events.length)];
-                
-                let banner = document.createElement('div');
-                banner.className = 'event-banner';
-                
-                if (event === 'bonus') {
-                    clips += 1000;
-                    banner.innerText = '🎉 BONUS! +1000 clips';
-                } else if (event === 'boost') {
-                    productionBoost *= 1.5;
-                    banner.innerText = '⚡ BOOST! Production x1.5 for 30s';
-                    setTimeout(() => {
-                        productionBoost /= 1.5;
-                    }, 30000);
-                } else {
-                    clips += clips * 0.1;
-                    banner.innerText = '📎 WINDFALL! +10% clips';
-                }
-                
-                document.getElementById('game').insertBefore(banner, document.getElementById('game').firstChild);
-                setTimeout(() => banner.remove(), 5000);
-                
-                showAchievement('RANDOM EVENT!');
-                update();
-            }, 60000);
-        }
+let G={spores:0,lifetime:0,totalClicks:0,ascendCount:0,ascendMult:1,bld:{},upg:{},ach:{},time:0};
 
-        function update() {
-            clips = Math.max(0, clips);
-            
-            document.getElementById('clips').innerText = Math.floor(clips).toLocaleString();
-            document.getElementById('clipsDisplay').innerText = Math.floor(clips).toLocaleString();
-            document.getElementById('casinoClips').innerText = Math.floor(clips).toLocaleString();
-            
-            document.getElementById('autos').innerText = autos;
-            document.getElementById('megas').innerText = megas;
-            document.getElementById('autoCost').innerText = Math.floor(autoCost);
-            document.getElementById('megaCost').innerText = Math.floor(megaCost);
-            
-            let perSecond = (autos * 10 + megas * 40) * rebirthMult * productionBoost;
-            document.getElementById('perSecond').innerText = perSecond.toFixed(1);
-            document.getElementById('rebirthMult').innerText = rebirthMult.toFixed(1) + 'x';
-            
-            document.getElementById('autoUpgrade').className = clips >= autoCost ? 'upgrade-card' : 'upgrade-card disabled';
-            document.getElementById('megaUpgrade').className = clips >= megaCost ? 'upgrade-card' : 'upgrade-card disabled';
-            
-            if (user) {
-                localStorage.setItem('paper_' + user, JSON.stringify({
-                    clips, autos, autoCost, megas, megaCost, rebirthMult, productionBoost
-                }));
-            }
-        }
+const BUILDINGS=[
+  {id:'spore',   name:'Spore Pod',        icon:'🫧',base:12,      cps:0.1, desc:'A pod that continuously releases spores.',   unlock:0},
+  {id:'mycel',   name:'Mycelium Thread',  icon:'🕸️',base:80,      cps:0.4, desc:'Underground threads absorb nutrients.',      unlock:40},
+  {id:'fairy',   name:'Fairy Ring',       icon:'💫',base:450,     cps:1.8, desc:'Ancient rings channel forest magic.',        unlock:200},
+  {id:'truffle', name:'Truffle Network',  icon:'🌰',base:2500,    cps:8,   desc:'Deep truffle nets farm rich soil.',          unlock:1000},
+  {id:'giant',   name:'Giant Shroom',     icon:'🍄',base:12000,   cps:35,  desc:'A colossal mushroom pulsing with power.',    unlock:5000},
+  {id:'cave',    name:'Cave Colony',      icon:'🦇',base:65000,   cps:150, desc:'Deep cave systems breed rare fungi.',        unlock:25000},
+  {id:'spire',   name:'Fungal Spire',     icon:'🗼',base:350000,  cps:600, desc:'A towering spire spreading spores for miles.',unlock:120000},
+  {id:'forest',  name:'Enchanted Forest', icon:'🌲',base:1800000, cps:2500,desc:'An entire forest under mycological control.',unlock:600000},
+  {id:'world',   name:'World Root',       icon:'🌍',base:9000000, cps:10000,desc:'Mycelium wraps around the entire world.',   unlock:3000000},
+  {id:'beyond',  name:'Spore Dimension',  icon:'🌀',base:4e8,     cps:60000,desc:'A pocket dimension made of pure fungus.',  unlock:1e8},
+];
 
-        setInterval(() => {
-            if (user) {
-                clips += (autos * 10 + megas * 40) * rebirthMult * productionBoost;
-                update();
-            }
-        }, 1000);
+const UPGRADES=[
+  {id:'c1',name:'Calloused Fingers',   icon:'🖐️',cost:80,      eff:'×2 tap power',        type:'click',mult:2,  req:()=>G.lifetime>=40},
+  {id:'c2',name:'Spore Gloves',        icon:'🧤',cost:1500,    eff:'×3 tap power',        type:'click',mult:3,  req:()=>G.lifetime>=800},
+  {id:'c3',name:'Enzyme Injection',    icon:'💉',cost:40000,   eff:'×5 tap power',        type:'click',mult:5,  req:()=>G.lifetime>=20000},
+  {id:'c4',name:'Myco-Gauntlets',      icon:'⚡',cost:800000,  eff:'×10 tap power',       type:'click',mult:10, req:()=>G.lifetime>=400000},
+  {id:'c5',name:'Fungal Apotheosis',   icon:'🌟',cost:5e7,     eff:'×20 tap power',       type:'click',mult:20, req:()=>G.lifetime>=2e7},
+  {id:'sp1',name:'Stronger Pods',      icon:'🫧',cost:400,     eff:'Pods ×2 SPS',         type:'bld',bld:'spore',  mult:2,req:()=>bldN('spore')>=5},
+  {id:'sp2',name:'Dense Spore Cloud',  icon:'🫧',cost:6000,    eff:'Pods ×3 SPS',         type:'bld',bld:'spore',  mult:3,req:()=>bldN('spore')>=15},
+  {id:'sp3',name:'Spore Cannon',       icon:'🫧',cost:80000,   eff:'Pods ×5 SPS',         type:'bld',bld:'spore',  mult:5,req:()=>bldN('spore')>=30},
+  {id:'my1',name:'Wider Threads',      icon:'🕸️',cost:2500,    eff:'Mycelium ×2 SPS',     type:'bld',bld:'mycel',  mult:2,req:()=>bldN('mycel')>=5},
+  {id:'my2',name:'Neural Fungi',       icon:'🕸️',cost:35000,   eff:'Mycelium ×3 SPS',     type:'bld',bld:'mycel',  mult:3,req:()=>bldN('mycel')>=15},
+  {id:'fr1',name:'Ring Resonance',     icon:'💫',cost:14000,   eff:'Fairy Rings ×2 SPS',  type:'bld',bld:'fairy',  mult:2,req:()=>bldN('fairy')>=5},
+  {id:'fr2',name:'Ancient Pact',       icon:'💫',cost:180000,  eff:'Fairy Rings ×3 SPS',  type:'bld',bld:'fairy',  mult:3,req:()=>bldN('fairy')>=15},
+  {id:'tr1',name:'Deep Aroma',         icon:'🌰',cost:75000,   eff:'Truffles ×2 SPS',     type:'bld',bld:'truffle',mult:2,req:()=>bldN('truffle')>=5},
+  {id:'tr2',name:'Truffle Oil Extract',icon:'🌰',cost:1000000, eff:'Truffles ×3 SPS',     type:'bld',bld:'truffle',mult:3,req:()=>bldN('truffle')>=15},
+  {id:'gs1',name:'Fertilizer Drip',    icon:'🍄',cost:400000,  eff:'Giant Shrooms ×2 SPS',type:'bld',bld:'giant',  mult:2,req:()=>bldN('giant')>=5},
+  {id:'gs2',name:'Titan Growth',       icon:'🍄',cost:5000000, eff:'Giant Shrooms ×3 SPS',type:'bld',bld:'giant',  mult:3,req:()=>bldN('giant')>=15},
+  {id:'g1',name:'Forest Alliance',     icon:'🌿',cost:4000,    eff:'All SPS ×1.5',        type:'global',mult:1.5,req:()=>G.lifetime>=2000},
+  {id:'g2',name:'Decomposer Guild',    icon:'♻️',cost:80000,   eff:'All SPS ×2',          type:'global',mult:2,  req:()=>G.lifetime>=40000},
+  {id:'g3',name:'Myco-Consciousness',  icon:'🧠',cost:1500000, eff:'All SPS ×3',          type:'global',mult:3,  req:()=>G.lifetime>=800000},
+  {id:'g4',name:'Hyphae Overmind',     icon:'🌐',cost:3e7,     eff:'All SPS ×5',          type:'global',mult:5,  req:()=>G.lifetime>=1.5e7},
+  {id:'g5',name:'Spore Singularity',   icon:'∞', cost:8e8,     eff:'All SPS ×10',         type:'global',mult:10, req:()=>G.lifetime>=4e8},
+];
 
-        function clickClip(event) {
-            let gain = 1 * rebirthMult * productionBoost;
-            clips += gain;
-            
-            let float = document.createElement('div');
-            float.className = 'floating-number';
-            float.innerText = '+' + Math.floor(gain);
-            float.style.left = event.clientX + 'px';
-            float.style.top = event.clientY + 'px';
-            document.body.appendChild(float);
-            setTimeout(() => float.remove(), 1000);
-            
-            update();
-        }
+const ACHIEVEMENTS=[
+  {id:'first', name:'First Harvest',     icon:'🌱',desc:'Tap the mushroom for the first time.',   req:()=>G.totalClicks>=1},
+  {id:'tap100',name:'Relentless',        icon:'👆',desc:'Tap 100 times.',                         req:()=>G.totalClicks>=100},
+  {id:'tap1k', name:'Obsessive',         icon:'🤯',desc:'Tap 1,000 times.',                       req:()=>G.totalClicks>=1000},
+  {id:'s1k',   name:'Spore Hoarder',     icon:'✨',desc:'Collect 1,000 spores.',                 req:()=>G.lifetime>=1000},
+  {id:'s100k', name:'Fungal Baron',      icon:'🍄',desc:'Collect 100,000 spores.',               req:()=>G.lifetime>=100000},
+  {id:'s1m',   name:'Myco-Millionaire',  icon:'💰',desc:'Collect 1 Million spores.',             req:()=>G.lifetime>=1e6},
+  {id:'s1b',   name:'Spore Billionaire', icon:'🤑',desc:'Collect 1 Billion spores.',             req:()=>G.lifetime>=1e9},
+  {id:'s1t',   name:'Fungal Titan',      icon:'🌍',desc:'Collect 1 Trillion spores.',            req:()=>G.lifetime>=1e12},
+  {id:'b10',   name:'Grower',            icon:'🌿',desc:'Own 10 colonies total.',                req:()=>totalBlds()>=10},
+  {id:'b50',   name:'Mycologist',        icon:'🔬',desc:'Own 50 colonies total.',                req:()=>totalBlds()>=50},
+  {id:'b100',  name:'Fungal Empire',     icon:'👑',desc:'Own 100 colonies total.',               req:()=>totalBlds()>=100},
+  {id:'b200',  name:'The Overmind',      icon:'🌀',desc:'Own 200 colonies total.',               req:()=>totalBlds()>=200},
+  {id:'allbld',name:'Full Ecosystem',    icon:'🌲',desc:'Own at least 1 of every colony type.',  req:()=>BUILDINGS.every(b=>bldN(b.id)>=1)},
+  {id:'asc1',  name:'Reborn Spore',      icon:'🔄',desc:'Ascend for the first time.',            req:()=>G.ascendCount>=1},
+  {id:'asc3',  name:'Eternal Fungus',    icon:'♾️',desc:'Ascend 3 times.',                      req:()=>G.ascendCount>=3},
+];
 
-        function buyAuto() {
-            if (clips >= autoCost) {
-                clips -= autoCost;
-                autos++;
-                autoCost += 10;
-                update();
-            }
-        }
+const STAGES=[
+  {at:0,      name:'🌱 Lone Spore',        desc:'A single spore on the forest floor. The journey begins.'},
+  {at:200,    name:'🍄 Sprouting',          desc:'Tiny mushrooms emerge from the soil.'},
+  {at:2000,   name:'🌿 Mycelium Network',   desc:'Underground threads connect your growing empire.'},
+  {at:20000,  name:'🌲 Forest Tender',      desc:'The trees whisper to your mycelium.'},
+  {at:200000, name:'🦋 Enchanted Grove',    desc:'Magic seeps through your fungal network.'},
+  {at:2e6,    name:'🌍 Planetary Mycelium', desc:'Your roots span entire continents.'},
+  {at:2e9,    name:'🌌 Dimensional Spore',  desc:'Your spores drift between worlds.'},
+  {at:2e12,   name:'👑 Fungal Deity',       desc:'You are the forest. You are everything.'},
+];
 
-        function buyMega() {
-            if (clips >= megaCost) {
-                clips -= megaCost;
-                megas++;
-                megaCost += 40;
-                update();
-            }
-        }
-
-        function rebirth() {
-            if (clips >= 1000000) {
-                leaderboard.push({ name: user, score: clips });
-                leaderboard.sort((a, b) => b.score - a.score);
-                leaderboard = leaderboard.slice(0, 5);
-                localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
-                
-                clips = 0;
-                autos = 0;
-                megas = 0;
-                autoCost = 50;
-                megaCost = 300;
-                rebirthMult++;
-                
-                update();
-                updateLeaderboard();
-                showAchievement('REBIRTH ' + rebirthMult + '!');
-            }
-        }
-
-        function updateLeaderboard() {
-            let list = document.getElementById('leaderboardList');
-            if (!list) return;
-            
-            let html = '';
-            if (leaderboard.length === 0) {
-                html = '<div class="leaderboard-item">No players yet</div>';
-            } else {
-                leaderboard.forEach((entry, i) => {
-                    html += `<div class="leaderboard-item"><span>${i+1}. ${entry.name}</span><span>${Math.floor(entry.score).toLocaleString()}</span></div>`;
-                });
-            }
-            list.innerHTML = html;
-        }
-
-        function showAchievement(text) {
-            let popup = document.createElement('div');
-            popup.className = 'achievement-popup';
-            popup.innerText = '🏆 ' + text;
-            document.body.appendChild(popup);
-            setTimeout(() => popup.remove(), 3000);
-        }
-
-        function openCasino() {
-            document.getElementById('casinoModal').style.display = 'block';
-            update();
-        }
-
-        function closeCasino() {
-            document.getElementById('casinoModal').style.display = 'none';
-        }
-
-        // Blackjack
-        function createDeck() {
-            let suits = ['♠','♥','♦','♣'];
-            let ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-            deck = [];
-            for (let s of suits) {
-                for (let r of ranks) {
-                    deck.push({rank: r, suit: s});
-                }
-            }
-            for (let i = deck.length - 1; i > 0; i--) {
-                let j = Math.floor(Math.random() * (i + 1));
-                [deck[i], deck[j]] = [deck[j], deck[i]];
-            }
-        }
-
-        function getCardValue(card) {
-            if (card.rank === 'A') return 11;
-            if (['K','Q','J'].includes(card.rank)) return 10;
-            return parseInt(card.rank);
-        }
-
-        function getHandTotal(hand) {
-            let total = 0;
-            let aces = 0;
-            for (let card of hand) {
-                total += getCardValue(card);
-                if (card.rank === 'A') aces++;
-            }
-            while (total > 21 && aces > 0) {
-                total -= 10;
-                aces--;
-            }
-            return total;
-        }
-
-        function renderBJ() {
-            let playerCards = document.getElementById('playerCards');
-            let dealerCards = document.getElementById('dealerCards');
-            
-            playerCards.innerHTML = '';
-            dealerCards.innerHTML = '';
-            
-            player.forEach(card => {
-                let color = (card.suit === '♥' || card.suit === '♦') ? 'red' : 'black';
-                playerCards.innerHTML += `<div class="card ${color}">${card.rank}${card.suit}</div>`;
-            });
-            
-            dealer.forEach((card, index) => {
-                if (bjActive && index === 1) {
-                    dealerCards.innerHTML += `<div class="card">?</div>`;
-                } else {
-                    let color = (card.suit === '♥' || card.suit === '♦') ? 'red' : 'black';
-                    dealerCards.innerHTML += `<div class="card ${color}">${card.rank}${card.suit}</div>`;
-                }
-            });
-            
-            document.getElementById('playerTotal').innerText = 'Total: ' + getHandTotal(player);
-            document.getElementById('dealerTotal').innerText = bjActive ? 'Total: ?' : 'Total: ' + getHandTotal(dealer);
-        }
-
-        function startBJ() {
-            let bet = parseInt(document.getElementById('bjBet').value);
-            if (bet > clips || bet <= 0) {
-                alert('Invalid bet!');
-                return;
-            }
-            
-            createDeck();
-            player = [deck.pop(), deck.pop()];
-            dealer = [deck.pop(), deck.pop()];
-            clips -= bet;
-            currentBet = bet;
-            bjActive = true;
-            
-            document.getElementById('hitBtn').disabled = false;
-            document.getElementById('standBtn').disabled = false;
-            document.getElementById('doubleBtn').disabled = false;
-            document.getElementById('dealBtn').disabled = true;
-            
-            document.getElementById('bjResult').innerText = '';
-            renderBJ();
-            update();
-        }
-
-        function hit() {
-            if (!bjActive) return;
-            player.push(deck.pop());
-            renderBJ();
-            
-            if (getHandTotal(player) > 21) {
-                document.getElementById('bjResult').innerText = 'BUST!';
-                bjActive = false;
-                document.getElementById('hitBtn').disabled = true;
-                document.getElementById('standBtn').disabled = true;
-                document.getElementById('doubleBtn').disabled = true;
-                document.getElementById('dealBtn').disabled = false;
-            }
-        }
-
-        function stand() {
-            if (!bjActive) return;
-            
-            while (getHandTotal(dealer) < 17) {
-                dealer.push(deck.pop());
-            }
-            
-            let playerTotal = getHandTotal(player);
-            let dealerTotal = getHandTotal(dealer);
-            
-            renderBJ();
-            
-            if (dealerTotal > 21 || playerTotal > dealerTotal) {
-                clips += currentBet * 2;
-                document.getElementById('bjResult').innerText = 'YOU WIN!';
-                productionBoost *= 1.2;
-            } else if (playerTotal === dealerTotal) {
-                clips += currentBet;
-                document.getElementById('bjResult').innerText = 'PUSH';
-            } else {
-                document.getElementById('bjResult').innerText = 'DEALER WINS';
-            }
-            
-            bjActive = false;
-            document.getElementById('hitBtn').disabled = true;
-            document.getElementById('standBtn').disabled = true;
-            document.getElementById('doubleBtn').disabled = true;
-            document.getElementById('dealBtn').disabled = false;
-            update();
-        }
-
-        function doubleDown() {
-            if (!bjActive) return;
-            if (clips < currentBet) return;
-            
-            clips -= currentBet;
-            currentBet *= 2;
-            player.push(deck.pop());
-            renderBJ();
-            
-            if (getHandTotal(player) > 21) {
-                document.getElementById('bjResult').innerText = 'BUST!';
-                bjActive = false;
-                document.getElementById('hitBtn').disabled = true;
-                document.getElementById('standBtn').disabled = true;
-                document.getElementById('doubleBtn').disabled = true;
-                document.getElementById('dealBtn').disabled = false;
-                update();
-                return;
-            }
-            
-            stand();
-        }
-
-        // Plinko
-        function createPlinkoBoard() {
-            let grid = document.getElementById('plinkoGrid');
-            let slots = document.getElementById('plinkoSlots');
-            
-            grid.innerHTML = '';
-            for (let row = 0; row < 8; row++) {
-                let rowDiv = document.createElement('div');
-                rowDiv.className = 'plinko-row';
-                for (let peg = 0; peg <= row; peg++) {
-                    rowDiv.innerHTML += '<div class="plinko-peg"></div>';
-                }
-                grid.appendChild(rowDiv);
-            }
-            
-            slots.innerHTML = '';
-            let multis = [10, 5, 3, 2, 1, 2, 3, 5, 10];
-            for (let i = 0; i < 9; i++) {
-                slots.innerHTML += `<div class="plinko-slot" id="plinkoSlot${i}">${multis[i]}x</div>`;
-            }
-        }
-
-        function dropPlinko() {
-            let bet = parseInt(document.getElementById('plinkoBet').value);
-            if (bet > clips || bet <= 0) {
-                alert('Invalid bet!');
-                return;
-            }
-            
-            clips -= bet;
-            
-            let position = 4;
-            for (let i = 0; i < 8; i++) {
-                position += Math.random() > 0.5 ? 1 : -1;
-                position = Math.max(0, Math.min(8, position));
-            }
-            
-            let multis = [10, 5, 3, 2, 1, 2, 3, 5, 10];
-            let multiplier = multis[position];
-            
-            for (let i = 0; i < 9; i++) {
-                document.getElementById('plinkoSlot' + i).classList.remove('highlight');
-            }
-            document.getElementById('plinkoSlot' + position).classList.add('highlight');
-            
-            let win = bet * multiplier;
-            clips += win;
-            document.getElementById('plinkoResult').innerText = `${multiplier}x WINNER! +${win}`;
-            
-            update();
-        }
-
-        // Roulette
-        function betRoulette(betType) {
-            let bet = parseInt(document.getElementById('rouletteBet').value);
-            if (bet > clips || bet <= 0) {
-                alert('Invalid bet!');
-                return;
-            }
-            
-            clips -= bet;
-            
-            let num = Math.floor(Math.random() * 6) + 1;
-            let color = [1,3,5].includes(num) ? 'red' : 'black';
-            
-            let won = false;
-            let multiplier = 0;
-            
-            if (betType === 'red' && color === 'red') { won = true; multiplier = 2; }
-            else if (betType === 'black' && color === 'black') { won = true; multiplier = 2; }
-            else if (betType === 'green' && num === 0) { won = true; multiplier = 36; }
-            else if (betType === num) { won = true; multiplier = 36; }
-            
-            if (won) {
-                clips += bet * multiplier;
-                document.getElementById('rouletteResult').innerText = `WIN! Number ${num} ${color}`;
-            } else {
-                document.getElementById('rouletteResult').innerText = `LOSE! Number ${num} ${color}`;
-            }
-            
-            update();
-        }
-
-        // Dice
-        function rollDice(betType) {
-            let bet = parseInt(document.getElementById('diceBet').value);
-            if (bet > clips || bet <= 0) {
-                alert('Invalid bet!');
-                return;
-            }
-            
-            clips -= bet;
-            
-            let die1 = Math.floor(Math.random() * 6) + 1;
-            let die2 = Math.floor(Math.random() * 6) + 1;
-            let sum = die1 + die2;
-            
-            let diceSymbols = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-            document.getElementById('dice1').innerText = diceSymbols[die1 - 1];
-            document.getElementById('dice2').innerText = diceSymbols[die2 - 1];
-            
-            let won = false;
-            let multiplier = 0;
-            
-            if (betType === 'under7' && sum < 7) { won = true; multiplier = 2; }
-            else if (betType === 'over7' && sum > 7) { won = true; multiplier = 2; }
-            else if (betType === 'exact7' && sum === 7) { won = true; multiplier = 5; }
-            
-            if (won) {
-                clips += bet * multiplier;
-                document.getElementById('diceResult').innerText = `WIN! Sum ${sum} (${multiplier}x)`;
-            } else {
-                document.getElementById('diceResult').innerText = `LOSE! Sum was ${sum}`;
-            }
-            
-            update();
-        }
-
-        // Slots
-        function spinSlots() {
-            let bet = parseInt(document.getElementById('slotsBet').value);
-            if (bet > clips || bet <= 0) {
-                alert('Invalid bet!');
-                return;
-            }
-            
-            clips -= bet;
-            
-            let symbols = ['🍒', '🍋', '🍊', '🍇', '💎', '7️⃣'];
-            let r1 = symbols[Math.floor(Math.random() * symbols.length)];
-            let r2 = symbols[Math.floor(Math.random() * symbols.length)];
-            let r3 = symbols[Math.floor(Math.random() * symbols.length)];
-            
-            document.getElementById('slot1').innerText = r1;
-            document.getElementById('slot2').innerText = r2;
-            document.getElementById('slot3').innerText = r3;
-            
-            if (r1 === r2 && r2 === r3) {
-                let multi = r1 === '7️⃣' ? 10 : r1 === '💎' ? 7 : 5;
-                clips += bet * multi;
-                document.getElementById('slotsResult').innerText = `JACKPOT! ${multi}x`;
-            } else if (r1 === r2 || r2 === r3 || r1 === r3) {
-                clips += bet * 2;
-                document.getElementById('slotsResult').innerText = 'PAIR! 2x';
-            } else {
-                document.getElementById('slotsResult').innerText = 'Try again';
-            }
-            
-            update();
-        }
-
-        // Crash Game
-        function startCrash() {
-            let bet = parseInt(document.getElementById('crashBet').value);
-            if (bet > clips || bet <= 0) {
-                alert('Invalid bet!');
-                return;
-            }
-            
-            crashBet = bet;
-            clips -= bet;
-            crashMultiplier = 1.0;
-            crashActive = true;
-            
-            document.getElementById('crashBtn').disabled = true;
-            document.getElementById('cashoutBtn').disabled = false;
-            document.getElementById('crashResult').innerText = '';
-            
-            crashInterval = setInterval(() => {
-                crashMultiplier += 0.01;
-                document.getElementById('crashMultiplier').innerText = crashMultiplier.toFixed(2) + 'x';
-                
-                if (Math.random() < 0.01) {
-                    crash();
-                }
-            }, 100);
-        }
-
-        function crash() {
-            clearInterval(crashInterval);
-            crashActive = false;
-            document.getElementById('crashMultiplier').innerText = 'CRASHED!';
-            document.getElementById('crashBtn').disabled = false;
-            document.getElementById('cashoutBtn').disabled = true;
-            update();
-        }
-
-        function cashOut() {
-            if (!crashActive) return;
-            
-            clearInterval(crashInterval);
-            crashActive = false;
-            
-            let win = Math.floor(crashBet * crashMultiplier);
-            clips += win;
-            
-            document.getElementById('crashResult').innerText = `CASHED OUT! +${win}`;
-            document.getElementById('crashBtn').disabled = false;
-            document.getElementById('cashoutBtn').disabled = true;
-            document.getElementById('crashMultiplier').innerText = '1.00x';
-            
-            update();
-        }
-
-        // Coin Flip
-        function flipCoin(choice) {
-            let bet = parseInt(document.getElementById('coinBet').value);
-            if (bet > clips || bet <= 0) {
-                alert('Invalid bet!');
-                return;
-            }
-            
-            clips -= bet;
-            
-            let result = Math.random() < 0.5 ? 'heads' : 'tails';
-            
-            if (choice === result) {
-                clips += bet * 2;
-                document.getElementById('coinResult').innerText = `WIN! It was ${result}`;
-            } else {
-                document.getElementById('coinResult').innerText = `LOSE! It was ${result}`;
-            }
-            
-            update();
-        }
-    </script>
-</body>
-</html>
+const TICKERS=[
+  '🍄 Local farmer re
