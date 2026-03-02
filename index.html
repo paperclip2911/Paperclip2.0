@@ -7,28 +7,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0d0a08;
-  --panel: rgba(26,18,8,0.95);
-  --panel2: rgba(34,24,10,0.9);
-  --border: #3d2a10;
-  --border2: #5a3f18;
-  --spore: #c8ff00;
-  --spore2: #88bb00;
-  --glow: #00ffaa;
-  --glow2: #00cc88;
-  --amber: #ffaa22;
-  --amber2: #ff7700;
-  --purple: #cc44ff;
-  --text: #e8d5a0;
-  --text2: #9a7a44;
-  --red: #ff4444;
+  --bg: #0d0a08; --panel: rgba(26,18,8,0.95); --panel2: rgba(34,24,10,0.9);
+  --border: #3d2a10; --border2: #5a3f18; --spore: #c8ff00; --spore2: #88bb00;
+  --glow: #00ffaa; --glow2: #00cc88; --amber: #ffaa22; --amber2: #ff7700;
+  --purple: #cc44ff; --text: #e8d5a0; --text2: #9a7a44; --red: #ff4444;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body { width:100%; min-height:100vh; background:var(--bg); color:var(--text); font-family:'Crimson Text',Georgia,serif; overflow-x:hidden; cursor:default; }
-body::before { content:''; position:fixed; inset:0; z-index:0; background: radial-gradient(ellipse at 20% 80%, rgba(0,255,100,0.04) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(200,100,0,0.05) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(0,200,100,0.03) 0%, transparent 70%); pointer-events:none !important; }
+body::before { content:''; position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse at 20% 80%,rgba(0,255,100,0.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(200,100,0,0.05) 0%,transparent 50%),radial-gradient(ellipse at 50% 50%,rgba(0,200,100,0.03) 0%,transparent 70%); pointer-events:none !important; }
 canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !important; opacity:0.4; }
 .wrap { position:relative; z-index:1; display:grid; grid-template-columns:260px 1fr 300px; min-height:100vh; }
-@media(max-width:960px){ .wrap { grid-template-columns:1fr; } .sidebar-left,.sidebar-right { display:none; } }
+@media(max-width:960px){ .wrap{grid-template-columns:1fr;} .sidebar-left,.sidebar-right{display:none;} }
 .topbar { grid-column:1/-1; background:linear-gradient(180deg,#0a0805 0%,rgba(10,8,5,0.97) 100%); border-bottom:2px solid var(--border2); padding:12px 24px; display:flex; align-items:center; gap:20px; position:sticky; top:0; z-index:200; box-shadow:0 4px 30px rgba(0,0,0,0.8); }
 .game-logo { font-family:'Cinzel',serif; font-size:20px; font-weight:900; color:var(--spore); text-shadow:0 0 20px rgba(200,255,0,0.5); white-space:nowrap; letter-spacing:1px; }
 .top-stat { background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; padding:5px 14px; text-align:center; }
@@ -58,7 +47,7 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
 .shroom-gills { position:absolute; bottom:108px; left:50%; transform:translateX(-50%); width:160px; height:18px; background:linear-gradient(180deg,#cc9966 0%,#aa7744 100%); border-radius:0 0 8px 8px; overflow:hidden; }
 .gill-line { position:absolute; width:1px; height:100%; background:rgba(0,0,0,0.3); top:0; }
 .spore-particle { position:absolute; width:4px; height:4px; border-radius:50%; background:var(--spore); box-shadow:0 0 6px var(--spore); pointer-events:none; animation:sporeFloat 3s ease-in infinite; opacity:0; }
-@keyframes sporeFloat { 0%{opacity:0;transform:translateY(0) translateX(0) scale(1);} 20%{opacity:0.8;} 100%{opacity:0;transform:translateY(-120px) translateX(var(--drift)) scale(0.3);} }
+@keyframes sporeFloat { 0%{opacity:0;transform:translateY(0) scale(1);} 20%{opacity:0.8;} 100%{opacity:0;transform:translateY(-120px) translateX(var(--drift)) scale(0.3);} }
 .res-panel { background:var(--panel); border:1px solid var(--border2); border-radius:12px; padding:20px 24px; text-align:center; width:100%; max-width:400px; box-shadow:0 0 40px rgba(0,0,0,0.5); }
 .spore-count { font-family:'Cinzel',serif; font-size:42px; font-weight:900; color:var(--spore); text-shadow:0 0 30px rgba(200,255,0,0.5); line-height:1; }
 .spore-label { font-size:14px; color:var(--text2); margin-top:4px; font-style:italic; }
@@ -103,6 +92,7 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
 .ach-name { font-family:'Cinzel',serif; font-size:11px; color:var(--text); }
 .ach-desc { font-size:10px; color:var(--text2); font-style:italic; }
 @keyframes floatUp { 0%{opacity:1;transform:translateY(0) scale(1);} 70%{opacity:1;transform:translateY(-70px) scale(1.1);} 100%{opacity:0;transform:translateY(-100px) scale(0.8);} }
+@keyframes eventSlide { from{opacity:0;transform:translateX(-50%) translateY(-20px) scale(0.95)} to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)} }
 .gold-shroom { position:fixed; font-size:44px; cursor:pointer; z-index:500; animation:shroomBounce 0.6s ease-in-out infinite alternate; filter:drop-shadow(0 0 20px #ffaa22) drop-shadow(0 0 8px #ffff00); user-select:none; }
 @keyframes shroomBounce { from{transform:scale(1) rotate(-8deg);} to{transform:scale(1.2) rotate(8deg);} }
 .notif { position:fixed; bottom:24px; right:24px; background:var(--panel); border:2px solid var(--amber2); border-radius:10px; padding:12px 18px; font-size:13px; font-weight:600; z-index:1000; max-width:280px; animation:notifSlide 0.4s ease; box-shadow:0 0 30px rgba(255,150,0,0.2); color:var(--text); }
@@ -134,13 +124,6 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
 .shop-close:hover { color:var(--text); }
 .shop-btn { display:block; width:100%; margin-top:14px; padding:10px; border-radius:8px; border:2px solid var(--amber2); background:rgba(255,120,0,0.1); color:var(--amber); font-family:'Cinzel',serif; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s; }
 .shop-btn:hover { background:rgba(255,120,0,0.25); }
-.event-popup { position:fixed; top:80px; left:50%; transform:translateX(-50%); z-index:900; width:420px; max-width:92vw; background:linear-gradient(135deg,#1a0a00,#0d0800); border:2px solid var(--amber); border-radius:14px; padding:20px 24px; box-shadow:0 0 50px rgba(255,150,0,0.3); animation:eventSlide 0.4s cubic-bezier(0.34,1.56,0.64,1); }
-@keyframes eventSlide { from{opacity:0;transform:translateX(-50%) translateY(-30px) scale(0.9)} to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)} }
-.event-type { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text2); margin-bottom:4px; }
-.event-title { font-family:'Cinzel',serif; font-size:18px; font-weight:900; color:var(--amber); margin-bottom:6px; }
-.event-desc { font-size:13px; color:var(--text); line-height:1.5; margin-bottom:14px; font-style:italic; }
-.event-btn { width:100%; padding:9px; border-radius:8px; border:2px solid var(--amber2); background:rgba(255,120,0,0.12); color:var(--amber); font-family:'Cinzel',serif; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.15s; }
-.event-btn:hover { background:rgba(255,120,0,0.28); }
 </style>
 </head>
 <body>
@@ -226,7 +209,6 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
     <button class="shop-btn" onclick="closeShop()">Fermer</button>
   </div>
 </div>
-<div id="eventPopup" style="display:none"></div>
 
 <script>
 const rc=document.getElementById('roots'),rx=rc.getContext('2d');
@@ -252,19 +234,19 @@ function fmt(n){
   return v.toFixed(i>0?2:0)+' '+S[i];
 }
 
-let G={spores:0,lifetime:0,totalClicks:0,ascendCount:0,ascendMult:1,bld:{},upg:{},ach:{},time:0};
+let G={spores:0,lifetime:0,totalClicks:0,ascendCount:0,ascendMult:1,bld:{},upg:{},ach:{},time:0,shielded:false};
 
 const BUILDINGS=[
   {id:'spore',  name:'Spore Pod',       icon:'🫧',base:12,     cps:0.1,  desc:'Libere des spores en continu.',          unlock:0},
-  {id:'mycel',  name:'Mycelium Thread', icon:'🕸️',base:80,     cps:0.4,  desc:'Les filaments absorbent les nutriments.',  unlock:40},
-  {id:'fairy',  name:'Fairy Ring',      icon:'💫',base:450,    cps:1.8,  desc:'Les anneaux anciens canalisent la magie.', unlock:200},
-  {id:'truffle',name:'Truffle Network', icon:'🌰',base:2500,   cps:8,    desc:'Les reseaux de truffes cultivent le sol.', unlock:1000},
+  {id:'mycel',  name:'Mycelium Thread', icon:'🕸️',base:80,     cps:0.4,  desc:'Les filaments absorbent les nutriments.', unlock:40},
+  {id:'fairy',  name:'Fairy Ring',      icon:'💫',base:450,    cps:1.8,  desc:'Les anneaux anciens canalisent la magie.',unlock:200},
+  {id:'truffle',name:'Truffle Network', icon:'🌰',base:2500,   cps:8,    desc:'Les reseaux de truffes cultivent le sol.',unlock:1000},
   {id:'giant',  name:'Giant Shroom',    icon:'🍄',base:12000,  cps:35,   desc:'Un champignon colossal plein de puissance.',unlock:5000},
   {id:'cave',   name:'Cave Colony',     icon:'🦇',base:65000,  cps:150,  desc:'Les grottes profondes cultivent des fungi.',unlock:25000},
-  {id:'spire',  name:'Fungal Spire',    icon:'🗼',base:350000, cps:600,  desc:'Une fleche repand des spores au loin.',    unlock:120000},
-  {id:'forest', name:'Enchanted Forest',icon:'🌲',base:1800000,cps:2500, desc:'Une foret entiere sous controle mycolo.', unlock:600000},
-  {id:'world',  name:'World Root',      icon:'🌍',base:9000000,cps:10000,desc:'Le mycelium enveloppe la planete entiere.',unlock:3000000},
-  {id:'beyond', name:'Spore Dimension', icon:'🌀',base:4e8,    cps:60000,desc:'Une dimension de pur champignon.',         unlock:1e8},
+  {id:'spire',  name:'Fungal Spire',    icon:'🗼',base:350000, cps:600,  desc:'Une fleche repand des spores au loin.',   unlock:120000},
+  {id:'forest', name:'Enchanted Forest',icon:'🌲',base:1800000,cps:2500, desc:'Une foret entiere sous controle myco.',  unlock:600000},
+  {id:'world',  name:'World Root',      icon:'🌍',base:9000000,cps:10000,desc:'Le mycelium enveloppe la planete.',       unlock:3000000},
+  {id:'beyond', name:'Spore Dimension', icon:'🌀',base:4e8,    cps:60000,desc:'Une dimension de pur champignon.',        unlock:1e8},
 ];
 
 const UPGRADES=[
@@ -324,7 +306,7 @@ const TICKERS=[
   '🍄 Un fermier signale des champignons couvrant son champ entier du jour au lendemain.',
   '🌿 Des botanistes perplexes face aux reseaux de mycelium sous les rues de la ville.',
   '✨ Un anneau de fees atteint 3 km de diametre — les touristes affluent en masse.',
-  '🦠 Scientists: Le foret pense. Nous ne pouvons pas l expliquer.',
+  '🦠 Scientists: La foret pense. Nous ne pouvons pas l expliquer.',
   '🌰 Le marche mondial des truffes s effondre — l offre devient inepuisable.',
   '🕸️ Un reseau mycelien communique via des signaux chimiques entre continents entiers.',
   '🌀 Des rapports d une dimension de spores apparaissant dans l ocean Pacifique.',
@@ -332,54 +314,49 @@ const TICKERS=[
   '🧠 Des biologistes confirment: le reseau mycelien a atteint une conscience collective.',
 ];
 
-// EVENTS — avec poids (weight) pour probabilite
 const EVENTS=[
-  // BONUS
-  {id:'spore_rain',    icon:'🌧️',title:'Pluie de Spores!',          desc:'Une tempete de spores balaie la foret. Recolte 3 minutes de production instant!', type:'bonus',weight:12,apply:()=>{const b=getSPS()*180;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
-  {id:'giant_shroom',  icon:'🌲',title:'Champignon Geant!',          desc:'Un champignon colossal surgit du sol. Bonus de 5 minutes de production!',         type:'bonus',weight:8, apply:()=>{const b=getSPS()*300;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
-  {id:'ancient_ritual',icon:'🔮',title:'Rituel Ancien!',             desc:'Un rituel ancestral se declenche. 10 minutes du meilleur batiment!',               type:'bonus',weight:5, apply:()=>{let best=0;BUILDINGS.forEach(b=>{const s=b.cps*bldN(b.id)*bldMult(b.id)*globalMult();if(s>best)best=s;});const b=best*600;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
-  {id:'spore_bounty',  icon:'🎁',title:'Bounty de Spores!',          desc:'Un chasseur de truffes offre une recompense. +2 minutes de production!',           type:'bonus',weight:10,apply:()=>{const b=getSPS()*120;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
-  // BOOSTS POSITIFS
-  {id:'myco_frenzy',   icon:'🍄',title:'Frenesie Mycelium!',          desc:'Le reseau vibre d energie. Production x3 pendant 30 secondes!',                   type:'boost',weight:10,apply:()=>{addBoost('myco_frenzy','🍄 Frenesie x3',3,30);return 'x3 / 30s';}},
-  {id:'spore_wind',    icon:'🌀',title:'Vent de Spores!',             desc:'Un vent porte tes spores loin. Tap power x5 pendant 45 secondes!',                type:'boost',weight:9, apply:()=>{addBoost('spore_wind','🌀 Tap x5',5,45,'click');return 'Tap x5 / 45s';}},
-  {id:'fairy_blessing',icon:'💫',title:'Benediction des Fees!',       desc:'Les fees te benissent. Production x2 pendant 60 secondes!',                       type:'boost',weight:8, apply:()=>{addBoost('fairy_blessing','💫 Benediction x2',2,60);return 'x2 / 60s';}},
-  {id:'truffle_rush',  icon:'🌰',title:'Ruee aux Truffes!',           desc:'Des truffes rares emergent. +50% de spores par clic pendant 60s!',                type:'boost',weight:9, apply:()=>{addBoost('truffle_rush','🌰 Clic +50%',1.5,60,'click');return '+50% clic / 60s';}},
-  {id:'spore_storm',   icon:'⚡',title:'Tempete de Spores!',          desc:'Une tempete electrique ionise les spores. Production x5 pendant 20s!',            type:'boost',weight:6, apply:()=>{addBoost('spore_storm','⚡ Tempete x5',5,20);return 'x5 / 20s';}},
-  {id:'mycoburst',     icon:'🌟',title:'Explosion Mycelienne!',       desc:'Une explosion de mycelium! Production x4 pendant 45s!',                           type:'boost',weight:7, apply:()=>{addBoost('mycoburst','🌟 Burst x4',4,45);return 'x4 / 45s';}},
-  // MALUS DOUX
-  {id:'drought',       icon:'☀️',title:'Secheresse!',                 desc:'Le sol se desseche. Production -50% pendant 45 secondes.',                        type:'malus',weight:8, apply:()=>{addBoost('drought','☀️ Secheresse -50%',0.5,45);return '-50% prod / 45s';}},
-  {id:'rot',           icon:'🦠',title:'Pourriture Mycelienne...',    desc:'Une maladie frappe. Tu perds 10% de tes spores actuels.',                         type:'malus',weight:6, apply:()=>{const l=Math.floor(G.spores*0.1);G.spores=Math.max(0,G.spores-l);return '-'+fmt(l)+' spores';}},
-  {id:'spore_thieves', icon:'🐛',title:'Voleurs de Spores!',         desc:'Des insectes envahissent ton reseau! Production -70% pendant 30 secondes.',        type:'malus',weight:5, apply:()=>{addBoost('spore_thieves','🐛 Invasion -70%',0.3,30);return '-70% prod / 30s';}},
-  {id:'cold_snap',     icon:'❄️',title:'Vague de Froid!',            desc:'Le gel ralentit ta croissance. Production -40% pendant 60 secondes.',              type:'malus',weight:7, apply:()=>{addBoost('cold_snap','❄️ Gel -40%',0.6,60);return '-40% prod / 60s';}},
-  {id:'fungal_blight', icon:'🌑',title:'Fletrissure Fongique!',       desc:'Une fletrissure noire se repand. Production -60% pendant 40 secondes.',            type:'malus',weight:5, apply:()=>{addBoost('fungal_blight','🌑 Fletrissure -60%',0.4,40);return '-60% prod / 40s';}},
-  {id:'root_damage',   icon:'⚠️',title:'Racines Endommagees!',       desc:'Des tunneliers brisent tes racines. Production -30% pendant 90 secondes!',         type:'malus',weight:6, apply:()=>{addBoost('root_damage','⚠️ Racines -30%',0.7,90);return '-30% prod / 90s';}},
-  // MALUS DURS — rares
-  {id:'spore_collapse',icon:'💀',title:'Effondrement de Spores!',     desc:'Une catastrophe! Tu perds 25% de tes spores actuels. Evenement rare!',            type:'malus',weight:2, apply:()=>{const l=Math.floor(G.spores*0.25);G.spores=Math.max(0,G.spores-l);return '-'+fmt(l)+' spores';}},
-  {id:'mega_drought',  icon:'🔥',title:'Grande Secheresse!',          desc:'Un megasecheresse devastatrice. Production -80% pendant 60 secondes!',            type:'malus',weight:2, apply:()=>{addBoost('mega_drought','🔥 Megasecheresse -80%',0.2,60);return '-80% prod / 60s';}},
-  {id:'parasite',      icon:'🕷️',title:'Parasite Mycelien!',          desc:'Un parasite ronge tout. -50% production ET -50% tap pendant 45 secondes!',        type:'malus',weight:3, apply:()=>{addBoost('parasite_prod','🕷️ Parasite prod -50%',0.5,45);addBoost('parasite_click','🕷️ Parasite tap -50%',0.5,45,'click');return '-50% tout / 45s';}},
+  {id:'spore_rain',    icon:'🌧️',title:'Pluie de Spores!',          desc:'Une tempete de spores balaie la foret. +3 minutes de production!',             type:'bonus',weight:12,apply:()=>{const b=getSPS()*180;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
+  {id:'giant_shroom',  icon:'🌲',title:'Champignon Geant!',          desc:'Un champignon colossal surgit. +5 minutes de production!',                     type:'bonus',weight:8, apply:()=>{const b=getSPS()*300;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
+  {id:'ancient_ritual',icon:'🔮',title:'Rituel Ancien!',             desc:'Un rituel ancestral. +10 min du meilleur batiment!',                           type:'bonus',weight:5, apply:()=>{let best=0;BUILDINGS.forEach(b=>{const s=b.cps*bldN(b.id)*bldMult(b.id)*globalMult();if(s>best)best=s;});const b=best*600;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
+  {id:'spore_bounty',  icon:'🎁',title:'Bounty de Spores!',          desc:'Un chasseur offre une recompense. +2 minutes de production!',                  type:'bonus',weight:10,apply:()=>{const b=getSPS()*120;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
+  {id:'myco_frenzy',   icon:'🍄',title:'Frenesie Mycelium!',          desc:'Le reseau vibre. Production x3 / 30s!',                                        type:'boost',weight:10,apply:()=>{addBoost('myco_frenzy','🍄 Frenesie x3',3,30);return 'x3 / 30s';}},
+  {id:'spore_wind',    icon:'🌀',title:'Vent de Spores!',             desc:'Un vent porte tes spores. Tap x5 / 45s!',                                      type:'boost',weight:9, apply:()=>{addBoost('spore_wind','🌀 Tap x5',5,45,'click');return 'Tap x5 / 45s';}},
+  {id:'fairy_blessing',icon:'💫',title:'Benediction des Fees!',       desc:'Les fees te benissent. Production x2 / 60s!',                                  type:'boost',weight:8, apply:()=>{addBoost('fairy_blessing','💫 Benediction x2',2,60);return 'x2 / 60s';}},
+  {id:'truffle_rush',  icon:'🌰',title:'Ruee aux Truffes!',           desc:'Truffes rares. +50% clic / 60s!',                                              type:'boost',weight:9, apply:()=>{addBoost('truffle_rush','🌰 Clic +50%',1.5,60,'click');return '+50% clic / 60s';}},
+  {id:'spore_storm',   icon:'⚡',title:'Tempete de Spores!',          desc:'Ionisation. Production x5 / 20s!',                                             type:'boost',weight:6, apply:()=>{addBoost('spore_storm','⚡ Tempete x5',5,20);return 'x5 / 20s';}},
+  {id:'mycoburst',     icon:'🌟',title:'Explosion Mycelienne!',       desc:'Explosion d energie. Production x4 / 45s!',                                    type:'boost',weight:7, apply:()=>{addBoost('mycoburst','🌟 Burst x4',4,45);return 'x4 / 45s';}},
+  {id:'drought',       icon:'☀️',title:'Secheresse!',                 desc:'Sol desseche. Production -50% / 45s.',                                         type:'malus',weight:8, apply:()=>{addBoost('drought','☀️ Secheresse -50%',0.5,45);return '-50% / 45s';}},
+  {id:'rot',           icon:'🦠',title:'Pourriture Mycelienne!',      desc:'Maladie. -10% de spores actuels.',                                             type:'malus',weight:6, apply:()=>{const l=Math.floor(G.spores*0.1);G.spores=Math.max(0,G.spores-l);return '-'+fmt(l)+' spores';}},
+  {id:'spore_thieves', icon:'🐛',title:'Voleurs de Spores!',          desc:'Insectes envahisseurs. Production -70% / 30s.',                                type:'malus',weight:5, apply:()=>{addBoost('spore_thieves','🐛 Invasion -70%',0.3,30);return '-70% / 30s';}},
+  {id:'cold_snap',     icon:'❄️',title:'Vague de Froid!',             desc:'Gel. Production -40% / 60s.',                                                  type:'malus',weight:7, apply:()=>{addBoost('cold_snap','❄️ Gel -40%',0.6,60);return '-40% / 60s';}},
+  {id:'fungal_blight', icon:'🌑',title:'Fletrissure Fongique!',       desc:'Fletrissure noire. Production -60% / 40s.',                                    type:'malus',weight:5, apply:()=>{addBoost('fungal_blight','🌑 Fletrissure -60%',0.4,40);return '-60% / 40s';}},
+  {id:'root_damage',   icon:'⚠️',title:'Racines Endommagees!',        desc:'Tunneliers. Production -30% / 90s.',                                           type:'malus',weight:6, apply:()=>{addBoost('root_damage','⚠️ Racines -30%',0.7,90);return '-30% / 90s';}},
+  {id:'spore_collapse',icon:'💀',title:'Effondrement!',               desc:'Catastrophe rare. -25% de spores.',                                            type:'malus',weight:2, apply:()=>{const l=Math.floor(G.spores*0.25);G.spores=Math.max(0,G.spores-l);return '-'+fmt(l)+' spores';}},
+  {id:'mega_drought',  icon:'🔥',title:'Grande Secheresse!',          desc:'Megasecheresse. Production -80% / 60s!',                                       type:'malus',weight:2, apply:()=>{addBoost('mega_drought','🔥 Megasecheresse -80%',0.2,60);return '-80% / 60s';}},
+  {id:'parasite',      icon:'🕷️',title:'Parasite Mycelien!',          desc:'Parasite. -50% prod ET -50% tap / 45s!',                                      type:'malus',weight:3, apply:()=>{addBoost('parasite_prod','🕷️ Parasite -50%',0.5,45);addBoost('parasite_click','🕷️ Tap -50%',0.5,45,'click');return '-50% tout / 45s';}},
 ];
 
 const SHOP_ITEMS_POOL=[
-  {id:'s_click2',   rarity:'common',   icon:'🖐️',name:'Dose de Spores',    desc:'Tap power x2 pendant 2 minutes.',    cost:()=>Math.max(100,getSPS()*20),   apply:()=>addBoost('s_click2','🖐️ Tap x2',2,120,'click')},
-  {id:'s_prod15',   rarity:'common',   icon:'🌿',name:'Fertilisant Leger',  desc:'Production +50% pendant 2 minutes.', cost:()=>Math.max(150,getSPS()*25),   apply:()=>addBoost('s_prod15','🌿 Prod +50%',1.5,120)},
+  {id:'s_click2',   rarity:'common',   icon:'🖐️',name:'Dose de Spores',    desc:'Tap power x2 / 2 minutes.',          cost:()=>Math.max(100,getSPS()*20),   apply:()=>addBoost('s_click2','🖐️ Tap x2',2,120,'click')},
+  {id:'s_prod15',   rarity:'common',   icon:'🌿',name:'Fertilisant Leger',  desc:'Production +50% / 2 minutes.',       cost:()=>Math.max(150,getSPS()*25),   apply:()=>addBoost('s_prod15','🌿 Prod +50%',1.5,120)},
   {id:'s_instant',  rarity:'common',   icon:'✨',name:'Recolte Rapide',     desc:'Recolte 1 minute de production.',    cost:()=>Math.max(80,getSPS()*15),    apply:()=>{const b=getSPS()*60;G.spores+=b;G.lifetime+=b;}},
-  {id:'s_click3',   rarity:'rare',     icon:'⚡',name:'Gants Myceliens',    desc:'Tap power x3 pendant 3 minutes.',    cost:()=>Math.max(500,getSPS()*60),   apply:()=>addBoost('s_click3','⚡ Tap x3',3,180,'click')},
-  {id:'s_prod2',    rarity:'rare',     icon:'🍄',name:'Champignon Booste',  desc:'Production x2 pendant 3 minutes.',   cost:()=>Math.max(600,getSPS()*70),   apply:()=>addBoost('s_prod2','🍄 Prod x2',2,180)},
+  {id:'s_click3',   rarity:'rare',     icon:'⚡',name:'Gants Myceliens',    desc:'Tap power x3 / 3 minutes.',          cost:()=>Math.max(500,getSPS()*60),   apply:()=>addBoost('s_click3','⚡ Tap x3',3,180,'click')},
+  {id:'s_prod2',    rarity:'rare',     icon:'🍄',name:'Champignon Booste',  desc:'Production x2 / 3 minutes.',         cost:()=>Math.max(600,getSPS()*70),   apply:()=>addBoost('s_prod2','🍄 Prod x2',2,180)},
   {id:'s_instant5', rarity:'rare',     icon:'🌧️',name:'Pluie de Spores',   desc:'Recolte 5 minutes de production.',   cost:()=>Math.max(400,getSPS()*80),   apply:()=>{const b=getSPS()*300;G.spores+=b;G.lifetime+=b;}},
-  {id:'s_antidote', rarity:'rare',     icon:'🛡️',name:'Antidote Fongique',  desc:'Annule tous les malus actifs instantanement!', cost:()=>Math.max(800,getSPS()*100), apply:()=>{Object.keys(activeBoosts).forEach(id=>{if(activeBoosts[id].isMalus)delete activeBoosts[id];});renderBoosts();}},
-  {id:'s_prod3',    rarity:'epic',     icon:'🔮',name:'Rituel Ancien',      desc:'Production x3 pendant 5 minutes.',   cost:()=>Math.max(2000,getSPS()*150), apply:()=>addBoost('s_prod3','🔮 Prod x3',3,300)},
-  {id:'s_click5',   rarity:'epic',     icon:'🌀',name:'Vortex de Spores',   desc:'Tap power x5 pendant 3 minutes.',    cost:()=>Math.max(1800,getSPS()*140), apply:()=>addBoost('s_click5','🌀 Tap x5',5,180,'click')},
+  {id:'s_antidote', rarity:'rare',     icon:'🛡️',name:'Antidote Fongique',  desc:'Annule tous les malus actifs!',      cost:()=>Math.max(800,getSPS()*100),  apply:()=>{Object.keys(activeBoosts).forEach(id=>{if(activeBoosts[id].isMalus)delete activeBoosts[id];});renderBoosts();}},
+  {id:'s_prod3',    rarity:'epic',     icon:'🔮',name:'Rituel Ancien',      desc:'Production x3 / 5 minutes.',         cost:()=>Math.max(2000,getSPS()*150), apply:()=>addBoost('s_prod3','🔮 Prod x3',3,300)},
+  {id:'s_click5',   rarity:'epic',     icon:'🌀',name:'Vortex de Spores',   desc:'Tap power x5 / 3 minutes.',          cost:()=>Math.max(1800,getSPS()*140), apply:()=>addBoost('s_click5','🌀 Tap x5',5,180,'click')},
   {id:'s_instant15',rarity:'epic',     icon:'🌲',name:'Foret Enchantee',    desc:'Recolte 15 minutes de production.',  cost:()=>Math.max(1500,getSPS()*200), apply:()=>{const b=getSPS()*900;G.spores+=b;G.lifetime+=b;}},
-  {id:'s_shield',   rarity:'epic',     icon:'🧿',name:'Bouclier Mycelien',  desc:'Immunise contre le prochain evenement negatif!', cost:()=>Math.max(3000,getSPS()*250), apply:()=>{G.shielded=true;addLog('🧿 Bouclier actif — prochain malus ignore!');}},
-  {id:'s_megaprod', rarity:'legendary',icon:'👑',name:'Couronne Fongique',  desc:'Production x5 pendant 10 minutes!', cost:()=>Math.max(8000,getSPS()*400), apply:()=>addBoost('s_megaprod','👑 x5 LEGENDAIRE',5,600)},
-  {id:'s_megaclick',rarity:'legendary',icon:'🌟',name:'Mains des Dieux',    desc:'Tap power x10 pendant 5 minutes!',   cost:()=>Math.max(7000,getSPS()*350), apply:()=>addBoost('s_megaclick','🌟 Tap x10',10,300,'click')},
-  {id:'s_godboost', rarity:'legendary',icon:'∞', name:'Eveil Mycelien',     desc:'Tout x8 pendant 2 minutes!',         cost:()=>Math.max(15000,getSPS()*600),apply:()=>addBoost('s_godboost','∞ Eveil x8',8,120)},
+  {id:'s_shield',   rarity:'epic',     icon:'🧿',name:'Bouclier Mycelien',  desc:'Bloque le prochain evenement negatif!',cost:()=>Math.max(3000,getSPS()*250),apply:()=>{G.shielded=true;addLog('🧿 Bouclier actif — prochain malus ignore!');}},
+  {id:'s_megaprod', rarity:'legendary',icon:'👑',name:'Couronne Fongique',  desc:'Production x5 / 10 minutes!',        cost:()=>Math.max(8000,getSPS()*400), apply:()=>addBoost('s_megaprod','👑 x5 LEGENDAIRE',5,600)},
+  {id:'s_megaclick',rarity:'legendary',icon:'🌟',name:'Mains des Dieux',    desc:'Tap power x10 / 5 minutes!',         cost:()=>Math.max(7000,getSPS()*350), apply:()=>addBoost('s_megaclick','🌟 Tap x10',10,300,'click')},
+  {id:'s_godboost', rarity:'legendary',icon:'∞', name:'Eveil Mycelien',     desc:'Tout x8 / 2 minutes!',               cost:()=>Math.max(15000,getSPS()*600),apply:()=>addBoost('s_godboost','∞ Eveil x8',8,120)},
 ];
 
 const RARITY_WEIGHTS={common:55,rare:30,epic:12,legendary:3};
 let shopItems=[],shopCdTimer=300,shopSold={};
 let eventTimer=60+Math.random()*20;
-let activeBoosts={},activeEventEl=null;
+let activeBoosts={};
 
 function bldN(id){return G.bld[id]||0;}
 function totalBlds(){return Object.values(G.bld).reduce((a,b)=>a+b,0);}
@@ -415,8 +392,7 @@ function renderBoosts(){
   document.getElementById('noBoosts').style.display=keys.length?'none':'';
   keys.forEach(id=>{
     const b=activeBoosts[id];
-    const chip=document.createElement('div');chip.id='chip_'+id;
-    chip.className='boost-chip';
+    const chip=document.createElement('div');chip.id='chip_'+id;chip.className='boost-chip';
     if(b.isMalus)chip.style.cssText='background:rgba(255,68,68,0.1);border-color:#ff4444;color:#ff6666;';
     chip.innerHTML=b.label+' <span class="boost-chip-timer" id="chiptimer_'+id+'">'+Math.ceil(b.timeLeft)+'s</span>';
     bar.appendChild(chip);
@@ -433,38 +409,33 @@ function tickBoosts(dt){
   if(changed)renderBoosts();
 }
 
+// EVENTS — auto-appliques, banniere qui disparait seule
 function triggerEvent(){
   if(getSPS()<=0&&G.lifetime<100)return;
-  // Selection ponderee par poids
   const totalW=EVENTS.reduce((s,e)=>s+(e.weight||1),0);
   let r=Math.random()*totalW,cum=0,ev=EVENTS[0];
   for(const e of EVENTS){cum+=(e.weight||1);if(r<=cum){ev=e;break;}}
-  // Bouclier contre les malus
   if(ev.type==='malus'&&G.shielded){
     G.shielded=false;
-    addLog('🧿 <strong style="color:var(--glow)">Bouclier actif!</strong> L evenement negatif a ete bloque.');
-    notif('🧿 <strong>Bouclier!</strong><br>Malus bloque par ton bouclier mycelien.');
+    addLog('🧿 <strong style="color:var(--glow)">Bouclier!</strong> Malus bloque: '+ev.title);
+    notif('🧿 <strong>Bouclier!</strong><br>'+ev.title+' bloque!');
     return;
   }
-  const typeLabel=ev.type==='malus'?'⚠️ Evenement negatif':ev.type==='boost'?'✨ Bonus temporaire':'🎁 Recompense';
+  const result=ev.apply();
   const borderCol=ev.type==='malus'?'#ff4444':ev.type==='boost'?'#00ffaa':'#ffaa22';
   const titleCol=ev.type==='malus'?'#ff6666':ev.type==='boost'?'#00ffaa':'#ffaa22';
-  const popup=document.getElementById('eventPopup');
-  popup.innerHTML='<div class="event-popup" style="border-color:'+borderCol+'"><div class="event-type">'+typeLabel+'</div><div class="event-title" style="color:'+titleCol+'">'+ev.icon+' '+ev.title+'</div><div class="event-desc">'+ev.desc+'</div><button class="event-btn" style="border-color:'+borderCol+';color:'+titleCol+'" onclick="acceptEvent(\''+ev.id+'\')">Accepter</button></div>';
-  popup.style.display='block';
-  activeEventEl=ev;
-  setTimeout(()=>{if(activeEventEl&&activeEventEl.id===ev.id)dismissEvent();},15000);
-}
-function acceptEvent(id){
-  if(!activeEventEl||activeEventEl.id!==id)return;
-  const result=activeEventEl.apply();
-  addLog(activeEventEl.icon+' <strong style="color:var(--amber)">'+activeEventEl.title+'</strong> — '+result);
-  dismissEvent();refresh();
-}
-function dismissEvent(){
-  document.getElementById('eventPopup').style.display='none';
-  document.getElementById('eventPopup').innerHTML='';
-  activeEventEl=null;
+  const typeLabel=ev.type==='malus'?'⚠️ Evenement negatif':ev.type==='boost'?'✨ Bonus temporaire':'🎁 Recompense';
+  const logColor=ev.type==='malus'?'#ff6666':ev.type==='boost'?'#00ffaa':'#ffaa22';
+  addLog(ev.icon+' <strong style="color:'+logColor+'">'+ev.title+'</strong> — '+result);
+  // Banniere auto
+  const old=document.getElementById('eventBanner');if(old)old.remove();
+  const banner=document.createElement('div');
+  banner.id='eventBanner';
+  banner.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:900;width:380px;max-width:92vw;background:linear-gradient(135deg,#1a0a00,#0d0800);border:2px solid '+borderCol+';border-radius:12px;padding:14px 20px;box-shadow:0 0 40px rgba(0,0,0,0.6);animation:eventSlide 0.4s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;';
+  banner.innerHTML='<div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#9a7a44;margin-bottom:2px">'+typeLabel+'</div><div style="font-family:Cinzel,serif;font-size:16px;font-weight:900;color:'+titleCol+';margin-bottom:4px">'+ev.icon+' '+ev.title+'</div><div style="font-size:12px;color:#e8d5a0;font-style:italic;margin-bottom:6px">'+ev.desc+'</div><div style="font-family:Cinzel,serif;font-size:13px;color:'+titleCol+';font-weight:700">'+result+'</div>';
+  document.body.appendChild(banner);
+  setTimeout(()=>{banner.style.transition='opacity 0.5s';banner.style.opacity='0';setTimeout(()=>banner.remove(),500);},4000);
+  refresh();
 }
 
 function generateShop(){
@@ -508,7 +479,7 @@ function tickShop(dt){
   if(eventTimer<=0){eventTimer=50+Math.random()*30;triggerEvent();}
   if(shopCdTimer<=0){
     shopCdTimer=300;generateShop();
-    addLog('🏪 <strong style="color:var(--amber)">Le marche s est renouvele!</strong>');
+    addLog('🏪 <strong style="color:var(--amber)">Marche renouvele!</strong>');
     notif('🏪 <strong>Marche renouvele!</strong><br>Nouveaux boosts disponibles!');
   }
   const sm=Math.floor(shopCdTimer/60),ss=Math.floor(shopCdTimer%60);
@@ -642,7 +613,7 @@ function doAscend(){
   const m=1+G.ascendCount*0.6;G.ascendMult=m;
   G.spores=0;G.lifetime=0;G.totalClicks=0;G.bld={};G.upg={};
   addLog('🌀 <strong style="color:#cc44ff">ASCENSION #'+G.ascendCount+'</strong> — Multiplicateur x'+m.toFixed(2));
-  notif('🌀 <strong>Ascension #'+G.ascendCount+'!</strong><br>Multiplicateur permanent x'+m.toFixed(2)+'!');
+  notif('🌀 <strong>Ascension #'+G.ascendCount+'!</strong><br>x'+m.toFixed(2)+' permanent!');
   refresh();renderAch();
 }
 let goldActive=false;
@@ -702,9 +673,8 @@ try{const sv=localStorage.getItem('myceliumEmpire');if(sv){G={...G,...JSON.parse
 renderAch();refresh();generateShopUI();
 addLog('🌱 Clique le champignon pour commencer ton empire!');
 addLog('💡 Achete des Colonies a droite pour automatiser la production.');
-addLog('💡 Recherche des upgrades a gauche pour multiplier ta production.');
-addLog('💡 Ouvre le 🏪 Marche pour acheter des boosts et un 🧿 Bouclier!');
-addLog('💡 Des evenements aleatoires arrivent toutes les ~1 minute — positifs ET negatifs!');
+addLog('💡 Ouvre le 🏪 Marche pour des boosts et le 🧿 Bouclier contre les malus!');
+addLog('💡 Les evenements arrivent automatiquement toutes les ~1 minute!');
 setInterval(tick,50);
 setInterval(()=>{try{localStorage.setItem('myceliumEmpire',JSON.stringify(G));}catch(e){}},8000);
 </script>
