@@ -21,150 +21,56 @@
   --purple: #cc44ff;
   --text: #e8d5a0;
   --text2: #9a7a44;
+  --red: #ff4444;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-html, body {
-  width:100%; min-height:100vh;
-  background:var(--bg); color:var(--text);
-  font-family:'Crimson Text', Georgia, serif;
-  overflow-x:hidden; cursor:default;
-}
-body::before {
-  content:''; position:fixed; inset:0; z-index:0;
-  background:
-    radial-gradient(ellipse at 20% 80%, rgba(0,255,100,0.04) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(200,100,0,0.05) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(0,200,100,0.03) 0%, transparent 70%);
-  pointer-events:none !important;
-}
+html, body { width:100%; min-height:100vh; background:var(--bg); color:var(--text); font-family:'Crimson Text',Georgia,serif; overflow-x:hidden; cursor:default; }
+body::before { content:''; position:fixed; inset:0; z-index:0; background: radial-gradient(ellipse at 20% 80%, rgba(0,255,100,0.04) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(200,100,0,0.05) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(0,200,100,0.03) 0%, transparent 70%); pointer-events:none !important; }
 canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !important; opacity:0.4; }
-.wrap {
-  position:relative; z-index:1;
-  display:grid;
-  grid-template-columns: 260px 1fr 300px;
-  min-height:100vh;
-}
-@media(max-width:960px){
-  .wrap { grid-template-columns:1fr; }
-  .sidebar-left, .sidebar-right { display:none; }
-}
-.topbar {
-  grid-column:1/-1;
-  background:linear-gradient(180deg, #0a0805 0%, rgba(10,8,5,0.97) 100%);
-  border-bottom:2px solid var(--border2);
-  padding:12px 24px; display:flex; align-items:center; gap:20px;
-  position:sticky; top:0; z-index:200;
-  box-shadow:0 4px 30px rgba(0,0,0,0.8);
-}
-.game-logo {
-  font-family:'Cinzel',serif; font-size:20px; font-weight:900;
-  color:var(--spore); text-shadow:0 0 20px rgba(200,255,0,0.5);
-  white-space:nowrap; letter-spacing:1px;
-}
-.top-stat {
-  background:rgba(255,255,255,0.03); border:1px solid var(--border);
-  border-radius:8px; padding:5px 14px; text-align:center;
-}
+.wrap { position:relative; z-index:1; display:grid; grid-template-columns:260px 1fr 300px; min-height:100vh; }
+@media(max-width:960px){ .wrap { grid-template-columns:1fr; } .sidebar-left,.sidebar-right { display:none; } }
+.topbar { grid-column:1/-1; background:linear-gradient(180deg,#0a0805 0%,rgba(10,8,5,0.97) 100%); border-bottom:2px solid var(--border2); padding:12px 24px; display:flex; align-items:center; gap:20px; position:sticky; top:0; z-index:200; box-shadow:0 4px 30px rgba(0,0,0,0.8); }
+.game-logo { font-family:'Cinzel',serif; font-size:20px; font-weight:900; color:var(--spore); text-shadow:0 0 20px rgba(200,255,0,0.5); white-space:nowrap; letter-spacing:1px; }
+.top-stat { background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; padding:5px 14px; text-align:center; }
 .top-stat .lbl { font-size:10px; color:var(--text2); letter-spacing:1px; text-transform:uppercase; display:block; }
 .top-stat .val { font-family:'Cinzel',serif; font-size:14px; color:var(--spore); }
-.ascend-btn {
-  margin-left:auto; padding:8px 20px; border-radius:6px;
-  border:2px solid var(--purple); background:rgba(136,0,204,0.12);
-  color:var(--purple); font-family:'Cinzel',serif; font-size:12px; font-weight:700;
-  cursor:pointer; transition:all 0.2s; white-space:nowrap; letter-spacing:1px;
-}
+.ascend-btn { margin-left:auto; padding:8px 20px; border-radius:6px; border:2px solid var(--purple); background:rgba(136,0,204,0.12); color:var(--purple); font-family:'Cinzel',serif; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; white-space:nowrap; letter-spacing:1px; }
 .ascend-btn:hover:not(:disabled) { background:rgba(136,0,204,0.3); }
 .ascend-btn:disabled { opacity:0.3; cursor:not-allowed; }
-.sidebar-left {
-  border-right:1px solid var(--border); padding:16px; overflow-y:auto;
-  background:linear-gradient(180deg, rgba(20,14,5,0.8) 0%, rgba(16,11,4,0.9) 100%);
-}
-.main {
-  display:flex; flex-direction:column; align-items:center;
-  padding:24px 20px 80px; overflow-y:auto; gap:18px;
-}
-.sidebar-right {
-  border-left:1px solid var(--border); padding:16px; overflow-y:auto;
-  background:linear-gradient(180deg, rgba(20,14,5,0.8) 0%, rgba(16,11,4,0.9) 100%);
-}
-.sec-head {
-  font-family:'Cinzel',serif; font-size:11px; letter-spacing:2px;
-  color:var(--text2); text-transform:uppercase;
-  border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:12px;
-}
+.open-shop-btn { padding:7px 16px; border-radius:6px; border:2px solid var(--amber2); background:rgba(255,120,0,0.1); color:var(--amber); font-family:'Cinzel',serif; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s; white-space:nowrap; letter-spacing:1px; }
+.open-shop-btn:hover { background:rgba(255,120,0,0.25); }
+.shop-cd { font-size:9px; display:block; color:var(--text2); margin-top:1px; }
+.boosts-bar { grid-column:1/-1; background:rgba(10,8,5,0.85); border-bottom:1px solid var(--border); padding:5px 20px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; min-height:34px; }
+.boost-chip { background:rgba(0,255,170,0.08); border:1px solid var(--glow2); border-radius:20px; padding:3px 10px; font-size:11px; color:var(--glow); display:flex; align-items:center; gap:5px; font-family:'Cinzel',serif; }
+.boost-chip-timer { color:var(--text2); font-size:10px; }
+.boosts-label { font-size:10px; color:var(--text2); letter-spacing:1px; text-transform:uppercase; margin-right:4px; }
+.sidebar-left { border-right:1px solid var(--border); padding:16px; overflow-y:auto; background:linear-gradient(180deg,rgba(20,14,5,0.8) 0%,rgba(16,11,4,0.9) 100%); }
+.main { display:flex; flex-direction:column; align-items:center; padding:24px 20px 80px; overflow-y:auto; gap:18px; }
+.sidebar-right { border-left:1px solid var(--border); padding:16px; overflow-y:auto; background:linear-gradient(180deg,rgba(20,14,5,0.8) 0%,rgba(16,11,4,0.9) 100%); }
+.sec-head { font-family:'Cinzel',serif; font-size:11px; letter-spacing:2px; color:var(--text2); text-transform:uppercase; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
 .shroom-stage { position:relative; width:220px; height:220px; cursor:pointer; user-select:none; }
-.shroom-ground {
-  position:absolute; bottom:0; left:50%; transform:translateX(-50%);
-  width:180px; height:30px;
-  background:radial-gradient(ellipse, #3a2508 0%, transparent 70%); border-radius:50%;
-}
-.shroom-stem {
-  position:absolute; bottom:30px; left:50%; transform:translateX(-50%);
-  width:28px; height:90px;
-  background:linear-gradient(180deg, #d4c080 0%, #a89050 50%, #8a7040 100%);
-  border-radius:14px 14px 8px 8px;
-  box-shadow:inset -4px 0 8px rgba(0,0,0,0.3), inset 2px 0 6px rgba(255,255,255,0.1);
-}
-.shroom-stem::after {
-  content:''; position:absolute; top:40%; left:0; right:0; height:4px;
-  background:rgba(255,255,255,0.15); border-radius:2px;
-}
-.shroom-cap {
-  position:absolute; bottom:110px; left:50%; transform:translateX(-50%);
-  width:160px; height:100px; border-radius:80px 80px 10px 10px;
-  background:radial-gradient(ellipse at 35% 35%, #ff4422, #cc1100 50%, #881100);
-  box-shadow:0 0 30px rgba(255,68,0,0.4), 0 0 60px rgba(255,68,0,0.15),
-    inset -15px -10px 30px rgba(0,0,0,0.4), inset 8px 6px 20px rgba(255,150,100,0.2);
-  transition:transform 0.05s, box-shadow 0.08s;
-}
-.shroom-cap:hover { box-shadow:0 0 50px rgba(255,68,0,0.6), inset -15px -10px 30px rgba(0,0,0,0.4); }
+.shroom-ground { position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:180px; height:30px; background:radial-gradient(ellipse,#3a2508 0%,transparent 70%); border-radius:50%; }
+.shroom-stem { position:absolute; bottom:30px; left:50%; transform:translateX(-50%); width:28px; height:90px; background:linear-gradient(180deg,#d4c080 0%,#a89050 50%,#8a7040 100%); border-radius:14px 14px 8px 8px; box-shadow:inset -4px 0 8px rgba(0,0,0,0.3),inset 2px 0 6px rgba(255,255,255,0.1); }
+.shroom-stem::after { content:''; position:absolute; top:40%; left:0; right:0; height:4px; background:rgba(255,255,255,0.15); border-radius:2px; }
+.shroom-cap { position:absolute; bottom:110px; left:50%; transform:translateX(-50%); width:160px; height:100px; border-radius:80px 80px 10px 10px; background:radial-gradient(ellipse at 35% 35%,#ff4422,#cc1100 50%,#881100); box-shadow:0 0 30px rgba(255,68,0,0.4),0 0 60px rgba(255,68,0,0.15),inset -15px -10px 30px rgba(0,0,0,0.4),inset 8px 6px 20px rgba(255,150,100,0.2); transition:transform 0.05s,box-shadow 0.08s; }
+.shroom-cap:hover { box-shadow:0 0 50px rgba(255,68,0,0.6),inset -15px -10px 30px rgba(0,0,0,0.4); }
 .spot { position:absolute; background:rgba(255,255,255,0.7); border-radius:50%; box-shadow:0 0 6px rgba(255,255,255,0.5); }
-.shroom-gills {
-  position:absolute; bottom:108px; left:50%; transform:translateX(-50%);
-  width:160px; height:18px;
-  background:linear-gradient(180deg, #cc9966 0%, #aa7744 100%);
-  border-radius:0 0 8px 8px; overflow:hidden;
-}
+.shroom-gills { position:absolute; bottom:108px; left:50%; transform:translateX(-50%); width:160px; height:18px; background:linear-gradient(180deg,#cc9966 0%,#aa7744 100%); border-radius:0 0 8px 8px; overflow:hidden; }
 .gill-line { position:absolute; width:1px; height:100%; background:rgba(0,0,0,0.3); top:0; }
-.spore-particle {
-  position:absolute; width:4px; height:4px; border-radius:50%;
-  background:var(--spore); box-shadow:0 0 6px var(--spore);
-  pointer-events:none; animation:sporeFloat 3s ease-in infinite; opacity:0;
-}
-@keyframes sporeFloat {
-  0%   { opacity:0; transform:translateY(0) translateX(0) scale(1); }
-  20%  { opacity:0.8; }
-  100% { opacity:0; transform:translateY(-120px) translateX(var(--drift)) scale(0.3); }
-}
-.res-panel {
-  background:var(--panel); border:1px solid var(--border2); border-radius:12px;
-  padding:20px 24px; text-align:center; width:100%; max-width:400px;
-  box-shadow:0 0 40px rgba(0,0,0,0.5);
-}
-.spore-count {
-  font-family:'Cinzel',serif; font-size:42px; font-weight:900;
-  color:var(--spore); text-shadow:0 0 30px rgba(200,255,0,0.5); line-height:1;
-}
+.spore-particle { position:absolute; width:4px; height:4px; border-radius:50%; background:var(--spore); box-shadow:0 0 6px var(--spore); pointer-events:none; animation:sporeFloat 3s ease-in infinite; opacity:0; }
+@keyframes sporeFloat { 0%{opacity:0;transform:translateY(0) translateX(0) scale(1);} 20%{opacity:0.8;} 100%{opacity:0;transform:translateY(-120px) translateX(var(--drift)) scale(0.3);} }
+.res-panel { background:var(--panel); border:1px solid var(--border2); border-radius:12px; padding:20px 24px; text-align:center; width:100%; max-width:400px; box-shadow:0 0 40px rgba(0,0,0,0.5); }
+.spore-count { font-family:'Cinzel',serif; font-size:42px; font-weight:900; color:var(--spore); text-shadow:0 0 30px rgba(200,255,0,0.5); line-height:1; }
 .spore-label { font-size:14px; color:var(--text2); margin-top:4px; font-style:italic; }
 .auto-rate { font-size:15px; color:var(--glow); margin-top:10px; font-weight:600; }
 .click-rate { font-size:12px; color:var(--text2); margin-top:3px; }
-.stage-panel {
-  background:var(--panel); border:1px solid var(--border); border-radius:10px;
-  padding:14px 20px; width:100%; max-width:400px;
-}
+.stage-panel { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px 20px; width:100%; max-width:400px; }
 .stage-name { font-family:'Cinzel',serif; font-size:16px; color:var(--amber); margin-bottom:6px; }
 .stage-bar-bg { height:8px; background:rgba(255,255,255,0.06); border-radius:4px; overflow:hidden; margin-bottom:5px; }
-.stage-bar-fill {
-  height:100%; background:linear-gradient(90deg, var(--spore2), var(--spore));
-  border-radius:4px; transition:width 0.5s; box-shadow:0 0 8px rgba(200,255,0,0.4);
-}
+.stage-bar-fill { height:100%; background:linear-gradient(90deg,var(--spore2),var(--spore)); border-radius:4px; transition:width 0.5s; box-shadow:0 0 8px rgba(200,255,0,0.4); }
 .stage-desc { font-size:12px; color:var(--text2); font-style:italic; }
 .log-panel { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px; width:100%; max-width:400px; }
-.upg-card {
-  background:var(--panel2); border:1px solid var(--border); border-radius:8px;
-  padding:10px 12px; margin-bottom:8px; cursor:pointer; transition:all 0.15s;
-  position:relative; overflow:hidden;
-}
+.upg-card { background:var(--panel2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:8px; cursor:pointer; transition:all 0.15s; position:relative; overflow:hidden; }
 .upg-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--spore); opacity:0; transition:opacity 0.2s; }
 .upg-card.affordable::before { opacity:1; }
 .upg-card.affordable { border-color:var(--border2); }
@@ -175,10 +81,7 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
 .upg-name { font-family:'Cinzel',serif; font-size:12px; color:var(--text); }
 .upg-desc { font-size:11px; color:var(--text2); margin-top:2px; font-style:italic; }
 .upg-cost { font-size:11px; color:var(--amber); margin-top:3px; font-family:'Cinzel',serif; }
-.bld-card {
-  background:var(--panel2); border:1px solid var(--border); border-radius:10px;
-  padding:12px; margin-bottom:10px; cursor:pointer; transition:all 0.15s;
-}
+.bld-card { background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px; cursor:pointer; transition:all 0.15s; }
 .bld-card:hover:not(.locked) { border-color:var(--glow2); background:rgba(0,200,100,0.04); }
 .bld-card.affordable { border-color:var(--glow); box-shadow:0 0 15px rgba(0,255,170,0.08); }
 .bld-card.locked { opacity:0.3; cursor:not-allowed; filter:saturate(0); }
@@ -193,52 +96,55 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
 .bld-cps { font-size:11px; color:var(--glow2); }
 .bld-prog { height:2px; background:rgba(0,255,170,0.1); border-radius:1px; margin-top:6px; overflow:hidden; }
 .bld-prog-fill { height:100%; background:var(--glow2); border-radius:1px; transition:width 0.4s; }
-.ach-card {
-  display:flex; gap:8px; align-items:flex-start;
-  background:var(--panel2); border:1px solid var(--border); border-radius:8px;
-  padding:8px 10px; margin-bottom:6px;
-}
+.ach-card { display:flex; gap:8px; align-items:flex-start; background:var(--panel2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; margin-bottom:6px; transition:all 0.3s; }
 .ach-card.unlocked { border-color:var(--amber2); background:rgba(255,150,0,0.05); }
 .ach-card.locked { opacity:0.3; filter:saturate(0.2); }
 .ach-icon { font-size:18px; flex-shrink:0; }
 .ach-name { font-family:'Cinzel',serif; font-size:11px; color:var(--text); }
 .ach-desc { font-size:10px; color:var(--text2); font-style:italic; }
-@keyframes floatUp {
-  0%   { opacity:1; transform:translateY(0) scale(1); }
-  70%  { opacity:1; transform:translateY(-70px) scale(1.1); }
-  100% { opacity:0; transform:translateY(-100px) scale(0.8); }
-}
-.gold-shroom {
-  position:fixed; font-size:44px; cursor:pointer; z-index:500;
-  animation:shroomBounce 0.6s ease-in-out infinite alternate;
-  filter:drop-shadow(0 0 20px #ffaa22) drop-shadow(0 0 8px #ffff00); user-select:none;
-}
+@keyframes floatUp { 0%{opacity:1;transform:translateY(0) scale(1);} 70%{opacity:1;transform:translateY(-70px) scale(1.1);} 100%{opacity:0;transform:translateY(-100px) scale(0.8);} }
+.gold-shroom { position:fixed; font-size:44px; cursor:pointer; z-index:500; animation:shroomBounce 0.6s ease-in-out infinite alternate; filter:drop-shadow(0 0 20px #ffaa22) drop-shadow(0 0 8px #ffff00); user-select:none; }
 @keyframes shroomBounce { from{transform:scale(1) rotate(-8deg);} to{transform:scale(1.2) rotate(8deg);} }
-.notif {
-  position:fixed; bottom:24px; right:24px;
-  background:var(--panel); border:2px solid var(--amber2); border-radius:10px;
-  padding:12px 18px; font-size:13px; font-weight:600; z-index:1000;
-  max-width:280px; animation:notifSlide 0.4s ease;
-  box-shadow:0 0 30px rgba(255,150,0,0.2); color:var(--text);
-}
+.notif { position:fixed; bottom:24px; right:24px; background:var(--panel); border:2px solid var(--amber2); border-radius:10px; padding:12px 18px; font-size:13px; font-weight:600; z-index:1000; max-width:280px; animation:notifSlide 0.4s ease; box-shadow:0 0 30px rgba(255,150,0,0.2); color:var(--text); }
 @keyframes notifSlide { from{transform:translateX(110%)} to{transform:translateX(0)} }
-.ascend-panel {
-  background:rgba(136,0,204,0.06); border:1px solid rgba(136,0,204,0.25);
-  border-radius:10px; padding:12px; margin-top:10px;
-  font-size:11px; color:var(--text2); font-style:italic; line-height:1.6;
-}
+.ascend-panel { background:rgba(136,0,204,0.06); border:1px solid rgba(136,0,204,0.25); border-radius:10px; padding:12px; margin-top:10px; font-size:11px; color:var(--text2); font-style:italic; line-height:1.6; }
 .ascend-panel strong { color:var(--purple); font-style:normal; }
-.ticker {
-  position:fixed; bottom:0; left:0; right:0;
-  background:rgba(10,8,5,0.96); border-top:1px solid var(--border);
-  padding:6px 20px; font-size:12px; color:var(--text2);
-  font-style:italic; z-index:100; white-space:nowrap; overflow:hidden;
-}
+.ticker { grid-column:1/-1; position:fixed; bottom:0; left:0; right:0; background:rgba(10,8,5,0.96); border-top:1px solid var(--border); padding:6px 20px; font-size:12px; color:var(--text2); font-style:italic; z-index:100; white-space:nowrap; overflow:hidden; }
 .ticker-inner { display:inline-block; animation:tickerScroll 40s linear infinite; }
 @keyframes tickerScroll { from{transform:translateX(100vw)} to{transform:translateX(-100%)} }
 ::-webkit-scrollbar { width:4px; }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+/* SHOP */
+.shop-overlay { position:fixed; inset:0; z-index:800; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; animation:fadeIn 0.2s ease; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.shop-box { background:linear-gradient(180deg,#1a1008 0%,#0f0a04 100%); border:2px solid var(--amber2); border-radius:16px; padding:24px 28px; width:520px; max-width:95vw; box-shadow:0 0 60px rgba(255,120,0,0.25); position:relative; }
+.shop-title { font-family:'Cinzel',serif; font-size:20px; font-weight:900; color:var(--amber); text-align:center; margin-bottom:4px; text-shadow:0 0 20px rgba(255,170,0,0.5); }
+.shop-timer { text-align:center; font-size:12px; color:var(--text2); font-style:italic; margin-bottom:16px; }
+.shop-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.shop-item { background:rgba(255,255,255,0.03); border:1px solid var(--border2); border-radius:10px; padding:12px; cursor:pointer; transition:all 0.15s; position:relative; overflow:hidden; }
+.shop-item:hover:not(.sold) { border-color:var(--amber); background:rgba(255,170,0,0.06); transform:translateY(-2px); }
+.shop-item.sold { opacity:0.4; cursor:default; }
+.shop-item.sold::after { content:'VENDU'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-15deg); font-family:'Cinzel',serif; font-size:22px; font-weight:900; color:var(--red); opacity:0.8; }
+.shop-item-rarity { font-size:9px; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+.shop-item-icon { font-size:28px; margin-bottom:6px; }
+.shop-item-name { font-family:'Cinzel',serif; font-size:13px; color:var(--text); margin-bottom:3px; }
+.shop-item-desc { font-size:11px; color:var(--text2); font-style:italic; margin-bottom:8px; }
+.shop-item-cost { font-family:'Cinzel',serif; font-size:12px; }
+.shop-close { position:absolute; top:14px; right:16px; background:none; border:none; color:var(--text2); font-size:22px; cursor:pointer; line-height:1; transition:color 0.1s; }
+.shop-close:hover { color:var(--text); }
+.shop-btn { display:block; width:100%; margin-top:14px; padding:10px; border-radius:8px; border:2px solid var(--amber2); background:rgba(255,120,0,0.1); color:var(--amber); font-family:'Cinzel',serif; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s; letter-spacing:1px; }
+.shop-btn:hover { background:rgba(255,120,0,0.25); }
+
+/* EVENTS */
+.event-popup { position:fixed; top:80px; left:50%; transform:translateX(-50%); z-index:900; width:420px; max-width:92vw; background:linear-gradient(135deg,#1a0a00,#0d0800); border:2px solid var(--amber); border-radius:14px; padding:20px 24px; box-shadow:0 0 50px rgba(255,150,0,0.3); animation:eventSlide 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes eventSlide { from{opacity:0;transform:translateX(-50%) translateY(-30px) scale(0.9)} to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)} }
+.event-type { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text2); margin-bottom:4px; }
+.event-title { font-family:'Cinzel',serif; font-size:18px; font-weight:900; color:var(--amber); margin-bottom:6px; }
+.event-desc { font-size:13px; color:var(--text); line-height:1.5; margin-bottom:14px; font-style:italic; }
+.event-btn { width:100%; padding:9px; border-radius:8px; border:2px solid var(--amber2); background:rgba(255,120,0,0.12); color:var(--amber); font-family:'Cinzel',serif; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.15s; }
+.event-btn:hover { background:rgba(255,120,0,0.28); }
 </style>
 </head>
 <body>
@@ -249,31 +155,37 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
   <div class="topbar">
     <div class="game-logo">🍄 Mycelium Empire</div>
     <div class="top-stat"><span class="lbl">Spores</span><span class="val" id="tSpores">0</span></div>
-    <div class="top-stat"><span class="lbl">Per Sec</span><span class="val" id="tSPS">0</span></div>
+    <div class="top-stat"><span class="lbl">Par Sec</span><span class="val" id="tSPS">0</span></div>
     <div class="top-stat"><span class="lbl">Harvest x</span><span class="val" id="tMult">1.00</span></div>
-    <div class="top-stat"><span class="lbl">All-Time</span><span class="val" id="tLife">0</span></div>
+    <div class="top-stat"><span class="lbl">Total</span><span class="val" id="tLife">0</span></div>
+    <button class="open-shop-btn" onclick="openShop()">🏪 Marche<span class="shop-cd" id="shopCdTxt">Nouveau dans 5:00</span></button>
     <button class="ascend-btn" id="ascBtn" disabled onclick="doAscend()">🌀 Ascend</button>
   </div>
 
+  <div class="boosts-bar" id="boostsBar">
+    <span class="boosts-label">Actifs:</span>
+    <span style="color:var(--text2);font-size:11px;font-style:italic" id="noBoosts">Aucun boost actif</span>
+  </div>
+
   <div class="sidebar-left">
-    <div class="sec-head">🔬 Research</div>
+    <div class="sec-head">🔬 Recherche</div>
     <div id="upgList"></div>
-    <div class="sec-head" style="margin-top:12px">🏅 Discoveries</div>
+    <div class="sec-head" style="margin-top:12px">🏅 Decouvertes</div>
     <div id="achList"></div>
     <div class="ascend-panel">
       <strong>🌀 Ascension</strong><br>
-      Reach <strong>1 Quadrillion spores</strong> lifetime to Ascend.<br>
-      Sacrifice all for a permanent <strong id="ascMultPrev">x1.60</strong> multiplier.<br>
-      Each Ascension compounds forever.
+      Atteins <strong>1 Quadrillion spores</strong> pour Ascender.<br>
+      Sacrifie tout pour un multiplicateur permanent <strong id="ascMultPrev">x1.60</strong>.<br>
+      Chaque Ascension se cumule pour toujours.
     </div>
   </div>
 
   <div class="main">
     <div class="res-panel">
       <div class="spore-count" id="sporeCount">0</div>
-      <div class="spore-label">✨ Spores</div>
-      <div class="auto-rate">🍄 <span id="spsDisplay">0</span> spores / second</div>
-      <div class="click-rate">👆 <span id="spcDisplay">1</span> per tap</div>
+      <div class="spore-label">Spores</div>
+      <div class="auto-rate">🍄 <span id="spsDisplay">0</span> spores / seconde</div>
+      <div class="click-rate">👆 <span id="spcDisplay">1</span> par clic</div>
     </div>
 
     <div class="shroom-stage" id="shroomStage" onclick="onClickShroom(event)">
@@ -307,11 +219,11 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
     <div class="stage-panel">
       <div class="stage-name" id="stageName">🌱 Lone Spore</div>
       <div class="stage-bar-bg"><div class="stage-bar-fill" id="stageBar" style="width:0%"></div></div>
-      <div class="stage-desc" id="stageDesc">The forest floor awaits your dominion...</div>
+      <div class="stage-desc" id="stageDesc">La foret attend ton empire...</div>
     </div>
 
     <div class="log-panel">
-      <div class="sec-head">📜 Chronicle</div>
+      <div class="sec-head">📜 Chronique</div>
       <div id="logDiv" style="max-height:130px;overflow-y:auto"></div>
     </div>
   </div>
@@ -322,10 +234,24 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
   </div>
 </div>
 
-<div class="ticker"><div class="ticker-inner" id="tickerText">🍄 The forest stirs... your empire begins with a single click.</div></div>
+<div class="ticker"><div class="ticker-inner" id="tickerText">🍄 La foret s'eveille... ton empire commence par un seul clic.</div></div>
+
+<!-- SHOP -->
+<div class="shop-overlay" id="shopOverlay" style="display:none">
+  <div class="shop-box">
+    <button class="shop-close" onclick="closeShop()">✕</button>
+    <div class="shop-title">🏪 Marche des Spores</div>
+    <div class="shop-timer" id="shopTimerTxt">Se renouvelle dans 5:00</div>
+    <div class="shop-grid" id="shopGrid"></div>
+    <button class="shop-btn" onclick="closeShop()">Fermer</button>
+  </div>
+</div>
+
+<!-- EVENT POPUP -->
+<div id="eventPopup" style="display:none"></div>
 
 <script>
-// STARFIELD ROOTS
+// ROOTS CANVAS
 const rc=document.getElementById('roots'),rx=rc.getContext('2d');
 function resizeRoots(){rc.width=window.innerWidth;rc.height=window.innerHeight;}
 resizeRoots();window.addEventListener('resize',resizeRoots);
@@ -334,7 +260,7 @@ for(let i=0;i<60;i++)RN.push({x:Math.random()*9999,y:Math.random()*9999,vx:(Math
 function drawRoots(){
   rx.clearRect(0,0,rc.width,rc.height);
   RN.forEach(n=>{n.x=(n.x+n.vx+rc.width*2)%(rc.width*2)-rc.width*0.5;n.y=(n.y+n.vy+rc.height*2)%(rc.height*2)-rc.height*0.5;n.p+=0.02;});
-  for(let i=0;i<RN.length;i++){for(let j=i+1;j<RN.length;j++){
+  for(let i=0;i<RN.length;i++)for(let j=i+1;j<RN.length;j++){
     const dx=RN[i].x-RN[j].x,dy=RN[i].y-RN[j].y,d=Math.sqrt(dx*dx+dy*dy);
     if(d<180){
       const a=(1-d/180)*0.25*(0.5+0.5*Math.sin(RN[i].p));
@@ -342,7 +268,7 @@ function drawRoots(){
       rx.quadraticCurveTo((RN[i].x+RN[j].x)/2+dy*0.2,(RN[i].y+RN[j].y)/2-dx*0.2,RN[j].x,RN[j].y);
       rx.strokeStyle='rgba(100,220,80,'+a+')';rx.lineWidth=0.8;rx.stroke();
     }
-  }}
+  }
   requestAnimationFrame(drawRoots);
 }
 drawRoots();
@@ -357,82 +283,115 @@ function fmt(n){
 let G={spores:0,lifetime:0,totalClicks:0,ascendCount:0,ascendMult:1,bld:{},upg:{},ach:{},time:0};
 
 const BUILDINGS=[
-  {id:'spore',  name:'Spore Pod',       icon:'🫧',base:12,     cps:0.1,  desc:'Releases spores continuously.',         unlock:0},
-  {id:'mycel',  name:'Mycelium Thread', icon:'🕸️',base:80,     cps:0.4,  desc:'Underground threads absorb nutrients.', unlock:40},
-  {id:'fairy',  name:'Fairy Ring',      icon:'💫',base:450,    cps:1.8,  desc:'Ancient rings channel forest magic.',   unlock:200},
-  {id:'truffle',name:'Truffle Network', icon:'🌰',base:2500,   cps:8,    desc:'Deep truffle nets farm rich soil.',     unlock:1000},
-  {id:'giant',  name:'Giant Shroom',    icon:'🍄',base:12000,  cps:35,   desc:'A colossal mushroom of great power.',  unlock:5000},
-  {id:'cave',   name:'Cave Colony',     icon:'🦇',base:65000,  cps:150,  desc:'Deep caves breed rare fungi.',         unlock:25000},
-  {id:'spire',  name:'Fungal Spire',    icon:'🗼',base:350000, cps:600,  desc:'Spire spreading spores for miles.',    unlock:120000},
-  {id:'forest', name:'Enchanted Forest',icon:'🌲',base:1800000,cps:2500, desc:'Entire forest under your control.',    unlock:600000},
-  {id:'world',  name:'World Root',      icon:'🌍',base:9000000,cps:10000,desc:'Mycelium wraps the entire world.',     unlock:3000000},
-  {id:'beyond', name:'Spore Dimension', icon:'🌀',base:4e8,    cps:60000,desc:'A pocket dimension of pure fungus.',  unlock:1e8},
+  {id:'spore',  name:'Spore Pod',       icon:'🫧',base:12,     cps:0.1,  desc:'Libere des spores en continu.',        unlock:0},
+  {id:'mycel',  name:'Mycelium Thread', icon:'🕸️',base:80,     cps:0.4,  desc:'Les filaments absorbent les nutriments.',unlock:40},
+  {id:'fairy',  name:'Fairy Ring',      icon:'💫',base:450,    cps:1.8,  desc:'Les anneaux anciens canalisent la magie.',unlock:200},
+  {id:'truffle',name:'Truffle Network', icon:'🌰',base:2500,   cps:8,    desc:'Les reseaux de truffes cultivent le sol.', unlock:1000},
+  {id:'giant',  name:'Giant Shroom',    icon:'🍄',base:12000,  cps:35,   desc:'Un champignon colossal plein de puissance.',unlock:5000},
+  {id:'cave',   name:'Cave Colony',     icon:'🦇',base:65000,  cps:150,  desc:'Les grottes profondes cultivent des fungi rares.',unlock:25000},
+  {id:'spire',  name:'Fungal Spire',    icon:'🗼',base:350000, cps:600,  desc:'Une fleche repand des spores sur des kilometres.',unlock:120000},
+  {id:'forest', name:'Enchanted Forest',icon:'🌲',base:1800000,cps:2500, desc:'Une foret entiere sous controle mycologique.',unlock:600000},
+  {id:'world',  name:'World Root',      icon:'🌍',base:9000000,cps:10000,desc:'Le mycelium enveloppe la planete entiere.',unlock:3000000},
+  {id:'beyond', name:'Spore Dimension', icon:'🌀',base:4e8,    cps:60000,desc:'Une dimension de pur champignon.',       unlock:1e8},
 ];
 
 const UPGRADES=[
-  {id:'c1',name:'Calloused Fingers',   icon:'🖐️',cost:80,     eff:'x2 tap power',        type:'click',mult:2,  req:()=>G.lifetime>=40},
-  {id:'c2',name:'Spore Gloves',        icon:'🧤',cost:1500,   eff:'x3 tap power',        type:'click',mult:3,  req:()=>G.lifetime>=800},
-  {id:'c3',name:'Enzyme Injection',    icon:'💉',cost:40000,  eff:'x5 tap power',        type:'click',mult:5,  req:()=>G.lifetime>=20000},
-  {id:'c4',name:'Myco-Gauntlets',      icon:'⚡',cost:800000, eff:'x10 tap power',       type:'click',mult:10, req:()=>G.lifetime>=400000},
-  {id:'c5',name:'Fungal Apotheosis',   icon:'🌟',cost:5e7,    eff:'x20 tap power',       type:'click',mult:20, req:()=>G.lifetime>=2e7},
-  {id:'sp1',name:'Stronger Pods',      icon:'🫧',cost:400,    eff:'Pods x2 SPS',         type:'bld',bld:'spore',  mult:2,req:()=>bldN('spore')>=5},
-  {id:'sp2',name:'Dense Spore Cloud',  icon:'🫧',cost:6000,   eff:'Pods x3 SPS',         type:'bld',bld:'spore',  mult:3,req:()=>bldN('spore')>=15},
-  {id:'sp3',name:'Spore Cannon',       icon:'🫧',cost:80000,  eff:'Pods x5 SPS',         type:'bld',bld:'spore',  mult:5,req:()=>bldN('spore')>=30},
-  {id:'my1',name:'Wider Threads',      icon:'🕸️',cost:2500,   eff:'Mycelium x2 SPS',     type:'bld',bld:'mycel',  mult:2,req:()=>bldN('mycel')>=5},
-  {id:'my2',name:'Neural Fungi',       icon:'🕸️',cost:35000,  eff:'Mycelium x3 SPS',     type:'bld',bld:'mycel',  mult:3,req:()=>bldN('mycel')>=15},
-  {id:'fr1',name:'Ring Resonance',     icon:'💫',cost:14000,  eff:'Fairy Rings x2 SPS',  type:'bld',bld:'fairy',  mult:2,req:()=>bldN('fairy')>=5},
-  {id:'fr2',name:'Ancient Pact',       icon:'💫',cost:180000, eff:'Fairy Rings x3 SPS',  type:'bld',bld:'fairy',  mult:3,req:()=>bldN('fairy')>=15},
-  {id:'tr1',name:'Deep Aroma',         icon:'🌰',cost:75000,  eff:'Truffles x2 SPS',     type:'bld',bld:'truffle',mult:2,req:()=>bldN('truffle')>=5},
-  {id:'tr2',name:'Truffle Oil Extract',icon:'🌰',cost:1000000,eff:'Truffles x3 SPS',     type:'bld',bld:'truffle',mult:3,req:()=>bldN('truffle')>=15},
-  {id:'gs1',name:'Fertilizer Drip',    icon:'🍄',cost:400000, eff:'Giant Shrooms x2 SPS',type:'bld',bld:'giant',  mult:2,req:()=>bldN('giant')>=5},
-  {id:'gs2',name:'Titan Growth',       icon:'🍄',cost:5000000,eff:'Giant Shrooms x3 SPS',type:'bld',bld:'giant',  mult:3,req:()=>bldN('giant')>=15},
-  {id:'g1',name:'Forest Alliance',     icon:'🌿',cost:4000,   eff:'All SPS x1.5',        type:'global',mult:1.5,req:()=>G.lifetime>=2000},
-  {id:'g2',name:'Decomposer Guild',    icon:'♻️',cost:80000,  eff:'All SPS x2',          type:'global',mult:2,  req:()=>G.lifetime>=40000},
-  {id:'g3',name:'Myco-Consciousness',  icon:'🧠',cost:1500000,eff:'All SPS x3',          type:'global',mult:3,  req:()=>G.lifetime>=800000},
-  {id:'g4',name:'Hyphae Overmind',     icon:'🌐',cost:3e7,    eff:'All SPS x5',          type:'global',mult:5,  req:()=>G.lifetime>=1.5e7},
-  {id:'g5',name:'Spore Singularity',   icon:'∞', cost:8e8,    eff:'All SPS x10',         type:'global',mult:10, req:()=>G.lifetime>=4e8},
+  {id:'c1',name:'Doigts Calleux',      icon:'🖐️',cost:80,     eff:'x2 puissance clic',      type:'click',mult:2,  req:()=>G.lifetime>=40},
+  {id:'c2',name:'Gants de Spores',     icon:'🧤',cost:1500,   eff:'x3 puissance clic',      type:'click',mult:3,  req:()=>G.lifetime>=800},
+  {id:'c3',name:'Injection Enzyme',    icon:'💉',cost:40000,  eff:'x5 puissance clic',      type:'click',mult:5,  req:()=>G.lifetime>=20000},
+  {id:'c4',name:'Gants Myco',          icon:'⚡',cost:800000, eff:'x10 puissance clic',     type:'click',mult:10, req:()=>G.lifetime>=400000},
+  {id:'c5',name:'Apotheose Fongique',  icon:'🌟',cost:5e7,    eff:'x20 puissance clic',     type:'click',mult:20, req:()=>G.lifetime>=2e7},
+  {id:'sp1',name:'Pods Plus Forts',    icon:'🫧',cost:400,    eff:'Pods x2 SPS',            type:'bld',bld:'spore',  mult:2,req:()=>bldN('spore')>=5},
+  {id:'sp2',name:'Nuage Dense',        icon:'🫧',cost:6000,   eff:'Pods x3 SPS',            type:'bld',bld:'spore',  mult:3,req:()=>bldN('spore')>=15},
+  {id:'sp3',name:'Canon de Spores',    icon:'🫧',cost:80000,  eff:'Pods x5 SPS',            type:'bld',bld:'spore',  mult:5,req:()=>bldN('spore')>=30},
+  {id:'my1',name:'Filaments Larges',   icon:'🕸️',cost:2500,   eff:'Mycelium x2 SPS',        type:'bld',bld:'mycel',  mult:2,req:()=>bldN('mycel')>=5},
+  {id:'my2',name:'Fungi Neural',       icon:'🕸️',cost:35000,  eff:'Mycelium x3 SPS',        type:'bld',bld:'mycel',  mult:3,req:()=>bldN('mycel')>=15},
+  {id:'fr1',name:'Resonance Anneau',   icon:'💫',cost:14000,  eff:'Fairy Rings x2 SPS',     type:'bld',bld:'fairy',  mult:2,req:()=>bldN('fairy')>=5},
+  {id:'fr2',name:'Pacte Ancien',       icon:'💫',cost:180000, eff:'Fairy Rings x3 SPS',     type:'bld',bld:'fairy',  mult:3,req:()=>bldN('fairy')>=15},
+  {id:'tr1',name:'Arome Profond',      icon:'🌰',cost:75000,  eff:'Truffles x2 SPS',        type:'bld',bld:'truffle',mult:2,req:()=>bldN('truffle')>=5},
+  {id:'tr2',name:'Extrait de Truffe',  icon:'🌰',cost:1000000,eff:'Truffles x3 SPS',        type:'bld',bld:'truffle',mult:3,req:()=>bldN('truffle')>=15},
+  {id:'gs1',name:'Goutte Fertilisant', icon:'🍄',cost:400000, eff:'Giant Shrooms x2 SPS',   type:'bld',bld:'giant',  mult:2,req:()=>bldN('giant')>=5},
+  {id:'gs2',name:'Croissance Titan',   icon:'🍄',cost:5000000,eff:'Giant Shrooms x3 SPS',   type:'bld',bld:'giant',  mult:3,req:()=>bldN('giant')>=15},
+  {id:'g1',name:'Alliance Foret',      icon:'🌿',cost:4000,   eff:'Tout SPS x1.5',          type:'global',mult:1.5,req:()=>G.lifetime>=2000},
+  {id:'g2',name:'Guilde Decomposeurs', icon:'♻️',cost:80000,  eff:'Tout SPS x2',            type:'global',mult:2,  req:()=>G.lifetime>=40000},
+  {id:'g3',name:'Conscience Myco',     icon:'🧠',cost:1500000,eff:'Tout SPS x3',            type:'global',mult:3,  req:()=>G.lifetime>=800000},
+  {id:'g4',name:'Overmind Hyphae',     icon:'🌐',cost:3e7,    eff:'Tout SPS x5',            type:'global',mult:5,  req:()=>G.lifetime>=1.5e7},
+  {id:'g5',name:'Singularite Spore',   icon:'∞', cost:8e8,    eff:'Tout SPS x10',           type:'global',mult:10, req:()=>G.lifetime>=4e8},
 ];
 
 const ACHIEVEMENTS=[
-  {id:'first', name:'First Harvest',     icon:'🌱',desc:'Tap the mushroom.',                        req:()=>G.totalClicks>=1},
-  {id:'tap100',name:'Relentless',        icon:'👆',desc:'Tap 100 times.',                           req:()=>G.totalClicks>=100},
-  {id:'tap1k', name:'Obsessive',         icon:'🤯',desc:'Tap 1,000 times.',                         req:()=>G.totalClicks>=1000},
-  {id:'s1k',   name:'Spore Hoarder',     icon:'✨',desc:'Collect 1,000 spores.',                   req:()=>G.lifetime>=1000},
-  {id:'s100k', name:'Fungal Baron',      icon:'🍄',desc:'Collect 100,000 spores.',                 req:()=>G.lifetime>=100000},
-  {id:'s1m',   name:'Myco-Millionaire',  icon:'💰',desc:'Collect 1 Million spores.',               req:()=>G.lifetime>=1e6},
-  {id:'s1b',   name:'Spore Billionaire', icon:'🤑',desc:'Collect 1 Billion spores.',               req:()=>G.lifetime>=1e9},
-  {id:'s1t',   name:'Fungal Titan',      icon:'🌍',desc:'Collect 1 Trillion spores.',              req:()=>G.lifetime>=1e12},
-  {id:'b10',   name:'Grower',            icon:'🌿',desc:'Own 10 colonies.',                        req:()=>totalBlds()>=10},
-  {id:'b50',   name:'Mycologist',        icon:'🔬',desc:'Own 50 colonies.',                        req:()=>totalBlds()>=50},
-  {id:'b100',  name:'Fungal Empire',     icon:'👑',desc:'Own 100 colonies.',                       req:()=>totalBlds()>=100},
-  {id:'b200',  name:'The Overmind',      icon:'🌀',desc:'Own 200 colonies.',                       req:()=>totalBlds()>=200},
-  {id:'allbld',name:'Full Ecosystem',    icon:'🌲',desc:'Own 1 of every colony type.',             req:()=>BUILDINGS.every(b=>bldN(b.id)>=1)},
-  {id:'asc1',  name:'Reborn Spore',      icon:'🔄',desc:'Ascend for the first time.',              req:()=>G.ascendCount>=1},
-  {id:'asc3',  name:'Eternal Fungus',    icon:'♾️',desc:'Ascend 3 times.',                        req:()=>G.ascendCount>=3},
+  {id:'first', name:'Premiere Recolte',  icon:'🌱',desc:'Clique le champignon une fois.',     req:()=>G.totalClicks>=1},
+  {id:'tap100',name:'Inlassable',        icon:'👆',desc:'Clique 100 fois.',                   req:()=>G.totalClicks>=100},
+  {id:'tap1k', name:'Obsessionnel',      icon:'🤯',desc:'Clique 1 000 fois.',                 req:()=>G.totalClicks>=1000},
+  {id:'s1k',   name:'Accumulateur',      icon:'✨',desc:'Collecte 1 000 spores.',             req:()=>G.lifetime>=1000},
+  {id:'s100k', name:'Baron Fongique',    icon:'🍄',desc:'Collecte 100 000 spores.',           req:()=>G.lifetime>=100000},
+  {id:'s1m',   name:'Myco-Millionnaire', icon:'💰',desc:'Collecte 1 Million de spores.',      req:()=>G.lifetime>=1e6},
+  {id:'s1b',   name:'Milliardaire Spore',icon:'🤑',desc:'Collecte 1 Milliard de spores.',     req:()=>G.lifetime>=1e9},
+  {id:'s1t',   name:'Titan Fongique',    icon:'🌍',desc:'Collecte 1 Trillion de spores.',     req:()=>G.lifetime>=1e12},
+  {id:'b10',   name:'Cultivateur',       icon:'🌿',desc:'Possede 10 colonies.',               req:()=>totalBlds()>=10},
+  {id:'b50',   name:'Mycologue',         icon:'🔬',desc:'Possede 50 colonies.',               req:()=>totalBlds()>=50},
+  {id:'b100',  name:'Empire Fongique',   icon:'👑',desc:'Possede 100 colonies.',              req:()=>totalBlds()>=100},
+  {id:'b200',  name:'L Overmind',        icon:'🌀',desc:'Possede 200 colonies.',              req:()=>totalBlds()>=200},
+  {id:'allbld',name:'Ecosysteme Complet',icon:'🌲',desc:'Possede 1 de chaque type de colonie.',req:()=>BUILDINGS.every(b=>bldN(b.id)>=1)},
+  {id:'asc1',  name:'Spore Renee',       icon:'🔄',desc:'Ascende pour la premiere fois.',     req:()=>G.ascendCount>=1},
+  {id:'asc3',  name:'Fungi Eternel',     icon:'♾️',desc:'Ascende 3 fois.',                   req:()=>G.ascendCount>=3},
 ];
 
 const STAGES=[
-  {at:0,      name:'🌱 Lone Spore',        desc:'A single spore on the forest floor.'},
-  {at:200,    name:'🍄 Sprouting',          desc:'Tiny mushrooms emerge from the soil.'},
-  {at:2000,   name:'🌿 Mycelium Network',   desc:'Underground threads connect your empire.'},
-  {at:20000,  name:'🌲 Forest Tender',      desc:'The trees whisper to your mycelium.'},
-  {at:200000, name:'🦋 Enchanted Grove',    desc:'Magic seeps through your fungal network.'},
-  {at:2e6,    name:'🌍 Planetary Mycelium', desc:'Your roots span entire continents.'},
-  {at:2e9,    name:'🌌 Dimensional Spore',  desc:'Your spores drift between worlds.'},
-  {at:2e12,   name:'👑 Fungal Deity',       desc:'You are the forest. You are everything.'},
+  {at:0,      name:'🌱 Spore Solitaire',  desc:'Une seule spore sur le sol de la foret.'},
+  {at:200,    name:'🍄 Germination',       desc:'De petits champignons emergent du sol.'},
+  {at:2000,   name:'🌿 Reseau Mycelien',   desc:'Des filaments souterrains connectent ton empire.'},
+  {at:20000,  name:'🌲 Gardien de Foret',  desc:'Les arbres chuchotent a ton mycelium.'},
+  {at:200000, name:'🦋 Bosquet Enchante',  desc:'La magie s imprègne dans ton reseau fongique.'},
+  {at:2e6,    name:'🌍 Mycelium Planetaire',desc:'Tes racines couvrent des continents entiers.'},
+  {at:2e9,    name:'🌌 Spore Dimensionnel',desc:'Tes spores voyagent entre les mondes.'},
+  {at:2e12,   name:'👑 Divinite Fongique', desc:'Tu es la foret. Tu es tout.'},
 ];
 
 const TICKERS=[
-  '🍄 Local farmer reports mushroom growths covering entire field overnight.',
-  '🌿 Botanists baffled by spreading mycelium beneath city streets.',
-  '✨ Ancient fairy ring grows to 3 kilometers — tourists flock to witness.',
-  '🦠 Scientists: "The forest is thinking. We cannot explain it."',
-  '🌰 World truffle market collapses as underground supply becomes inexhaustible.',
-  '🕸️ Mycelium web communicating via chemical signals across continents.',
-  '🌀 Reports of spore dimension pocket universe appearing in Pacific Ocean.',
-  '💰 Spore futures hit all-time high on interplanetary exchange.',
-  '🧠 Biologists confirm: mycelium network has achieved collective consciousness.',
+  '🍄 Un fermier signale des champignons couvrant son champ entier du jour au lendemain.',
+  '🌿 Des botanistes perplexes face aux reseaux de mycelium sous les rues de la ville.',
+  '✨ Un anneau de fees atteint 3 km de diametre - les touristes affluent.',
+  '🦠 Scientists: Le foret pense. Nous ne pouvons pas l expliquer.',
+  '🌰 Le marche mondial des truffes s effondre - l offre devient inepuisable.',
+  '🕸️ Un reseau mycelien communique via des signaux chimiques entre continents.',
+  '🌀 Des rapports d une dimension de spores apparaissant dans l ocean Pacifique.',
+  '💰 Les futures de spores atteignent un sommet historique sur l echange interplanetaire.',
+  '🧠 Des biologistes confirment: le reseau mycelien a atteint une conscience collective.',
 ];
+
+const EVENTS=[
+  {id:'spore_rain',icon:'🌧️',title:'Pluie de Spores!',desc:'Une tempete de spores balaie la foret. Recolte immediate de 3 minutes de production!',type:'bonus',apply:()=>{const b=getSPS()*180;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
+  {id:'myco_frenzy',icon:'🍄',title:'Frenesie Mycelium!',desc:'Le reseau mycelien vibre d energie. Production x3 pendant 30 secondes!',type:'boost',apply:()=>{addBoost('myco_frenzy','🍄 Frenesie x3',3,30);return 'Production x3 / 30s';}},
+  {id:'spore_wind',icon:'🌀',title:'Vent de Spores!',desc:'Un vent mysterieux porte tes spores loin. Tap power x5 pendant 45 secondes!',type:'boost',apply:()=>{addBoost('spore_wind','🌀 Tap x5',5,45,'click');return 'Tap x5 / 45s';}},
+  {id:'giant_shroom',icon:'🌲',title:'Champignon Geant!',desc:'Un champignon colossal surgit du sol. Bonus instant de 5 minutes de production!',type:'bonus',apply:()=>{const b=getSPS()*300;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
+  {id:'rot',icon:'🦠',title:'Pourriture Mycelienne...',desc:'Une maladie frappe ton empire. Tu perds 10% de tes spores actuels.',type:'malus',apply:()=>{const l=Math.floor(G.spores*0.1);G.spores=Math.max(0,G.spores-l);return '-'+fmt(l)+' spores';}},
+  {id:'fairy_blessing',icon:'💫',title:'Benediction des Fees!',desc:'Les fees de la foret te benissent. Toute production x2 pendant 60 secondes!',type:'boost',apply:()=>{addBoost('fairy_blessing','💫 Benediction x2',2,60);return 'Production x2 / 60s';}},
+  {id:'truffle_rush',icon:'🌰',title:'Ruee aux Truffes!',desc:'Des truffes rares emergent partout. +50% de spores par clic pendant 60s!',type:'boost',apply:()=>{addBoost('truffle_rush','🌰 Clic +50%',1.5,60,'click');return 'Clic +50% / 60s';}},
+  {id:'spore_storm',icon:'⚡',title:'Tempete de Spores!',desc:'Une tempete electrique ionise les spores. Production x5 pendant 20 secondes!',type:'boost',apply:()=>{addBoost('spore_storm','⚡ Tempete x5',5,20);return 'x5 prod / 20s';}},
+  {id:'ancient_ritual',icon:'🔮',title:'Rituel Ancien!',desc:'Un rituel ancestral se declenche. Recois 10 minutes de production du meilleur batiment!',type:'bonus',apply:()=>{let best=0;BUILDINGS.forEach(b=>{const s=b.cps*bldN(b.id)*bldMult(b.id)*globalMult();if(s>best)best=s;});const b=best*600;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
+  {id:'drought',icon:'☀️',title:'Secheresse!',desc:'Le sol se dessèche. Production -50% pendant 30 secondes.',type:'malus',apply:()=>{addBoost('drought','☀️ Secheresse -50%',0.5,30);return '-50% prod / 30s';}},
+];
+
+const SHOP_ITEMS_POOL=[
+  {id:'s_click2',  rarity:'common',   icon:'🖐️',name:'Dose de Spores',    desc:'Tap power x2 pendant 2 minutes.',     cost:()=>Math.max(100,getSPS()*20),   apply:()=>addBoost('s_click2','🖐️ Tap x2',2,120,'click')},
+  {id:'s_prod15',  rarity:'common',   icon:'🌿',name:'Fertilisant Leger',  desc:'Production +50% pendant 2 minutes.',  cost:()=>Math.max(150,getSPS()*25),   apply:()=>addBoost('s_prod15','🌿 Prod +50%',1.5,120)},
+  {id:'s_instant', rarity:'common',   icon:'✨',name:'Recolte Rapide',     desc:'Recolte 1 minute de production.',     cost:()=>Math.max(80,getSPS()*15),    apply:()=>{const b=getSPS()*60;G.spores+=b;G.lifetime+=b;}},
+  {id:'s_click3',  rarity:'rare',     icon:'⚡',name:'Gants Myceliens',    desc:'Tap power x3 pendant 3 minutes.',     cost:()=>Math.max(500,getSPS()*60),   apply:()=>addBoost('s_click3','⚡ Tap x3',3,180,'click')},
+  {id:'s_prod2',   rarity:'rare',     icon:'🍄',name:'Champignon Booste',  desc:'Production x2 pendant 3 minutes.',    cost:()=>Math.max(600,getSPS()*70),   apply:()=>addBoost('s_prod2','🍄 Prod x2',2,180)},
+  {id:'s_instant5',rarity:'rare',     icon:'🌧️',name:'Pluie de Spores',   desc:'Recolte 5 minutes de production.',    cost:()=>Math.max(400,getSPS()*80),   apply:()=>{const b=getSPS()*300;G.spores+=b;G.lifetime+=b;}},
+  {id:'s_prod3',   rarity:'epic',     icon:'🔮',name:'Rituel Ancien',      desc:'Production x3 pendant 5 minutes.',    cost:()=>Math.max(2000,getSPS()*150), apply:()=>addBoost('s_prod3','🔮 Prod x3',3,300)},
+  {id:'s_click5',  rarity:'epic',     icon:'🌀',name:'Vortex de Spores',   desc:'Tap power x5 pendant 3 minutes.',     cost:()=>Math.max(1800,getSPS()*140), apply:()=>addBoost('s_click5','🌀 Tap x5',5,180,'click')},
+  {id:'s_instant15',rarity:'epic',    icon:'🌲',name:'Foret Enchantee',    desc:'Recolte 15 minutes de production.',   cost:()=>Math.max(1500,getSPS()*200), apply:()=>{const b=getSPS()*900;G.spores+=b;G.lifetime+=b;}},
+  {id:'s_megaprod', rarity:'legendary',icon:'👑',name:'Couronne Fongique',  desc:'Production x5 pendant 10 minutes!',  cost:()=>Math.max(8000,getSPS()*400), apply:()=>addBoost('s_megaprod','👑 x5 LEGENDAIRE',5,600)},
+  {id:'s_megaclick',rarity:'legendary',icon:'🌟',name:'Mains des Dieux',    desc:'Tap power x10 pendant 5 minutes!',   cost:()=>Math.max(7000,getSPS()*350), apply:()=>addBoost('s_megaclick','🌟 Tap x10',10,300,'click')},
+  {id:'s_godboost', rarity:'legendary',icon:'∞', name:'Eveil Mycelien',     desc:'Tout x8 pendant 2 minutes!',         cost:()=>Math.max(15000,getSPS()*600),apply:()=>addBoost('s_godboost','∞ Eveil x8',8,120)},
+];
+
+const RARITY_WEIGHTS={common:55,rare:30,epic:12,legendary:3};
+let shopItems=[],shopCdTimer=300,shopSold={};
+let eventTimer=60+Math.random()*20;
+let activeBoosts={},activeEventEl=null;
 
 function bldN(id){return G.bld[id]||0;}
 function totalBlds(){return Object.values(G.bld).reduce((a,b)=>a+b,0);}
@@ -440,8 +399,10 @@ function bldCost(b){return Math.floor(b.base*Math.pow(1.16,bldN(b.id)));}
 function clickMult(){let m=1;UPGRADES.forEach(u=>{if(u.type==='click'&&G.upg[u.id])m*=u.mult;});return m;}
 function globalMult(){let m=1;UPGRADES.forEach(u=>{if(u.type==='global'&&G.upg[u.id])m*=u.mult;});return m*G.ascendMult;}
 function bldMult(id){let m=1;UPGRADES.forEach(u=>{if(u.type==='bld'&&u.bld===id&&G.upg[u.id])m*=u.mult;});return m;}
-function getSPS(){let s=0;BUILDINGS.forEach(b=>{const n=bldN(b.id);if(n>0)s+=b.cps*n*bldMult(b.id);});return s*globalMult();}
-function getClickPow(){return Math.ceil(Math.max(1,getSPS()*0.004+1)*clickMult()*G.ascendMult);}
+function getEventBoostMult(){let m=1;Object.values(activeBoosts).forEach(b=>{if(b.type==='global')m*=b.mult;});return m;}
+function getEventClickMult(){let m=1;Object.values(activeBoosts).forEach(b=>{if(b.type==='click')m*=b.mult;});return m;}
+function getSPS(){let s=0;BUILDINGS.forEach(b=>{const n=bldN(b.id);if(n>0)s+=b.cps*n*bldMult(b.id);});return s*globalMult()*getEventBoostMult();}
+function getClickPow(){return Math.ceil(Math.max(1,getSPS()*0.004+1)*clickMult()*G.ascendMult*getEventClickMult());}
 
 const logLines=[];
 function addLog(msg){
@@ -455,7 +416,109 @@ function notif(msg){
   document.body.appendChild(el);setTimeout(()=>el.remove(),3500);
 }
 
-// QUICK REFRESH — numbers only, no DOM rebuild
+function addBoost(id,label,mult,duration,type='global'){
+  activeBoosts[id]={label,mult,timeLeft:duration,type};
+  renderBoosts();
+}
+function renderBoosts(){
+  const bar=document.getElementById('boostsBar');
+  bar.querySelectorAll('.boost-chip').forEach(c=>c.remove());
+  const keys=Object.keys(activeBoosts);
+  document.getElementById('noBoosts').style.display=keys.length?'none':'';
+  keys.forEach(id=>{
+    const b=activeBoosts[id];
+    const chip=document.createElement('div');chip.className='boost-chip';chip.id='chip_'+id;
+    chip.innerHTML=b.label+' <span class="boost-chip-timer" id="chiptimer_'+id+'">'+Math.ceil(b.timeLeft)+'s</span>';
+    bar.appendChild(chip);
+  });
+}
+function tickBoosts(dt){
+  let changed=false;
+  Object.keys(activeBoosts).forEach(id=>{
+    activeBoosts[id].timeLeft-=dt;
+    const tel=document.getElementById('chiptimer_'+id);
+    if(tel)tel.textContent=Math.max(0,Math.ceil(activeBoosts[id].timeLeft))+'s';
+    if(activeBoosts[id].timeLeft<=0){
+      delete activeBoosts[id];
+      const chip=document.getElementById('chip_'+id);if(chip)chip.remove();
+      changed=true;
+    }
+  });
+  if(changed)renderBoosts();
+}
+
+function triggerEvent(){
+  if(getSPS()<=0&&G.lifetime<100)return;
+  const ev=EVENTS[Math.floor(Math.random()*EVENTS.length)];
+  const popup=document.getElementById('eventPopup');
+  const typeLabel=ev.type==='malus'?'Evenement negatif':ev.type==='boost'?'Bonus temporaire':'Recompense';
+  popup.innerHTML='<div class="event-popup" id="evInner"><div class="event-type">'+typeLabel+'</div><div class="event-title">'+ev.icon+' '+ev.title+'</div><div class="event-desc">'+ev.desc+'</div><button class="event-btn" onclick="acceptEvent(\''+ev.id+'\')">Accepter</button></div>';
+  popup.style.display='block';
+  activeEventEl=ev;
+  setTimeout(()=>{if(activeEventEl&&activeEventEl.id===ev.id)dismissEvent();},15000);
+}
+function acceptEvent(id){
+  if(!activeEventEl||activeEventEl.id!==id)return;
+  const result=activeEventEl.apply();
+  addLog(activeEventEl.icon+' <strong style="color:var(--amber)">'+activeEventEl.title+'</strong> — '+result);
+  dismissEvent();refresh();
+}
+function dismissEvent(){
+  document.getElementById('eventPopup').style.display='none';
+  document.getElementById('eventPopup').innerHTML='';
+  activeEventEl=null;
+}
+
+function generateShop(){
+  shopItems=[];shopSold={};
+  const pool=[...SHOP_ITEMS_POOL],picked=new Set();
+  while(shopItems.length<4&&pool.length>0){
+    const totalW=pool.reduce((s,item)=>s+RARITY_WEIGHTS[item.rarity],0);
+    let r=Math.random()*totalW,cum=0,chosen=null;
+    for(const item of pool){cum+=RARITY_WEIGHTS[item.rarity];if(r<=cum){chosen=item;break;}}
+    if(!chosen)chosen=pool[0];
+    if(!picked.has(chosen.id)){shopItems.push(chosen);picked.add(chosen.id);}
+    pool.splice(pool.indexOf(chosen),1);
+  }
+}
+function openShop(){generateShopUI();document.getElementById('shopOverlay').style.display='flex';}
+function closeShop(){document.getElementById('shopOverlay').style.display='none';}
+function generateShopUI(){
+  const grid=document.getElementById('shopGrid');grid.innerHTML='';
+  const rarityColors={common:'#aaa',rare:'#44aaff',epic:'#cc44ff',legendary:'#ffaa22'};
+  shopItems.forEach(item=>{
+    const sold=shopSold[item.id],cost=item.cost(),canAfford=G.spores>=cost;
+    const div=document.createElement('div');
+    div.className='shop-item'+(sold?' sold':'');
+    div.innerHTML='<div class="shop-item-rarity" style="color:'+rarityColors[item.rarity]+'">'+item.rarity.toUpperCase()+'</div><div class="shop-item-icon">'+item.icon+'</div><div class="shop-item-name">'+item.name+'</div><div class="shop-item-desc">'+item.desc+'</div><div class="shop-item-cost" style="color:'+(canAfford?'var(--amber)':'var(--red)')+'">'+fmt(cost)+' ✨</div>';
+    if(!sold)div.onclick=()=>buyShopItem(item.id);
+    grid.appendChild(div);
+  });
+}
+function buyShopItem(id){
+  const item=shopItems.find(x=>x.id===id);
+  if(!item||shopSold[id])return;
+  const cost=item.cost();
+  if(G.spores<cost){notif('Pas assez de spores!');return;}
+  G.spores-=cost;shopSold[id]=true;item.apply();
+  addLog('🏪 Achete: <strong style="color:var(--amber)">'+item.name+'</strong> — '+fmt(cost)+' spores');
+  notif('✅ <strong>'+item.name+'</strong> active!');
+  generateShopUI();refresh();
+}
+function tickShop(dt){
+  shopCdTimer-=dt;eventTimer-=dt;
+  if(eventTimer<=0){eventTimer=50+Math.random()*30;triggerEvent();}
+  if(shopCdTimer<=0){
+    shopCdTimer=300;generateShop();
+    addLog('🏪 <strong style="color:var(--amber)">Le marche s est renouvele!</strong> Nouveaux boosts disponibles.');
+    notif('🏪 <strong>Marche renouvele!</strong><br>Nouveaux boosts disponibles!');
+  }
+  const sm=Math.floor(shopCdTimer/60),ss=Math.floor(shopCdTimer%60);
+  const txt='Nouveau dans '+sm+':'+(ss<10?'0':'')+ss;
+  const el1=document.getElementById('shopCdTxt');if(el1)el1.textContent=txt;
+  const el2=document.getElementById('shopTimerTxt');if(el2)el2.textContent='Se renouvelle dans '+sm+':'+(ss<10?'0':'')+ss;
+}
+
 function quickRefresh(){
   const sps=getSPS(),cp=getClickPow();
   document.getElementById('sporeCount').textContent=fmt(G.spores);
@@ -468,13 +531,12 @@ function quickRefresh(){
     const b=BUILDINGS[i];if(!b)return;
     const cost=bldCost(b),locked=G.lifetime<b.unlock,afford=!locked&&G.spores>=cost;
     el.classList.toggle('affordable',afford);
-    const countEl=el.querySelector('.bld-count');if(countEl)countEl.textContent=bldN(b.id);
-    const cpsEl=el.querySelector('.bld-cps'),n=bldN(b.id);
-    if(cpsEl)cpsEl.textContent=n>0?fmt(b.cps*n*bldMult(b.id)*globalMult())+' /s':'';
+    const ce=el.querySelector('.bld-count');if(ce)ce.textContent=bldN(b.id);
+    const cps=el.querySelector('.bld-cps'),n=bldN(b.id);
+    if(cps)cps.textContent=n>0?fmt(b.cps*n*bldMult(b.id)*globalMult())+' /s':'';
   });
 }
 
-// FULL REFRESH — rebuilds buildings and upgrades (every 500ms)
 function refresh(){
   const sps=getSPS(),cp=getClickPow();
   document.getElementById('sporeCount').textContent=fmt(G.spores);
@@ -491,7 +553,7 @@ function refresh(){
   const{stage,pct,nextAt}=getStage();
   document.getElementById('stageName').textContent=stage.name;
   document.getElementById('stageBar').style.width=pct+'%';
-  document.getElementById('stageDesc').textContent=nextAt===Infinity?stage.desc:stage.desc+' — Next: '+fmt(nextAt)+' spores';
+  document.getElementById('stageDesc').textContent=nextAt===Infinity?stage.desc:stage.desc+' — Prochain: '+fmt(nextAt)+' spores';
   renderBlds();renderUpgs();
 }
 
@@ -504,7 +566,7 @@ function renderBlds(){
     const prog=nextM<999?((n-prevM)/(nextM-prevM)*100):100;
     const div=document.createElement('div');
     div.className='bld-card'+(locked?' locked':'')+(afford?' affordable':'');
-    div.innerHTML='<div class="bld-top"><div class="bld-icon">'+b.icon+'</div><div class="bld-info"><div class="bld-name">'+b.name+'</div><div class="bld-desc">'+(locked?'Unlocks at '+fmt(b.unlock)+' spores':b.desc)+'</div></div><div class="bld-count">'+n+'</div></div><div class="bld-bottom"><div class="bld-cps">'+(n>0?fmt(sps)+' /s':'')+'</div><div class="bld-cost">'+fmt(cost)+' ✨</div></div><div class="bld-prog"><div class="bld-prog-fill" style="width:'+prog+'%"></div></div>';
+    div.innerHTML='<div class="bld-top"><div class="bld-icon">'+b.icon+'</div><div class="bld-info"><div class="bld-name">'+b.name+'</div><div class="bld-desc">'+(locked?'Debloque a '+fmt(b.unlock)+' spores':b.desc)+'</div></div><div class="bld-count">'+n+'</div></div><div class="bld-bottom"><div class="bld-cps">'+(n>0?fmt(sps)+' /s':'')+'</div><div class="bld-cost">'+fmt(cost)+' ✨</div></div><div class="bld-prog"><div class="bld-prog-fill" style="width:'+prog+'%"></div></div>';
     if(!locked)div.onclick=()=>buyBld(b.id);
     el.appendChild(div);
   });
@@ -517,7 +579,7 @@ function renderUpgs(){
     const afford=!bought&&G.spores>=u.cost;
     const div=document.createElement('div');
     div.className='upg-card'+(bought?' bought':'')+(afford?' affordable':'');
-    div.innerHTML='<span class="upg-icon">'+u.icon+'</span><div class="upg-name">'+u.name+'</div><div class="upg-desc">'+u.eff+'</div><div class="upg-cost">'+(bought?'✓ Researched':fmt(u.cost)+' ✨')+'</div>';
+    div.innerHTML='<span class="upg-icon">'+u.icon+'</span><div class="upg-name">'+u.name+'</div><div class="upg-desc">'+u.eff+'</div><div class="upg-cost">'+(bought?'✓ Recherche':fmt(u.cost)+' ✨')+'</div>';
     if(!bought)div.onclick=()=>buyUpg(u.id);
     el.appendChild(div);
   });
@@ -541,7 +603,6 @@ function getStage(){
   return{stage:s,pct:Math.min(100,((G.lifetime-s.at)/(next.at-s.at))*100),nextAt:next.at};
 }
 
-// INSTANT CLICK — no lag
 const _cap=document.getElementById('shroomCap');
 let _ct=null;
 function onClickShroom(e){
@@ -561,7 +622,7 @@ function buyBld(id){
   const b=BUILDINGS.find(x=>x.id===id),cost=bldCost(b);
   if(G.spores<cost)return;
   G.spores-=cost;G.bld[id]=(G.bld[id]||0)+1;
-  addLog('Built '+b.icon+' <strong style="color:var(--glow)">'+b.name+'</strong> #'+bldN(id)+' — '+fmt(cost)+' spores');
+  addLog('Construit '+b.icon+' <strong style="color:var(--glow)">'+b.name+'</strong> #'+bldN(id)+' — '+fmt(cost)+' spores');
   refresh();checkAch();
 }
 
@@ -570,7 +631,7 @@ function buyUpg(id){
   const u=UPGRADES.find(x=>x.id===id);
   if(!u||G.spores<u.cost)return;
   G.spores-=u.cost;G.upg[id]=true;
-  addLog('Researched '+u.icon+' <strong style="color:var(--amber)">'+u.name+'</strong>');
+  addLog('Recherche '+u.icon+' <strong style="color:var(--amber)">'+u.name+'</strong>');
   notif('🔬 <strong>'+u.name+'</strong><br><em>'+u.eff+'</em>');
   refresh();
 }
@@ -579,7 +640,7 @@ function checkAch(){
   ACHIEVEMENTS.forEach(a=>{
     if(!G.ach[a.id]&&a.req()){
       G.ach[a.id]=true;
-      addLog('🏅 <strong style="color:var(--amber)">'+a.name+'</strong> unlocked!');
+      addLog('🏅 <strong style="color:var(--amber)">'+a.name+'</strong> debloque!');
       notif('🏅 <strong>'+a.name+'</strong><br><em>'+a.desc+'</em>');
       renderAch();
     }
@@ -591,8 +652,8 @@ function doAscend(){
   G.ascendCount++;
   const m=1+G.ascendCount*0.6;G.ascendMult=m;
   G.spores=0;G.lifetime=0;G.totalClicks=0;G.bld={};G.upg={};
-  addLog('🌀 <strong style="color:#cc44ff">ASCENDED #'+G.ascendCount+'</strong> — Multiplier x'+m.toFixed(2));
-  notif('🌀 <strong>Ascension #'+G.ascendCount+'!</strong><br>Permanent x'+m.toFixed(2)+' multiplier!');
+  addLog('🌀 <strong style="color:#cc44ff">ASCENSION #'+G.ascendCount+'</strong> — Multiplicateur x'+m.toFixed(2));
+  notif('🌀 <strong>Ascension #'+G.ascendCount+'!</strong><br>Multiplicateur permanent x'+m.toFixed(2)+'!');
   refresh();renderAch();
 }
 
@@ -600,14 +661,14 @@ let goldActive=false;
 function spawnGold(){
   if(goldActive)return;goldActive=true;
   const el=document.createElement('div');el.className='gold-shroom';
-  el.textContent='🌟';el.title='Golden Shroom! Click for a bonus!';
+  el.textContent='🌟';el.title='Champignon Dore! Clique vite!';
   el.style.left=(80+Math.random()*(window.innerWidth-180))+'px';
   el.style.top=(80+Math.random()*(window.innerHeight-180))+'px';
   el.onclick=()=>{
     const bonus=Math.floor(getSPS()*25+getClickPow()*80);
     G.spores+=bonus;G.lifetime+=bonus;
-    addLog('🌟 <strong style="color:var(--amber)">Golden Shroom!</strong> +'+fmt(bonus)+' spores!');
-    notif('🌟 <strong>Golden Shroom!</strong><br>+'+fmt(bonus)+' Spores!');
+    addLog('🌟 <strong style="color:var(--amber)">Champignon Dore!</strong> +'+fmt(bonus)+' spores!');
+    notif('🌟 <strong>Champignon Dore!</strong><br>+'+fmt(bonus)+' Spores!');
     el.remove();goldActive=false;refresh();
   };
   document.body.appendChild(el);
@@ -616,18 +677,20 @@ function spawnGold(){
 
 let loggedMs=-1;
 const MS=[
-  {v:100,   t:'Spore Pod unlocked!'},
-  {v:500,   t:'Mycelium Threads available!'},
-  {v:2500,  t:'Fairy Rings discovered!'},
-  {v:12000, t:'Truffle Networks revealed!'},
-  {v:60000, t:'Giant Shroom blueprint found!'},
-  {v:300000,t:'Cave Colony ready!'},
-  {v:1.5e6, t:'Fungal Spire constructed!'},
-  {v:9e6,   t:'Enchanted Forest claimed!'},
-  {v:4e7,   t:'World Root awakened!'},
-  {v:2e8,   t:'The Spore Dimension tears open...'},
-  {v:1e15,  t:'ASCENSION AVAILABLE!'},
+  {v:100,   t:'Spore Pod debloque!'},
+  {v:500,   t:'Mycelium Thread disponible!'},
+  {v:2500,  t:'Fairy Ring decouvert!'},
+  {v:12000, t:'Truffle Network revele!'},
+  {v:60000, t:'Plan Giant Shroom trouve!'},
+  {v:300000,t:'Cave Colony prete!'},
+  {v:1.5e6, t:'Fungal Spire construit!'},
+  {v:9e6,   t:'Enchanted Forest conquise!'},
+  {v:4e7,   t:'World Root eveille!'},
+  {v:2e8,   t:'La Dimension Spore s ouvre...'},
+  {v:1e15,  t:'ASCENSION DISPONIBLE!'},
 ];
+
+generateShop();
 
 let lastT=Date.now(),goldCdTimer=100,tickerIdx=0,tickerTimer=0,renderTimer=0;
 function tick(){
@@ -640,17 +703,20 @@ function tick(){
   MS.forEach((m,i)=>{if(G.lifetime>=m.v&&loggedMs<i){loggedMs=i;addLog('📍 <strong style="color:var(--glow)">'+m.t+'</strong>');}});
   tickerTimer+=dt;
   if(tickerTimer>35){tickerTimer=0;tickerIdx=(tickerIdx+1)%TICKERS.length;document.getElementById('tickerText').textContent=TICKERS[tickerIdx];}
+  tickBoosts(dt);
+  tickShop(dt);
   quickRefresh();
   renderTimer+=dt;if(renderTimer>=0.5){renderTimer=0;refresh();}
   checkAch();
 }
 
-try{const sv=localStorage.getItem('myceliumEmpire');if(sv){G={...G,...JSON.parse(sv)};addLog('🍄 Spores remembered. Welcome back!');}}catch(e){}
-renderAch();refresh();
-addLog('🌱 Click the mushroom to begin your empire!');
-addLog('💡 Buy Colonies on the right to earn spores automatically.');
-addLog('💡 Research upgrades on the left to multiply production.');
-addLog('💡 Watch for the 🌟 Golden Shroom — click it fast!');
+try{const sv=localStorage.getItem('myceliumEmpire');if(sv){G={...G,...JSON.parse(sv)};addLog('🍄 Spores memorisees. L empire se reveille.');}}catch(e){}
+renderAch();refresh();generateShopUI();
+addLog('🌱 Clique le champignon pour commencer ton empire!');
+addLog('💡 Achete des Colonies a droite pour automatiser la production.');
+addLog('💡 Recherche des upgrades a gauche pour multiplier ta production.');
+addLog('💡 Ouvre le 🏪 Marche pour acheter des boosts!');
+addLog('💡 Des evenements aleatoires arrivent toutes les ~1 minute!');
 setInterval(tick,50);
 setInterval(()=>{try{localStorage.setItem('myceliumEmpire',JSON.stringify(G));}catch(e){}},8000);
 </script>
