@@ -109,14 +109,12 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
 @keyframes notifSlide { from{transform:translateX(110%)} to{transform:translateX(0)} }
 .ascend-panel { background:rgba(136,0,204,0.06); border:1px solid rgba(136,0,204,0.25); border-radius:10px; padding:12px; margin-top:10px; font-size:11px; color:var(--text2); font-style:italic; line-height:1.6; }
 .ascend-panel strong { color:var(--purple); font-style:normal; }
-.ticker { grid-column:1/-1; position:fixed; bottom:0; left:0; right:0; background:rgba(10,8,5,0.96); border-top:1px solid var(--border); padding:6px 20px; font-size:12px; color:var(--text2); font-style:italic; z-index:100; white-space:nowrap; overflow:hidden; }
+.ticker { position:fixed; bottom:0; left:0; right:0; background:rgba(10,8,5,0.96); border-top:1px solid var(--border); padding:6px 20px; font-size:12px; color:var(--text2); font-style:italic; z-index:100; white-space:nowrap; overflow:hidden; }
 .ticker-inner { display:inline-block; animation:tickerScroll 40s linear infinite; }
 @keyframes tickerScroll { from{transform:translateX(100vw)} to{transform:translateX(-100%)} }
 ::-webkit-scrollbar { width:4px; }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
-
-/* SHOP */
 .shop-overlay { position:fixed; inset:0; z-index:800; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; animation:fadeIn 0.2s ease; }
 @keyframes fadeIn { from{opacity:0} to{opacity:1} }
 .shop-box { background:linear-gradient(180deg,#1a1008 0%,#0f0a04 100%); border:2px solid var(--amber2); border-radius:16px; padding:24px 28px; width:520px; max-width:95vw; box-shadow:0 0 60px rgba(255,120,0,0.25); position:relative; }
@@ -132,12 +130,10 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
 .shop-item-name { font-family:'Cinzel',serif; font-size:13px; color:var(--text); margin-bottom:3px; }
 .shop-item-desc { font-size:11px; color:var(--text2); font-style:italic; margin-bottom:8px; }
 .shop-item-cost { font-family:'Cinzel',serif; font-size:12px; }
-.shop-close { position:absolute; top:14px; right:16px; background:none; border:none; color:var(--text2); font-size:22px; cursor:pointer; line-height:1; transition:color 0.1s; }
+.shop-close { position:absolute; top:14px; right:16px; background:none; border:none; color:var(--text2); font-size:22px; cursor:pointer; line-height:1; }
 .shop-close:hover { color:var(--text); }
-.shop-btn { display:block; width:100%; margin-top:14px; padding:10px; border-radius:8px; border:2px solid var(--amber2); background:rgba(255,120,0,0.1); color:var(--amber); font-family:'Cinzel',serif; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s; letter-spacing:1px; }
+.shop-btn { display:block; width:100%; margin-top:14px; padding:10px; border-radius:8px; border:2px solid var(--amber2); background:rgba(255,120,0,0.1); color:var(--amber); font-family:'Cinzel',serif; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s; }
 .shop-btn:hover { background:rgba(255,120,0,0.25); }
-
-/* EVENTS */
 .event-popup { position:fixed; top:80px; left:50%; transform:translateX(-50%); z-index:900; width:420px; max-width:92vw; background:linear-gradient(135deg,#1a0a00,#0d0800); border:2px solid var(--amber); border-radius:14px; padding:20px 24px; box-shadow:0 0 50px rgba(255,150,0,0.3); animation:eventSlide 0.4s cubic-bezier(0.34,1.56,0.64,1); }
 @keyframes eventSlide { from{opacity:0;transform:translateX(-50%) translateY(-30px) scale(0.9)} to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)} }
 .event-type { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text2); margin-bottom:4px; }
@@ -148,9 +144,7 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
 </style>
 </head>
 <body>
-
 <canvas id="roots"></canvas>
-
 <div class="wrap">
   <div class="topbar">
     <div class="game-logo">🍄 Mycelium Empire</div>
@@ -161,12 +155,10 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
     <button class="open-shop-btn" onclick="openShop()">🏪 Marche<span class="shop-cd" id="shopCdTxt">Nouveau dans 5:00</span></button>
     <button class="ascend-btn" id="ascBtn" disabled onclick="doAscend()">🌀 Ascend</button>
   </div>
-
   <div class="boosts-bar" id="boostsBar">
     <span class="boosts-label">Actifs:</span>
     <span style="color:var(--text2);font-size:11px;font-style:italic" id="noBoosts">Aucun boost actif</span>
   </div>
-
   <div class="sidebar-left">
     <div class="sec-head">🔬 Recherche</div>
     <div id="upgList"></div>
@@ -179,7 +171,6 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
       Chaque Ascension se cumule pour toujours.
     </div>
   </div>
-
   <div class="main">
     <div class="res-panel">
       <div class="spore-count" id="sporeCount">0</div>
@@ -187,7 +178,6 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
       <div class="auto-rate">🍄 <span id="spsDisplay">0</span> spores / seconde</div>
       <div class="click-rate">👆 <span id="spcDisplay">1</span> par clic</div>
     </div>
-
     <div class="shroom-stage" id="shroomStage" onclick="onClickShroom(event)">
       <div class="spore-particle" style="left:40%;bottom:115px;animation-delay:0s;--drift:-20px"></div>
       <div class="spore-particle" style="left:50%;bottom:118px;animation-delay:0.8s;--drift:10px"></div>
@@ -195,14 +185,10 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
       <div class="spore-particle" style="left:45%;bottom:112px;animation-delay:2.2s;--drift:25px"></div>
       <div class="spore-particle" style="left:55%;bottom:116px;animation-delay:0.4s;--drift:-30px"></div>
       <div class="shroom-gills">
-        <div class="gill-line" style="left:10%"></div>
-        <div class="gill-line" style="left:20%"></div>
-        <div class="gill-line" style="left:30%"></div>
-        <div class="gill-line" style="left:40%"></div>
-        <div class="gill-line" style="left:50%"></div>
-        <div class="gill-line" style="left:60%"></div>
-        <div class="gill-line" style="left:70%"></div>
-        <div class="gill-line" style="left:80%"></div>
+        <div class="gill-line" style="left:10%"></div><div class="gill-line" style="left:20%"></div>
+        <div class="gill-line" style="left:30%"></div><div class="gill-line" style="left:40%"></div>
+        <div class="gill-line" style="left:50%"></div><div class="gill-line" style="left:60%"></div>
+        <div class="gill-line" style="left:70%"></div><div class="gill-line" style="left:80%"></div>
         <div class="gill-line" style="left:90%"></div>
       </div>
       <div class="shroom-cap" id="shroomCap">
@@ -215,28 +201,22 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
       <div class="shroom-stem"></div>
       <div class="shroom-ground"></div>
     </div>
-
     <div class="stage-panel">
-      <div class="stage-name" id="stageName">🌱 Lone Spore</div>
+      <div class="stage-name" id="stageName">🌱 Spore Solitaire</div>
       <div class="stage-bar-bg"><div class="stage-bar-fill" id="stageBar" style="width:0%"></div></div>
       <div class="stage-desc" id="stageDesc">La foret attend ton empire...</div>
     </div>
-
     <div class="log-panel">
       <div class="sec-head">📜 Chronique</div>
       <div id="logDiv" style="max-height:130px;overflow-y:auto"></div>
     </div>
   </div>
-
   <div class="sidebar-right">
     <div class="sec-head">🏗️ Colonies</div>
     <div id="bldList"></div>
   </div>
 </div>
-
-<div class="ticker"><div class="ticker-inner" id="tickerText">🍄 La foret s'eveille... ton empire commence par un seul clic.</div></div>
-
-<!-- SHOP -->
+<div class="ticker"><div class="ticker-inner" id="tickerText">🍄 La foret s eveille... ton empire commence par un seul clic.</div></div>
 <div class="shop-overlay" id="shopOverlay" style="display:none">
   <div class="shop-box">
     <button class="shop-close" onclick="closeShop()">✕</button>
@@ -246,12 +226,9 @@ canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !importan
     <button class="shop-btn" onclick="closeShop()">Fermer</button>
   </div>
 </div>
-
-<!-- EVENT POPUP -->
 <div id="eventPopup" style="display:none"></div>
 
 <script>
-// ROOTS CANVAS
 const rc=document.getElementById('roots'),rx=rc.getContext('2d');
 function resizeRoots(){rc.width=window.innerWidth;rc.height=window.innerHeight;}
 resizeRoots();window.addEventListener('resize',resizeRoots);
@@ -262,12 +239,7 @@ function drawRoots(){
   RN.forEach(n=>{n.x=(n.x+n.vx+rc.width*2)%(rc.width*2)-rc.width*0.5;n.y=(n.y+n.vy+rc.height*2)%(rc.height*2)-rc.height*0.5;n.p+=0.02;});
   for(let i=0;i<RN.length;i++)for(let j=i+1;j<RN.length;j++){
     const dx=RN[i].x-RN[j].x,dy=RN[i].y-RN[j].y,d=Math.sqrt(dx*dx+dy*dy);
-    if(d<180){
-      const a=(1-d/180)*0.25*(0.5+0.5*Math.sin(RN[i].p));
-      rx.beginPath();rx.moveTo(RN[i].x,RN[i].y);
-      rx.quadraticCurveTo((RN[i].x+RN[j].x)/2+dy*0.2,(RN[i].y+RN[j].y)/2-dx*0.2,RN[j].x,RN[j].y);
-      rx.strokeStyle='rgba(100,220,80,'+a+')';rx.lineWidth=0.8;rx.stroke();
-    }
+    if(d<180){const a=(1-d/180)*0.25*(0.5+0.5*Math.sin(RN[i].p));rx.beginPath();rx.moveTo(RN[i].x,RN[i].y);rx.quadraticCurveTo((RN[i].x+RN[j].x)/2+dy*0.2,(RN[i].y+RN[j].y)/2-dx*0.2,RN[j].x,RN[j].y);rx.strokeStyle='rgba(100,220,80,'+a+')';rx.lineWidth=0.8;rx.stroke();}
   }
   requestAnimationFrame(drawRoots);
 }
@@ -283,107 +255,123 @@ function fmt(n){
 let G={spores:0,lifetime:0,totalClicks:0,ascendCount:0,ascendMult:1,bld:{},upg:{},ach:{},time:0};
 
 const BUILDINGS=[
-  {id:'spore',  name:'Spore Pod',       icon:'🫧',base:12,     cps:0.1,  desc:'Libere des spores en continu.',        unlock:0},
-  {id:'mycel',  name:'Mycelium Thread', icon:'🕸️',base:80,     cps:0.4,  desc:'Les filaments absorbent les nutriments.',unlock:40},
-  {id:'fairy',  name:'Fairy Ring',      icon:'💫',base:450,    cps:1.8,  desc:'Les anneaux anciens canalisent la magie.',unlock:200},
+  {id:'spore',  name:'Spore Pod',       icon:'🫧',base:12,     cps:0.1,  desc:'Libere des spores en continu.',          unlock:0},
+  {id:'mycel',  name:'Mycelium Thread', icon:'🕸️',base:80,     cps:0.4,  desc:'Les filaments absorbent les nutriments.',  unlock:40},
+  {id:'fairy',  name:'Fairy Ring',      icon:'💫',base:450,    cps:1.8,  desc:'Les anneaux anciens canalisent la magie.', unlock:200},
   {id:'truffle',name:'Truffle Network', icon:'🌰',base:2500,   cps:8,    desc:'Les reseaux de truffes cultivent le sol.', unlock:1000},
   {id:'giant',  name:'Giant Shroom',    icon:'🍄',base:12000,  cps:35,   desc:'Un champignon colossal plein de puissance.',unlock:5000},
-  {id:'cave',   name:'Cave Colony',     icon:'🦇',base:65000,  cps:150,  desc:'Les grottes profondes cultivent des fungi rares.',unlock:25000},
-  {id:'spire',  name:'Fungal Spire',    icon:'🗼',base:350000, cps:600,  desc:'Une fleche repand des spores sur des kilometres.',unlock:120000},
-  {id:'forest', name:'Enchanted Forest',icon:'🌲',base:1800000,cps:2500, desc:'Une foret entiere sous controle mycologique.',unlock:600000},
+  {id:'cave',   name:'Cave Colony',     icon:'🦇',base:65000,  cps:150,  desc:'Les grottes profondes cultivent des fungi.',unlock:25000},
+  {id:'spire',  name:'Fungal Spire',    icon:'🗼',base:350000, cps:600,  desc:'Une fleche repand des spores au loin.',    unlock:120000},
+  {id:'forest', name:'Enchanted Forest',icon:'🌲',base:1800000,cps:2500, desc:'Une foret entiere sous controle mycolo.', unlock:600000},
   {id:'world',  name:'World Root',      icon:'🌍',base:9000000,cps:10000,desc:'Le mycelium enveloppe la planete entiere.',unlock:3000000},
-  {id:'beyond', name:'Spore Dimension', icon:'🌀',base:4e8,    cps:60000,desc:'Une dimension de pur champignon.',       unlock:1e8},
+  {id:'beyond', name:'Spore Dimension', icon:'🌀',base:4e8,    cps:60000,desc:'Une dimension de pur champignon.',         unlock:1e8},
 ];
 
 const UPGRADES=[
-  {id:'c1',name:'Doigts Calleux',      icon:'🖐️',cost:80,     eff:'x2 puissance clic',      type:'click',mult:2,  req:()=>G.lifetime>=40},
-  {id:'c2',name:'Gants de Spores',     icon:'🧤',cost:1500,   eff:'x3 puissance clic',      type:'click',mult:3,  req:()=>G.lifetime>=800},
-  {id:'c3',name:'Injection Enzyme',    icon:'💉',cost:40000,  eff:'x5 puissance clic',      type:'click',mult:5,  req:()=>G.lifetime>=20000},
-  {id:'c4',name:'Gants Myco',          icon:'⚡',cost:800000, eff:'x10 puissance clic',     type:'click',mult:10, req:()=>G.lifetime>=400000},
-  {id:'c5',name:'Apotheose Fongique',  icon:'🌟',cost:5e7,    eff:'x20 puissance clic',     type:'click',mult:20, req:()=>G.lifetime>=2e7},
-  {id:'sp1',name:'Pods Plus Forts',    icon:'🫧',cost:400,    eff:'Pods x2 SPS',            type:'bld',bld:'spore',  mult:2,req:()=>bldN('spore')>=5},
-  {id:'sp2',name:'Nuage Dense',        icon:'🫧',cost:6000,   eff:'Pods x3 SPS',            type:'bld',bld:'spore',  mult:3,req:()=>bldN('spore')>=15},
-  {id:'sp3',name:'Canon de Spores',    icon:'🫧',cost:80000,  eff:'Pods x5 SPS',            type:'bld',bld:'spore',  mult:5,req:()=>bldN('spore')>=30},
-  {id:'my1',name:'Filaments Larges',   icon:'🕸️',cost:2500,   eff:'Mycelium x2 SPS',        type:'bld',bld:'mycel',  mult:2,req:()=>bldN('mycel')>=5},
-  {id:'my2',name:'Fungi Neural',       icon:'🕸️',cost:35000,  eff:'Mycelium x3 SPS',        type:'bld',bld:'mycel',  mult:3,req:()=>bldN('mycel')>=15},
-  {id:'fr1',name:'Resonance Anneau',   icon:'💫',cost:14000,  eff:'Fairy Rings x2 SPS',     type:'bld',bld:'fairy',  mult:2,req:()=>bldN('fairy')>=5},
-  {id:'fr2',name:'Pacte Ancien',       icon:'💫',cost:180000, eff:'Fairy Rings x3 SPS',     type:'bld',bld:'fairy',  mult:3,req:()=>bldN('fairy')>=15},
-  {id:'tr1',name:'Arome Profond',      icon:'🌰',cost:75000,  eff:'Truffles x2 SPS',        type:'bld',bld:'truffle',mult:2,req:()=>bldN('truffle')>=5},
-  {id:'tr2',name:'Extrait de Truffe',  icon:'🌰',cost:1000000,eff:'Truffles x3 SPS',        type:'bld',bld:'truffle',mult:3,req:()=>bldN('truffle')>=15},
-  {id:'gs1',name:'Goutte Fertilisant', icon:'🍄',cost:400000, eff:'Giant Shrooms x2 SPS',   type:'bld',bld:'giant',  mult:2,req:()=>bldN('giant')>=5},
-  {id:'gs2',name:'Croissance Titan',   icon:'🍄',cost:5000000,eff:'Giant Shrooms x3 SPS',   type:'bld',bld:'giant',  mult:3,req:()=>bldN('giant')>=15},
-  {id:'g1',name:'Alliance Foret',      icon:'🌿',cost:4000,   eff:'Tout SPS x1.5',          type:'global',mult:1.5,req:()=>G.lifetime>=2000},
-  {id:'g2',name:'Guilde Decomposeurs', icon:'♻️',cost:80000,  eff:'Tout SPS x2',            type:'global',mult:2,  req:()=>G.lifetime>=40000},
-  {id:'g3',name:'Conscience Myco',     icon:'🧠',cost:1500000,eff:'Tout SPS x3',            type:'global',mult:3,  req:()=>G.lifetime>=800000},
-  {id:'g4',name:'Overmind Hyphae',     icon:'🌐',cost:3e7,    eff:'Tout SPS x5',            type:'global',mult:5,  req:()=>G.lifetime>=1.5e7},
-  {id:'g5',name:'Singularite Spore',   icon:'∞', cost:8e8,    eff:'Tout SPS x10',           type:'global',mult:10, req:()=>G.lifetime>=4e8},
+  {id:'c1',name:'Doigts Calleux',     icon:'🖐️',cost:80,     eff:'x2 puissance clic',    type:'click',mult:2,  req:()=>G.lifetime>=40},
+  {id:'c2',name:'Gants de Spores',    icon:'🧤',cost:1500,   eff:'x3 puissance clic',    type:'click',mult:3,  req:()=>G.lifetime>=800},
+  {id:'c3',name:'Injection Enzyme',   icon:'💉',cost:40000,  eff:'x5 puissance clic',    type:'click',mult:5,  req:()=>G.lifetime>=20000},
+  {id:'c4',name:'Gants Myco',         icon:'⚡',cost:800000, eff:'x10 puissance clic',   type:'click',mult:10, req:()=>G.lifetime>=400000},
+  {id:'c5',name:'Apotheose Fongique', icon:'🌟',cost:5e7,    eff:'x20 puissance clic',   type:'click',mult:20, req:()=>G.lifetime>=2e7},
+  {id:'sp1',name:'Pods Plus Forts',   icon:'🫧',cost:400,    eff:'Pods x2 SPS',          type:'bld',bld:'spore',  mult:2,req:()=>bldN('spore')>=5},
+  {id:'sp2',name:'Nuage Dense',       icon:'🫧',cost:6000,   eff:'Pods x3 SPS',          type:'bld',bld:'spore',  mult:3,req:()=>bldN('spore')>=15},
+  {id:'sp3',name:'Canon de Spores',   icon:'🫧',cost:80000,  eff:'Pods x5 SPS',          type:'bld',bld:'spore',  mult:5,req:()=>bldN('spore')>=30},
+  {id:'my1',name:'Filaments Larges',  icon:'🕸️',cost:2500,   eff:'Mycelium x2 SPS',      type:'bld',bld:'mycel',  mult:2,req:()=>bldN('mycel')>=5},
+  {id:'my2',name:'Fungi Neural',      icon:'🕸️',cost:35000,  eff:'Mycelium x3 SPS',      type:'bld',bld:'mycel',  mult:3,req:()=>bldN('mycel')>=15},
+  {id:'fr1',name:'Resonance Anneau',  icon:'💫',cost:14000,  eff:'Fairy Rings x2 SPS',   type:'bld',bld:'fairy',  mult:2,req:()=>bldN('fairy')>=5},
+  {id:'fr2',name:'Pacte Ancien',      icon:'💫',cost:180000, eff:'Fairy Rings x3 SPS',   type:'bld',bld:'fairy',  mult:3,req:()=>bldN('fairy')>=15},
+  {id:'tr1',name:'Arome Profond',     icon:'🌰',cost:75000,  eff:'Truffles x2 SPS',      type:'bld',bld:'truffle',mult:2,req:()=>bldN('truffle')>=5},
+  {id:'tr2',name:'Extrait de Truffe', icon:'🌰',cost:1000000,eff:'Truffles x3 SPS',      type:'bld',bld:'truffle',mult:3,req:()=>bldN('truffle')>=15},
+  {id:'gs1',name:'Goutte Fertilisant',icon:'🍄',cost:400000, eff:'Giant Shrooms x2 SPS', type:'bld',bld:'giant',  mult:2,req:()=>bldN('giant')>=5},
+  {id:'gs2',name:'Croissance Titan',  icon:'🍄',cost:5000000,eff:'Giant Shrooms x3 SPS', type:'bld',bld:'giant',  mult:3,req:()=>bldN('giant')>=15},
+  {id:'g1',name:'Alliance Foret',     icon:'🌿',cost:4000,   eff:'Tout SPS x1.5',        type:'global',mult:1.5,req:()=>G.lifetime>=2000},
+  {id:'g2',name:'Guilde Decomposeurs',icon:'♻️',cost:80000,  eff:'Tout SPS x2',          type:'global',mult:2,  req:()=>G.lifetime>=40000},
+  {id:'g3',name:'Conscience Myco',    icon:'🧠',cost:1500000,eff:'Tout SPS x3',          type:'global',mult:3,  req:()=>G.lifetime>=800000},
+  {id:'g4',name:'Overmind Hyphae',    icon:'🌐',cost:3e7,    eff:'Tout SPS x5',          type:'global',mult:5,  req:()=>G.lifetime>=1.5e7},
+  {id:'g5',name:'Singularite Spore',  icon:'∞', cost:8e8,    eff:'Tout SPS x10',         type:'global',mult:10, req:()=>G.lifetime>=4e8},
 ];
 
 const ACHIEVEMENTS=[
-  {id:'first', name:'Premiere Recolte',  icon:'🌱',desc:'Clique le champignon une fois.',     req:()=>G.totalClicks>=1},
-  {id:'tap100',name:'Inlassable',        icon:'👆',desc:'Clique 100 fois.',                   req:()=>G.totalClicks>=100},
-  {id:'tap1k', name:'Obsessionnel',      icon:'🤯',desc:'Clique 1 000 fois.',                 req:()=>G.totalClicks>=1000},
-  {id:'s1k',   name:'Accumulateur',      icon:'✨',desc:'Collecte 1 000 spores.',             req:()=>G.lifetime>=1000},
-  {id:'s100k', name:'Baron Fongique',    icon:'🍄',desc:'Collecte 100 000 spores.',           req:()=>G.lifetime>=100000},
-  {id:'s1m',   name:'Myco-Millionnaire', icon:'💰',desc:'Collecte 1 Million de spores.',      req:()=>G.lifetime>=1e6},
-  {id:'s1b',   name:'Milliardaire Spore',icon:'🤑',desc:'Collecte 1 Milliard de spores.',     req:()=>G.lifetime>=1e9},
-  {id:'s1t',   name:'Titan Fongique',    icon:'🌍',desc:'Collecte 1 Trillion de spores.',     req:()=>G.lifetime>=1e12},
-  {id:'b10',   name:'Cultivateur',       icon:'🌿',desc:'Possede 10 colonies.',               req:()=>totalBlds()>=10},
-  {id:'b50',   name:'Mycologue',         icon:'🔬',desc:'Possede 50 colonies.',               req:()=>totalBlds()>=50},
-  {id:'b100',  name:'Empire Fongique',   icon:'👑',desc:'Possede 100 colonies.',              req:()=>totalBlds()>=100},
-  {id:'b200',  name:'L Overmind',        icon:'🌀',desc:'Possede 200 colonies.',              req:()=>totalBlds()>=200},
-  {id:'allbld',name:'Ecosysteme Complet',icon:'🌲',desc:'Possede 1 de chaque type de colonie.',req:()=>BUILDINGS.every(b=>bldN(b.id)>=1)},
-  {id:'asc1',  name:'Spore Renee',       icon:'🔄',desc:'Ascende pour la premiere fois.',     req:()=>G.ascendCount>=1},
-  {id:'asc3',  name:'Fungi Eternel',     icon:'♾️',desc:'Ascende 3 fois.',                   req:()=>G.ascendCount>=3},
+  {id:'first', name:'Premiere Recolte',  icon:'🌱',desc:'Clique le champignon une fois.',    req:()=>G.totalClicks>=1},
+  {id:'tap100',name:'Inlassable',        icon:'👆',desc:'Clique 100 fois.',                  req:()=>G.totalClicks>=100},
+  {id:'tap1k', name:'Obsessionnel',      icon:'🤯',desc:'Clique 1 000 fois.',                req:()=>G.totalClicks>=1000},
+  {id:'s1k',   name:'Accumulateur',      icon:'✨',desc:'Collecte 1 000 spores.',            req:()=>G.lifetime>=1000},
+  {id:'s100k', name:'Baron Fongique',    icon:'🍄',desc:'Collecte 100 000 spores.',          req:()=>G.lifetime>=100000},
+  {id:'s1m',   name:'Myco-Millionnaire',icon:'💰',desc:'Collecte 1 Million de spores.',     req:()=>G.lifetime>=1e6},
+  {id:'s1b',   name:'Milliardaire Spore',icon:'🤑',desc:'Collecte 1 Milliard de spores.',   req:()=>G.lifetime>=1e9},
+  {id:'s1t',   name:'Titan Fongique',    icon:'🌍',desc:'Collecte 1 Trillion de spores.',   req:()=>G.lifetime>=1e12},
+  {id:'b10',   name:'Cultivateur',       icon:'🌿',desc:'Possede 10 colonies.',              req:()=>totalBlds()>=10},
+  {id:'b50',   name:'Mycologue',         icon:'🔬',desc:'Possede 50 colonies.',              req:()=>totalBlds()>=50},
+  {id:'b100',  name:'Empire Fongique',   icon:'👑',desc:'Possede 100 colonies.',             req:()=>totalBlds()>=100},
+  {id:'b200',  name:'L Overmind',        icon:'🌀',desc:'Possede 200 colonies.',             req:()=>totalBlds()>=200},
+  {id:'allbld',name:'Ecosysteme Complet',icon:'🌲',desc:'Possede 1 de chaque type.',         req:()=>BUILDINGS.every(b=>bldN(b.id)>=1)},
+  {id:'asc1',  name:'Spore Renee',       icon:'🔄',desc:'Ascende pour la premiere fois.',    req:()=>G.ascendCount>=1},
+  {id:'asc3',  name:'Fungi Eternel',     icon:'♾️',desc:'Ascende 3 fois.',                  req:()=>G.ascendCount>=3},
 ];
 
 const STAGES=[
-  {at:0,      name:'🌱 Spore Solitaire',  desc:'Une seule spore sur le sol de la foret.'},
-  {at:200,    name:'🍄 Germination',       desc:'De petits champignons emergent du sol.'},
-  {at:2000,   name:'🌿 Reseau Mycelien',   desc:'Des filaments souterrains connectent ton empire.'},
-  {at:20000,  name:'🌲 Gardien de Foret',  desc:'Les arbres chuchotent a ton mycelium.'},
-  {at:200000, name:'🦋 Bosquet Enchante',  desc:'La magie s imprègne dans ton reseau fongique.'},
-  {at:2e6,    name:'🌍 Mycelium Planetaire',desc:'Tes racines couvrent des continents entiers.'},
-  {at:2e9,    name:'🌌 Spore Dimensionnel',desc:'Tes spores voyagent entre les mondes.'},
-  {at:2e12,   name:'👑 Divinite Fongique', desc:'Tu es la foret. Tu es tout.'},
+  {at:0,      name:'🌱 Spore Solitaire',   desc:'Une seule spore sur le sol de la foret.'},
+  {at:200,    name:'🍄 Germination',        desc:'De petits champignons emergent du sol.'},
+  {at:2000,   name:'🌿 Reseau Mycelien',    desc:'Des filaments souterrains connectent ton empire.'},
+  {at:20000,  name:'🌲 Gardien de Foret',   desc:'Les arbres chuchotent a ton mycelium.'},
+  {at:200000, name:'🦋 Bosquet Enchante',   desc:'La magie s imprègne dans ton reseau.'},
+  {at:2e6,    name:'🌍 Mycelium Planetaire',desc:'Tes racines couvrent des continents.'},
+  {at:2e9,    name:'🌌 Spore Dimensionnel', desc:'Tes spores voyagent entre les mondes.'},
+  {at:2e12,   name:'👑 Divinite Fongique',  desc:'Tu es la foret. Tu es tout.'},
 ];
 
 const TICKERS=[
   '🍄 Un fermier signale des champignons couvrant son champ entier du jour au lendemain.',
   '🌿 Des botanistes perplexes face aux reseaux de mycelium sous les rues de la ville.',
-  '✨ Un anneau de fees atteint 3 km de diametre - les touristes affluent.',
+  '✨ Un anneau de fees atteint 3 km de diametre — les touristes affluent en masse.',
   '🦠 Scientists: Le foret pense. Nous ne pouvons pas l expliquer.',
-  '🌰 Le marche mondial des truffes s effondre - l offre devient inepuisable.',
-  '🕸️ Un reseau mycelien communique via des signaux chimiques entre continents.',
+  '🌰 Le marche mondial des truffes s effondre — l offre devient inepuisable.',
+  '🕸️ Un reseau mycelien communique via des signaux chimiques entre continents entiers.',
   '🌀 Des rapports d une dimension de spores apparaissant dans l ocean Pacifique.',
   '💰 Les futures de spores atteignent un sommet historique sur l echange interplanetaire.',
   '🧠 Des biologistes confirment: le reseau mycelien a atteint une conscience collective.',
 ];
 
+// EVENTS — avec poids (weight) pour probabilite
 const EVENTS=[
-  {id:'spore_rain',icon:'🌧️',title:'Pluie de Spores!',desc:'Une tempete de spores balaie la foret. Recolte immediate de 3 minutes de production!',type:'bonus',apply:()=>{const b=getSPS()*180;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
-  {id:'myco_frenzy',icon:'🍄',title:'Frenesie Mycelium!',desc:'Le reseau mycelien vibre d energie. Production x3 pendant 30 secondes!',type:'boost',apply:()=>{addBoost('myco_frenzy','🍄 Frenesie x3',3,30);return 'Production x3 / 30s';}},
-  {id:'spore_wind',icon:'🌀',title:'Vent de Spores!',desc:'Un vent mysterieux porte tes spores loin. Tap power x5 pendant 45 secondes!',type:'boost',apply:()=>{addBoost('spore_wind','🌀 Tap x5',5,45,'click');return 'Tap x5 / 45s';}},
-  {id:'giant_shroom',icon:'🌲',title:'Champignon Geant!',desc:'Un champignon colossal surgit du sol. Bonus instant de 5 minutes de production!',type:'bonus',apply:()=>{const b=getSPS()*300;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
-  {id:'rot',icon:'🦠',title:'Pourriture Mycelienne...',desc:'Une maladie frappe ton empire. Tu perds 10% de tes spores actuels.',type:'malus',apply:()=>{const l=Math.floor(G.spores*0.1);G.spores=Math.max(0,G.spores-l);return '-'+fmt(l)+' spores';}},
-  {id:'fairy_blessing',icon:'💫',title:'Benediction des Fees!',desc:'Les fees de la foret te benissent. Toute production x2 pendant 60 secondes!',type:'boost',apply:()=>{addBoost('fairy_blessing','💫 Benediction x2',2,60);return 'Production x2 / 60s';}},
-  {id:'truffle_rush',icon:'🌰',title:'Ruee aux Truffes!',desc:'Des truffes rares emergent partout. +50% de spores par clic pendant 60s!',type:'boost',apply:()=>{addBoost('truffle_rush','🌰 Clic +50%',1.5,60,'click');return 'Clic +50% / 60s';}},
-  {id:'spore_storm',icon:'⚡',title:'Tempete de Spores!',desc:'Une tempete electrique ionise les spores. Production x5 pendant 20 secondes!',type:'boost',apply:()=>{addBoost('spore_storm','⚡ Tempete x5',5,20);return 'x5 prod / 20s';}},
-  {id:'ancient_ritual',icon:'🔮',title:'Rituel Ancien!',desc:'Un rituel ancestral se declenche. Recois 10 minutes de production du meilleur batiment!',type:'bonus',apply:()=>{let best=0;BUILDINGS.forEach(b=>{const s=b.cps*bldN(b.id)*bldMult(b.id)*globalMult();if(s>best)best=s;});const b=best*600;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
-  {id:'drought',icon:'☀️',title:'Secheresse!',desc:'Le sol se dessèche. Production -50% pendant 30 secondes.',type:'malus',apply:()=>{addBoost('drought','☀️ Secheresse -50%',0.5,30);return '-50% prod / 30s';}},
+  // BONUS
+  {id:'spore_rain',    icon:'🌧️',title:'Pluie de Spores!',          desc:'Une tempete de spores balaie la foret. Recolte 3 minutes de production instant!', type:'bonus',weight:12,apply:()=>{const b=getSPS()*180;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
+  {id:'giant_shroom',  icon:'🌲',title:'Champignon Geant!',          desc:'Un champignon colossal surgit du sol. Bonus de 5 minutes de production!',         type:'bonus',weight:8, apply:()=>{const b=getSPS()*300;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
+  {id:'ancient_ritual',icon:'🔮',title:'Rituel Ancien!',             desc:'Un rituel ancestral se declenche. 10 minutes du meilleur batiment!',               type:'bonus',weight:5, apply:()=>{let best=0;BUILDINGS.forEach(b=>{const s=b.cps*bldN(b.id)*bldMult(b.id)*globalMult();if(s>best)best=s;});const b=best*600;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
+  {id:'spore_bounty',  icon:'🎁',title:'Bounty de Spores!',          desc:'Un chasseur de truffes offre une recompense. +2 minutes de production!',           type:'bonus',weight:10,apply:()=>{const b=getSPS()*120;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
+  // BOOSTS POSITIFS
+  {id:'myco_frenzy',   icon:'🍄',title:'Frenesie Mycelium!',          desc:'Le reseau vibre d energie. Production x3 pendant 30 secondes!',                   type:'boost',weight:10,apply:()=>{addBoost('myco_frenzy','🍄 Frenesie x3',3,30);return 'x3 / 30s';}},
+  {id:'spore_wind',    icon:'🌀',title:'Vent de Spores!',             desc:'Un vent porte tes spores loin. Tap power x5 pendant 45 secondes!',                type:'boost',weight:9, apply:()=>{addBoost('spore_wind','🌀 Tap x5',5,45,'click');return 'Tap x5 / 45s';}},
+  {id:'fairy_blessing',icon:'💫',title:'Benediction des Fees!',       desc:'Les fees te benissent. Production x2 pendant 60 secondes!',                       type:'boost',weight:8, apply:()=>{addBoost('fairy_blessing','💫 Benediction x2',2,60);return 'x2 / 60s';}},
+  {id:'truffle_rush',  icon:'🌰',title:'Ruee aux Truffes!',           desc:'Des truffes rares emergent. +50% de spores par clic pendant 60s!',                type:'boost',weight:9, apply:()=>{addBoost('truffle_rush','🌰 Clic +50%',1.5,60,'click');return '+50% clic / 60s';}},
+  {id:'spore_storm',   icon:'⚡',title:'Tempete de Spores!',          desc:'Une tempete electrique ionise les spores. Production x5 pendant 20s!',            type:'boost',weight:6, apply:()=>{addBoost('spore_storm','⚡ Tempete x5',5,20);return 'x5 / 20s';}},
+  {id:'mycoburst',     icon:'🌟',title:'Explosion Mycelienne!',       desc:'Une explosion de mycelium! Production x4 pendant 45s!',                           type:'boost',weight:7, apply:()=>{addBoost('mycoburst','🌟 Burst x4',4,45);return 'x4 / 45s';}},
+  // MALUS DOUX
+  {id:'drought',       icon:'☀️',title:'Secheresse!',                 desc:'Le sol se desseche. Production -50% pendant 45 secondes.',                        type:'malus',weight:8, apply:()=>{addBoost('drought','☀️ Secheresse -50%',0.5,45);return '-50% prod / 45s';}},
+  {id:'rot',           icon:'🦠',title:'Pourriture Mycelienne...',    desc:'Une maladie frappe. Tu perds 10% de tes spores actuels.',                         type:'malus',weight:6, apply:()=>{const l=Math.floor(G.spores*0.1);G.spores=Math.max(0,G.spores-l);return '-'+fmt(l)+' spores';}},
+  {id:'spore_thieves', icon:'🐛',title:'Voleurs de Spores!',         desc:'Des insectes envahissent ton reseau! Production -70% pendant 30 secondes.',        type:'malus',weight:5, apply:()=>{addBoost('spore_thieves','🐛 Invasion -70%',0.3,30);return '-70% prod / 30s';}},
+  {id:'cold_snap',     icon:'❄️',title:'Vague de Froid!',            desc:'Le gel ralentit ta croissance. Production -40% pendant 60 secondes.',              type:'malus',weight:7, apply:()=>{addBoost('cold_snap','❄️ Gel -40%',0.6,60);return '-40% prod / 60s';}},
+  {id:'fungal_blight', icon:'🌑',title:'Fletrissure Fongique!',       desc:'Une fletrissure noire se repand. Production -60% pendant 40 secondes.',            type:'malus',weight:5, apply:()=>{addBoost('fungal_blight','🌑 Fletrissure -60%',0.4,40);return '-60% prod / 40s';}},
+  {id:'root_damage',   icon:'⚠️',title:'Racines Endommagees!',       desc:'Des tunneliers brisent tes racines. Production -30% pendant 90 secondes!',         type:'malus',weight:6, apply:()=>{addBoost('root_damage','⚠️ Racines -30%',0.7,90);return '-30% prod / 90s';}},
+  // MALUS DURS — rares
+  {id:'spore_collapse',icon:'💀',title:'Effondrement de Spores!',     desc:'Une catastrophe! Tu perds 25% de tes spores actuels. Evenement rare!',            type:'malus',weight:2, apply:()=>{const l=Math.floor(G.spores*0.25);G.spores=Math.max(0,G.spores-l);return '-'+fmt(l)+' spores';}},
+  {id:'mega_drought',  icon:'🔥',title:'Grande Secheresse!',          desc:'Un megasecheresse devastatrice. Production -80% pendant 60 secondes!',            type:'malus',weight:2, apply:()=>{addBoost('mega_drought','🔥 Megasecheresse -80%',0.2,60);return '-80% prod / 60s';}},
+  {id:'parasite',      icon:'🕷️',title:'Parasite Mycelien!',          desc:'Un parasite ronge tout. -50% production ET -50% tap pendant 45 secondes!',        type:'malus',weight:3, apply:()=>{addBoost('parasite_prod','🕷️ Parasite prod -50%',0.5,45);addBoost('parasite_click','🕷️ Parasite tap -50%',0.5,45,'click');return '-50% tout / 45s';}},
 ];
 
 const SHOP_ITEMS_POOL=[
-  {id:'s_click2',  rarity:'common',   icon:'🖐️',name:'Dose de Spores',    desc:'Tap power x2 pendant 2 minutes.',     cost:()=>Math.max(100,getSPS()*20),   apply:()=>addBoost('s_click2','🖐️ Tap x2',2,120,'click')},
-  {id:'s_prod15',  rarity:'common',   icon:'🌿',name:'Fertilisant Leger',  desc:'Production +50% pendant 2 minutes.',  cost:()=>Math.max(150,getSPS()*25),   apply:()=>addBoost('s_prod15','🌿 Prod +50%',1.5,120)},
-  {id:'s_instant', rarity:'common',   icon:'✨',name:'Recolte Rapide',     desc:'Recolte 1 minute de production.',     cost:()=>Math.max(80,getSPS()*15),    apply:()=>{const b=getSPS()*60;G.spores+=b;G.lifetime+=b;}},
-  {id:'s_click3',  rarity:'rare',     icon:'⚡',name:'Gants Myceliens',    desc:'Tap power x3 pendant 3 minutes.',     cost:()=>Math.max(500,getSPS()*60),   apply:()=>addBoost('s_click3','⚡ Tap x3',3,180,'click')},
-  {id:'s_prod2',   rarity:'rare',     icon:'🍄',name:'Champignon Booste',  desc:'Production x2 pendant 3 minutes.',    cost:()=>Math.max(600,getSPS()*70),   apply:()=>addBoost('s_prod2','🍄 Prod x2',2,180)},
-  {id:'s_instant5',rarity:'rare',     icon:'🌧️',name:'Pluie de Spores',   desc:'Recolte 5 minutes de production.',    cost:()=>Math.max(400,getSPS()*80),   apply:()=>{const b=getSPS()*300;G.spores+=b;G.lifetime+=b;}},
-  {id:'s_prod3',   rarity:'epic',     icon:'🔮',name:'Rituel Ancien',      desc:'Production x3 pendant 5 minutes.',    cost:()=>Math.max(2000,getSPS()*150), apply:()=>addBoost('s_prod3','🔮 Prod x3',3,300)},
-  {id:'s_click5',  rarity:'epic',     icon:'🌀',name:'Vortex de Spores',   desc:'Tap power x5 pendant 3 minutes.',     cost:()=>Math.max(1800,getSPS()*140), apply:()=>addBoost('s_click5','🌀 Tap x5',5,180,'click')},
-  {id:'s_instant15',rarity:'epic',    icon:'🌲',name:'Foret Enchantee',    desc:'Recolte 15 minutes de production.',   cost:()=>Math.max(1500,getSPS()*200), apply:()=>{const b=getSPS()*900;G.spores+=b;G.lifetime+=b;}},
-  {id:'s_megaprod', rarity:'legendary',icon:'👑',name:'Couronne Fongique',  desc:'Production x5 pendant 10 minutes!',  cost:()=>Math.max(8000,getSPS()*400), apply:()=>addBoost('s_megaprod','👑 x5 LEGENDAIRE',5,600)},
+  {id:'s_click2',   rarity:'common',   icon:'🖐️',name:'Dose de Spores',    desc:'Tap power x2 pendant 2 minutes.',    cost:()=>Math.max(100,getSPS()*20),   apply:()=>addBoost('s_click2','🖐️ Tap x2',2,120,'click')},
+  {id:'s_prod15',   rarity:'common',   icon:'🌿',name:'Fertilisant Leger',  desc:'Production +50% pendant 2 minutes.', cost:()=>Math.max(150,getSPS()*25),   apply:()=>addBoost('s_prod15','🌿 Prod +50%',1.5,120)},
+  {id:'s_instant',  rarity:'common',   icon:'✨',name:'Recolte Rapide',     desc:'Recolte 1 minute de production.',    cost:()=>Math.max(80,getSPS()*15),    apply:()=>{const b=getSPS()*60;G.spores+=b;G.lifetime+=b;}},
+  {id:'s_click3',   rarity:'rare',     icon:'⚡',name:'Gants Myceliens',    desc:'Tap power x3 pendant 3 minutes.',    cost:()=>Math.max(500,getSPS()*60),   apply:()=>addBoost('s_click3','⚡ Tap x3',3,180,'click')},
+  {id:'s_prod2',    rarity:'rare',     icon:'🍄',name:'Champignon Booste',  desc:'Production x2 pendant 3 minutes.',   cost:()=>Math.max(600,getSPS()*70),   apply:()=>addBoost('s_prod2','🍄 Prod x2',2,180)},
+  {id:'s_instant5', rarity:'rare',     icon:'🌧️',name:'Pluie de Spores',   desc:'Recolte 5 minutes de production.',   cost:()=>Math.max(400,getSPS()*80),   apply:()=>{const b=getSPS()*300;G.spores+=b;G.lifetime+=b;}},
+  {id:'s_antidote', rarity:'rare',     icon:'🛡️',name:'Antidote Fongique',  desc:'Annule tous les malus actifs instantanement!', cost:()=>Math.max(800,getSPS()*100), apply:()=>{Object.keys(activeBoosts).forEach(id=>{if(activeBoosts[id].isMalus)delete activeBoosts[id];});renderBoosts();}},
+  {id:'s_prod3',    rarity:'epic',     icon:'🔮',name:'Rituel Ancien',      desc:'Production x3 pendant 5 minutes.',   cost:()=>Math.max(2000,getSPS()*150), apply:()=>addBoost('s_prod3','🔮 Prod x3',3,300)},
+  {id:'s_click5',   rarity:'epic',     icon:'🌀',name:'Vortex de Spores',   desc:'Tap power x5 pendant 3 minutes.',    cost:()=>Math.max(1800,getSPS()*140), apply:()=>addBoost('s_click5','🌀 Tap x5',5,180,'click')},
+  {id:'s_instant15',rarity:'epic',     icon:'🌲',name:'Foret Enchantee',    desc:'Recolte 15 minutes de production.',  cost:()=>Math.max(1500,getSPS()*200), apply:()=>{const b=getSPS()*900;G.spores+=b;G.lifetime+=b;}},
+  {id:'s_shield',   rarity:'epic',     icon:'🧿',name:'Bouclier Mycelien',  desc:'Immunise contre le prochain evenement negatif!', cost:()=>Math.max(3000,getSPS()*250), apply:()=>{G.shielded=true;addLog('🧿 Bouclier actif — prochain malus ignore!');}},
+  {id:'s_megaprod', rarity:'legendary',icon:'👑',name:'Couronne Fongique',  desc:'Production x5 pendant 10 minutes!', cost:()=>Math.max(8000,getSPS()*400), apply:()=>addBoost('s_megaprod','👑 x5 LEGENDAIRE',5,600)},
   {id:'s_megaclick',rarity:'legendary',icon:'🌟',name:'Mains des Dieux',    desc:'Tap power x10 pendant 5 minutes!',   cost:()=>Math.max(7000,getSPS()*350), apply:()=>addBoost('s_megaclick','🌟 Tap x10',10,300,'click')},
   {id:'s_godboost', rarity:'legendary',icon:'∞', name:'Eveil Mycelien',     desc:'Tout x8 pendant 2 minutes!',         cost:()=>Math.max(15000,getSPS()*600),apply:()=>addBoost('s_godboost','∞ Eveil x8',8,120)},
 ];
@@ -417,7 +405,7 @@ function notif(msg){
 }
 
 function addBoost(id,label,mult,duration,type='global'){
-  activeBoosts[id]={label,mult,timeLeft:duration,type};
+  activeBoosts[id]={label,mult,timeLeft:duration,type,isMalus:mult<1};
   renderBoosts();
 }
 function renderBoosts(){
@@ -427,7 +415,9 @@ function renderBoosts(){
   document.getElementById('noBoosts').style.display=keys.length?'none':'';
   keys.forEach(id=>{
     const b=activeBoosts[id];
-    const chip=document.createElement('div');chip.className='boost-chip';chip.id='chip_'+id;
+    const chip=document.createElement('div');chip.id='chip_'+id;
+    chip.className='boost-chip';
+    if(b.isMalus)chip.style.cssText='background:rgba(255,68,68,0.1);border-color:#ff4444;color:#ff6666;';
     chip.innerHTML=b.label+' <span class="boost-chip-timer" id="chiptimer_'+id+'">'+Math.ceil(b.timeLeft)+'s</span>';
     bar.appendChild(chip);
   });
@@ -438,21 +428,29 @@ function tickBoosts(dt){
     activeBoosts[id].timeLeft-=dt;
     const tel=document.getElementById('chiptimer_'+id);
     if(tel)tel.textContent=Math.max(0,Math.ceil(activeBoosts[id].timeLeft))+'s';
-    if(activeBoosts[id].timeLeft<=0){
-      delete activeBoosts[id];
-      const chip=document.getElementById('chip_'+id);if(chip)chip.remove();
-      changed=true;
-    }
+    if(activeBoosts[id].timeLeft<=0){delete activeBoosts[id];const chip=document.getElementById('chip_'+id);if(chip)chip.remove();changed=true;}
   });
   if(changed)renderBoosts();
 }
 
 function triggerEvent(){
   if(getSPS()<=0&&G.lifetime<100)return;
-  const ev=EVENTS[Math.floor(Math.random()*EVENTS.length)];
+  // Selection ponderee par poids
+  const totalW=EVENTS.reduce((s,e)=>s+(e.weight||1),0);
+  let r=Math.random()*totalW,cum=0,ev=EVENTS[0];
+  for(const e of EVENTS){cum+=(e.weight||1);if(r<=cum){ev=e;break;}}
+  // Bouclier contre les malus
+  if(ev.type==='malus'&&G.shielded){
+    G.shielded=false;
+    addLog('🧿 <strong style="color:var(--glow)">Bouclier actif!</strong> L evenement negatif a ete bloque.');
+    notif('🧿 <strong>Bouclier!</strong><br>Malus bloque par ton bouclier mycelien.');
+    return;
+  }
+  const typeLabel=ev.type==='malus'?'⚠️ Evenement negatif':ev.type==='boost'?'✨ Bonus temporaire':'🎁 Recompense';
+  const borderCol=ev.type==='malus'?'#ff4444':ev.type==='boost'?'#00ffaa':'#ffaa22';
+  const titleCol=ev.type==='malus'?'#ff6666':ev.type==='boost'?'#00ffaa':'#ffaa22';
   const popup=document.getElementById('eventPopup');
-  const typeLabel=ev.type==='malus'?'Evenement negatif':ev.type==='boost'?'Bonus temporaire':'Recompense';
-  popup.innerHTML='<div class="event-popup" id="evInner"><div class="event-type">'+typeLabel+'</div><div class="event-title">'+ev.icon+' '+ev.title+'</div><div class="event-desc">'+ev.desc+'</div><button class="event-btn" onclick="acceptEvent(\''+ev.id+'\')">Accepter</button></div>';
+  popup.innerHTML='<div class="event-popup" style="border-color:'+borderCol+'"><div class="event-type">'+typeLabel+'</div><div class="event-title" style="color:'+titleCol+'">'+ev.icon+' '+ev.title+'</div><div class="event-desc">'+ev.desc+'</div><button class="event-btn" style="border-color:'+borderCol+';color:'+titleCol+'" onclick="acceptEvent(\''+ev.id+'\')">Accepter</button></div>';
   popup.style.display='block';
   activeEventEl=ev;
   setTimeout(()=>{if(activeEventEl&&activeEventEl.id===ev.id)dismissEvent();},15000);
@@ -510,7 +508,7 @@ function tickShop(dt){
   if(eventTimer<=0){eventTimer=50+Math.random()*30;triggerEvent();}
   if(shopCdTimer<=0){
     shopCdTimer=300;generateShop();
-    addLog('🏪 <strong style="color:var(--amber)">Le marche s est renouvele!</strong> Nouveaux boosts disponibles.');
+    addLog('🏪 <strong style="color:var(--amber)">Le marche s est renouvele!</strong>');
     notif('🏪 <strong>Marche renouvele!</strong><br>Nouveaux boosts disponibles!');
   }
   const sm=Math.floor(shopCdTimer/60),ss=Math.floor(shopCdTimer%60);
@@ -536,7 +534,6 @@ function quickRefresh(){
     if(cps)cps.textContent=n>0?fmt(b.cps*n*bldMult(b.id)*globalMult())+' /s':'';
   });
 }
-
 function refresh(){
   const sps=getSPS(),cp=getClickPow();
   document.getElementById('sporeCount').textContent=fmt(G.spores);
@@ -556,7 +553,6 @@ function refresh(){
   document.getElementById('stageDesc').textContent=nextAt===Infinity?stage.desc:stage.desc+' — Prochain: '+fmt(nextAt)+' spores';
   renderBlds();renderUpgs();
 }
-
 function renderBlds(){
   const el=document.getElementById('bldList');el.innerHTML='';
   BUILDINGS.forEach(b=>{
@@ -571,7 +567,6 @@ function renderBlds(){
     el.appendChild(div);
   });
 }
-
 function renderUpgs(){
   const el=document.getElementById('upgList');el.innerHTML='';
   UPGRADES.forEach(u=>{
@@ -584,7 +579,6 @@ function renderUpgs(){
     el.appendChild(div);
   });
 }
-
 function renderAch(){
   const el=document.getElementById('achList');el.innerHTML='';
   ACHIEVEMENTS.forEach(a=>{
@@ -594,7 +588,6 @@ function renderAch(){
     el.appendChild(div);
   });
 }
-
 function getStage(){
   let s=STAGES[0];
   for(let i=STAGES.length-1;i>=0;i--){if(G.lifetime>=STAGES[i].at){s=STAGES[i];break;}}
@@ -617,7 +610,6 @@ function onClickShroom(e){
   _ct=setTimeout(()=>{_cap.style.transform='translateX(-50%)';},80);
   quickRefresh();checkAch();
 }
-
 function buyBld(id){
   const b=BUILDINGS.find(x=>x.id===id),cost=bldCost(b);
   if(G.spores<cost)return;
@@ -625,7 +617,6 @@ function buyBld(id){
   addLog('Construit '+b.icon+' <strong style="color:var(--glow)">'+b.name+'</strong> #'+bldN(id)+' — '+fmt(cost)+' spores');
   refresh();checkAch();
 }
-
 function buyUpg(id){
   if(G.upg[id])return;
   const u=UPGRADES.find(x=>x.id===id);
@@ -635,7 +626,6 @@ function buyUpg(id){
   notif('🔬 <strong>'+u.name+'</strong><br><em>'+u.eff+'</em>');
   refresh();
 }
-
 function checkAch(){
   ACHIEVEMENTS.forEach(a=>{
     if(!G.ach[a.id]&&a.req()){
@@ -646,7 +636,6 @@ function checkAch(){
     }
   });
 }
-
 function doAscend(){
   if(G.lifetime<1e15)return;
   G.ascendCount++;
@@ -656,7 +645,6 @@ function doAscend(){
   notif('🌀 <strong>Ascension #'+G.ascendCount+'!</strong><br>Multiplicateur permanent x'+m.toFixed(2)+'!');
   refresh();renderAch();
 }
-
 let goldActive=false;
 function spawnGold(){
   if(goldActive)return;goldActive=true;
@@ -715,8 +703,8 @@ renderAch();refresh();generateShopUI();
 addLog('🌱 Clique le champignon pour commencer ton empire!');
 addLog('💡 Achete des Colonies a droite pour automatiser la production.');
 addLog('💡 Recherche des upgrades a gauche pour multiplier ta production.');
-addLog('💡 Ouvre le 🏪 Marche pour acheter des boosts!');
-addLog('💡 Des evenements aleatoires arrivent toutes les ~1 minute!');
+addLog('💡 Ouvre le 🏪 Marche pour acheter des boosts et un 🧿 Bouclier!');
+addLog('💡 Des evenements aleatoires arrivent toutes les ~1 minute — positifs ET negatifs!');
 setInterval(tick,50);
 setInterval(()=>{try{localStorage.setItem('myceliumEmpire',JSON.stringify(G));}catch(e){}},8000);
 </script>
