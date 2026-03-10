@@ -517,7 +517,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
       <p>The most realistic dropshipping simulator. Source products, outsmart competitors, and build a business from nothing — time advances automatically.</p>
       <div class="auth-features">
         <div class="af-item"><div class="af-icon">⏱️</div>Auto-advancing days — just manage your store</div>
-        <div class="af-item"><div class="af-icon">📦</div>30+ real product categories including collectibles</div>
+        <div class="af-item"><div class="af-icon">📦</div>99 real products across 16 categories — unlock more as you grow</div>
         <div class="af-item"><div class="af-icon">💾</div>Progress saved to your account across sessions</div>
         <div class="af-item"><div class="af-icon">♾️</div>Infinite days — no forced end, keep building</div>
         <div class="af-item"><div class="af-icon">⚔️</div>Live competitor AI that adapts to your strategy</div>
@@ -578,7 +578,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     <div class="tb-sep"></div>
     <div class="tb-kpi rep"><span class="tv" id="hud-rep">50</span><span class="tl">Reputation</span></div>
     <div class="tb-sep"></div>
-    <div class="tb-kpi"><span class="tv" id="hud-day" style="color:var(--text)">Day 1</span><span class="tl">Infinite Mode</span></div>
+    <div class="tb-kpi"><span class="tv" id="hud-day" style="color:var(--text)">Day 1</span><span class="tl">Hard Mode ♾</span></div>
     <div class="tb-ticker"><span class="tb-ticker-inner" id="ticker-txt">Loading market data...</span></div>
     <div class="speed-controls">
       <span class="speed-label">Speed</span>
@@ -647,13 +647,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
         <div class="cat-toolbar">
           <input class="cat-search" placeholder="🔍  Search products..." id="cat-search" oninput="renderCatalog()">
           <button class="flt active" id="f-All" onclick="setFilter('All')">All</button>
-          <button class="flt" id="f-Collectibles" onclick="setFilter('Collectibles')">Collectibles</button>
           <button class="flt" id="f-Health" onclick="setFilter('Health')">Health</button>
+          <button class="flt" id="f-Beauty" onclick="setFilter('Beauty')">Beauty</button>
+          <button class="flt" id="f-Kitchen" onclick="setFilter('Kitchen')">Kitchen</button>
+          <button class="flt" id="f-Auto" onclick="setFilter('Auto')">Auto</button>
+          <button class="flt" id="f-Pet" onclick="setFilter('Pet')">Pet</button>
+          <button class="flt" id="f-Fitness" onclick="setFilter('Fitness')">Fitness</button>
+          <button class="flt" id="f-Outdoors" onclick="setFilter('Outdoors')">Outdoors</button>
+          <button class="flt" id="f-Office" onclick="setFilter('Office')">Office</button>
+          <button class="flt" id="f-Travel" onclick="setFilter('Travel')">Travel</button>
+          <button class="flt" id="f-Baby" onclick="setFilter('Baby')">Baby</button>
+          <button class="flt" id="f-Garden" onclick="setFilter('Garden')">Garden</button>
           <button class="flt" id="f-Tech" onclick="setFilter('Tech')">Tech</button>
           <button class="flt" id="f-Home" onclick="setFilter('Home')">Home</button>
-          <button class="flt" id="f-Fashion" onclick="setFilter('Fashion')">Fashion</button>
-          <button class="flt" id="f-Pet" onclick="setFilter('Pet')">Pet</button>
-          <button class="flt" id="f-Toys" onclick="setFilter('Toys')">Toys</button>
+          <button class="flt" id="f-SmartHome" onclick="setFilter('Smart Home')">Smart Home</button>
+          <button class="flt" id="f-Food" onclick="setFilter('Food')">Food</button>
         </div>
         <div class="cat-grid" id="cat-grid"></div>
       </div>
@@ -829,87 +837,178 @@ function loadGame() {
 setInterval(saveGame, 8000);
 
 /* ══════════════════════════════════════════════
-   PRODUCTS — 32 items across 7 categories
+   PRODUCTS — 99 items across 16 categories
 ══════════════════════════════════════════════ */
 const PRODUCTS = [
-  // COLLECTIBLES
-  {id:'poke_booster',name:'Pokémon Booster Pack',emoji:'🃏',cat:'Collectibles',desc:'Scarlet & Violet packs. Huge demand, scalpers everywhere. Buy low from bulk sellers.',cost:4.80,msrp:14.99,demandBase:18,vol:.55,ship:3,compP:.80,retRate:.04,tag:'hot'},
-  {id:'poke_etb',name:'Pokémon Elite Trainer Box',emoji:'📦',cat:'Collectibles',desc:'Full ETBs. High AOV. Resellers dominate but margins are real if you time it.',cost:32,msrp:64.99,demandBase:6,vol:.50,ship:4,compP:.70,retRate:.03,tag:'hot'},
-  {id:'mtg_pack',name:'Magic: The Gathering Pack',emoji:'🧙',cat:'Collectibles',desc:'MTG collectors pay premium. Niche but loyal audience. Stable demand.',cost:3.80,msrp:12.99,demandBase:10,vol:.35,ship:3,compP:.60,retRate:.03,tag:'new'},
-  {id:'sports_cards',name:'Basketball Card Lot (50ct)',emoji:'🏀',cat:'Collectibles',desc:'Sealed lots. Massive resale community. Grading can 10x value.',cost:12,msrp:38.99,demandBase:9,vol:.45,ship:4,compP:.65,retRate:.05,tag:'trend'},
-  {id:'funko_pop',name:'Funko Pop (Rare Variant)',emoji:'🧸',cat:'Collectibles',desc:'Chase variants command premium prices. Collector FOMO is real.',cost:8,msrp:24.99,demandBase:8,vol:.40,ship:3,compP:.68,retRate:.04,tag:'trend'},
-  {id:'vintage_coins',name:'Silver Dollar Coin Set',emoji:'🪙',cat:'Collectibles',desc:'Precious metal collectibles. Very stable. No trend risk. Low margins.',cost:22,msrp:42.99,demandBase:4,vol:.10,ship:5,compP:.45,retRate:.02,tag:'new'},
+  // ── SMART HOME ──
+  {id:'air_monitor',name:'Smart Air Quality Monitor',emoji:'🌬️',cat:'Smart Home',desc:'Medical-grade sensor pods for VOC, CO₂, radon. High-ticket, premium buyer.',cost:55,msrp:165,demandBase:3,vol:.18,ship:6,retRate:.08,tag:'new'},
+  {id:'sleep_system',name:'Adaptive Sleep Sound System',emoji:'🌙',cat:'Smart Home',desc:'Biometric integration with Oura/Apple Watch. Niche but loyal audience.',cost:70,msrp:168,demandBase:2,vol:.22,ship:5,retRate:.07,tag:'new'},
+  {id:'smart_curtains',name:'Smart Curtains App-Controlled',emoji:'🪟',cat:'Smart Home',desc:'Luxury automation at accessible price. Sleep optimization crowd.',cost:52,msrp:145,demandBase:2,vol:.20,ship:7,retRate:.10,tag:'risky'},
 
-  // HEALTH & FITNESS
-  {id:'posture_brace',name:'Posture Corrector Pro',emoji:'🦴',cat:'Health',desc:'TikTok health staple. Consistent demand. Ships light.',cost:4.80,msrp:24.99,demandBase:9,vol:.22,ship:5,compP:.72,retRate:.09,tag:'trend'},
-  {id:'resistance_bands',name:'Resistance Band Set 5pc',emoji:'💪',cat:'Health',desc:'Evergreen fitness. Low cost, high volume. Saturated but still sells.',cost:3.40,msrp:17.99,demandBase:11,vol:.14,ship:4,compP:.70,retRate:.05,tag:'new'},
-  {id:'yoga_mat',name:'Foldable Travel Yoga Mat',emoji:'🧘',cat:'Health',desc:'Wellness boom. Moderate margins. Heavy to ship.',cost:9.20,msrp:38.99,demandBase:5,vol:.18,ship:8,compP:.55,retRate:.07,tag:'new'},
-  {id:'teeth_kit',name:'Teeth Whitening LED Kit',emoji:'🦷',cat:'Health',desc:'Premium margins but returns can kill profits. Reputable brands only.',cost:5.50,msrp:32.99,demandBase:7,vol:.32,ship:5,compP:.68,retRate:.14,tag:'risky'},
-  {id:'sleep_mask',name:'Silk Sleep Mask',emoji:'😴',cat:'Health',desc:'Simple, lightweight, great margins. Repeat buyer product.',cost:2.20,msrp:12.99,demandBase:10,vol:.15,ship:3,compP:.58,retRate:.04,tag:'trend'},
-  {id:'massage_gun',name:'Mini Massage Gun',emoji:'🔫',cat:'Health',desc:'Recovery gadget. High AOV, decent margins. Returns possible.',cost:14,msrp:49.99,demandBase:6,vol:.30,ship:6,compP:.62,retRate:.10,tag:'hot'},
+  // ── HEALTH & WELLNESS ──
+  {id:'posture_vest',name:'Ergonomic Posture Wearable',emoji:'🦺',cat:'Health',desc:'Haptic feedback vest with Bluetooth coaching app. High perceived value.',cost:32,msrp:89,demandBase:4,vol:.25,ship:5,retRate:.12,tag:'trend'},
+  {id:'rlt_mask',name:'Red Light Therapy Face Mask',emoji:'😷',cat:'Health',desc:'Spa-grade at-home results. Replaces professional facials. Strong social proof.',cost:22,msrp:74,demandBase:5,vol:.35,ship:4,retRate:.09,tag:'hot'},
+  {id:'acupressure_mat',name:'Acupressure Mat with Pillow',emoji:'🧘',cat:'Health',desc:'Search volume up 180%. Replaces massage therapy. Bundle-friendly.',cost:16,msrp:55,demandBase:6,vol:.28,ship:5,retRate:.06,tag:'trend'},
+  {id:'infrared_pad',name:'Infrared Heating Pad',emoji:'🔆',cat:'Health',desc:'App-controlled, alternative to chiropractor. Remote worker goldmine.',cost:20,msrp:67,demandBase:5,vol:.22,ship:5,retRate:.08,tag:'trend'},
+  {id:'lymph_massager',name:'Lymphatic Drainage Massager',emoji:'💆',cat:'Health',desc:'Anti-inflammation wellness trend. Tutorial content drives sales.',cost:11,msrp:40,demandBase:6,vol:.30,ship:4,retRate:.07,tag:'trend'},
+  {id:'scalp_massager',name:'Electric Scalp Massager',emoji:'🧠',cat:'Health',desc:'Stress relief + hair health. ASMR content performs extremely well.',cost:8,msrp:31,demandBase:8,vol:.28,ship:3,retRate:.05,tag:'hot'},
+  {id:'cupping_set',name:'Silicone Cupping Therapy Set',emoji:'🫙',cat:'Health',desc:'DIY professional therapy. Bundle with massage oils for repeat sales.',cost:9,msrp:35,demandBase:5,vol:.25,ship:4,retRate:.06,tag:'new'},
+  {id:'eye_massager',name:'Eye Massage Mask Heat+Vibration',emoji:'👁️',cat:'Health',desc:'Screen fatigue epidemic among remote workers. Target gamers, devs.',cost:18,msrp:59,demandBase:5,vol:.28,ship:5,retRate:.09,tag:'trend'},
 
-  // TECH
-  {id:'phone_ring',name:'MagSafe Phone Grip',emoji:'📱',cat:'Tech',desc:'Magnetic ring holder. Ultra-high volume, razor-thin margins. Win on price.',cost:1.40,msrp:9.99,demandBase:15,vol:.20,ship:3,compP:.88,retRate:.05,tag:'sat'},
-  {id:'led_strip',name:'Smart LED Strip Light',emoji:'💡',cat:'Tech',desc:'WiFi-controlled RGB. Viral home content driver. Consistent demand.',cost:6.20,msrp:29.99,demandBase:8,vol:.25,ship:6,compP:.65,retRate:.07,tag:'new'},
-  {id:'mini_drone',name:'Pocket Foldable Drone',emoji:'🚁',cat:'Tech',desc:'High AOV, high satisfaction ceiling. Returns are brutal. Build rep first.',cost:19,msrp:69.99,demandBase:3,vol:.42,ship:9,compP:.45,retRate:.18,tag:'risky'},
-  {id:'car_mount',name:'Magnetic Car Phone Mount',emoji:'🚗',cat:'Tech',desc:'Commuter essential. Fast ship, cheap sourcing. Win on volume.',cost:2.10,msrp:12.99,demandBase:12,vol:.16,ship:3,compP:.80,retRate:.05,tag:'sat'},
-  {id:'wireless_charger',name:'3-in-1 Wireless Charger',emoji:'🔋',cat:'Tech',desc:'Desk charger for Apple/Android. Strong gifting market. Solid margins.',cost:8.50,msrp:34.99,demandBase:7,vol:.22,ship:5,compP:.62,retRate:.06,tag:'trend'},
-  {id:'earbuds',name:'TWS Earbuds (ANC)',emoji:'🎧',cat:'Tech',desc:'Active noise cancellation at budget price. High AOV, decent returns.',cost:11,msrp:44.99,demandBase:7,vol:.28,ship:6,compP:.70,retRate:.12,tag:'hot'},
+  // ── BEAUTY & PERSONAL CARE ──
+  {id:'serum_refill',name:'Refillable Skincare Serum',emoji:'🧴',cat:'Beauty',desc:'Sustainable pods. Repeat purchase model. Eco-conscious premium buyer.',cost:26,msrp:85,demandBase:4,vol:.22,ship:4,retRate:.06,tag:'new'},
+  {id:'gua_sha',name:'Gua Sha Stone Set',emoji:'💎',cat:'Beauty',desc:'70-85% margin. High perceived value, lightweight. Pairs with facial oils.',cost:4,msrp:28,demandBase:9,vol:.32,ship:3,retRate:.04,tag:'hot'},
+  {id:'lip_oil_spf',name:'UV-Protective Lip Oil SPF 30',emoji:'💄',cat:'Beauty',desc:'Mineral-based, passes EU reef bans. Health + beauty crossover.',cost:7,msrp:28,demandBase:7,vol:.28,ship:3,retRate:.05,tag:'trend'},
+  {id:'led_wand',name:'LED Light Therapy Wand',emoji:'✨',cat:'Beauty',desc:'Portable, multiple skin benefits. Instagram-friendly demo content.',cost:13,msrp:49,demandBase:6,vol:.30,ship:4,retRate:.07,tag:'hot'},
+  {id:'makeup_pads',name:'Reusable Makeup Remover Pads',emoji:'🌸',cat:'Beauty',desc:'Eco-conscious, eventually wears out. Cross-sell laundry bags.',cost:4,msrp:23,demandBase:8,vol:.20,ship:3,retRate:.04,tag:'trend'},
+  {id:'biodeg_wipes',name:'Biodegradable Makeup Wipes',emoji:'🍃',cat:'Beauty',desc:'Preservative-free, meets 2026 sustainability regs. Subscription play.',cost:3,msrp:14,demandBase:9,vol:.18,ship:3,retRate:.03,tag:'new'},
+  {id:'heated_curler',name:'Heated Eyelash Curler',emoji:'👁️',cat:'Beauty',desc:'Long-lasting curl, gentle on lashes, battery-operated.',cost:8,msrp:30,demandBase:6,vol:.25,ship:3,retRate:.06,tag:'trend'},
+  {id:'dye_brush',name:'Silicone Hair Dye Brush Set',emoji:'🖌️',cat:'Beauty',desc:'Mess-free at-home color application. Reusable, high repeat purchase rate.',cost:3,msrp:12,demandBase:8,vol:.20,ship:2,retRate:.03,tag:'new'},
 
-  // HOME & GARDEN
-  {id:'succulent_set',name:'Mini Succulent Set 3pc',emoji:'🌵',cat:'Home',desc:'Instagram gift staple. Low cost, impulse buy, gift potential.',cost:2.80,msrp:14.99,demandBase:9,vol:.15,ship:4,compP:.50,retRate:.04,tag:'trend'},
-  {id:'silk_pillow',name:'Silk Pillowcase 2-Pack',emoji:'🛏️',cat:'Home',desc:'Beauty-sleep product. Low returns, good repeat rate, nice margins.',cost:7.80,msrp:34.99,demandBase:6,vol:.20,ship:6,compP:.52,retRate:.05,tag:'new'},
-  {id:'candle_set',name:'Soy Wax Candle Set',emoji:'🕯️',cat:'Home',desc:'Home fragrance is booming. Gift sets are easy upsells. Seasonal peaks.',cost:6.00,msrp:26.99,demandBase:8,vol:.20,ship:5,compP:.55,retRate:.04,tag:'trend'},
-  {id:'organizer',name:'Bamboo Desk Organizer',emoji:'🗂️',cat:'Home',desc:'WFH staple. Eco appeal boosts conversion. Low return rate.',cost:7.50,msrp:28.99,demandBase:6,vol:.17,ship:6,compP:.50,retRate:.04,tag:'new'},
+  // ── KITCHEN ──
+  {id:'air_fryer_liner',name:'Silicone Air Fryer Liners',emoji:'🍳',cat:'Kitchen',desc:'Consumable, needs regular replacement. Capitalizes on air fryer boom.',cost:5,msrp:20,demandBase:10,vol:.22,ship:3,retRate:.04,tag:'hot'},
+  {id:'veg_chopper',name:'Multi-Blade Vegetable Chopper',emoji:'🥕',cat:'Kitchen',desc:'Time-saving meal prep. Satisfying demo videos sell themselves.',cost:10,msrp:37,demandBase:7,vol:.25,ship:4,retRate:.08,tag:'trend'},
+  {id:'collap_containers',name:'Collapsible Silicone Food Containers',emoji:'🥡',cat:'Kitchen',desc:'Space-saving, eco-friendly. Multiple size bundles boost AOV.',cost:7,msrp:25,demandBase:7,vol:.20,ship:3,retRate:.05,tag:'new'},
+  {id:'wine_opener',name:'Electric Wine Opener',emoji:'🍷',cat:'Kitchen',desc:'Giftable, effortless opening. Includes foil cutter and charging base.',cost:10,msrp:35,demandBase:5,vol:.22,ship:4,retRate:.06,tag:'trend'},
+  {id:'meat_thermo',name:'Digital Meat Thermometer',emoji:'🌡️',cat:'Kitchen',desc:'Bluetooth, precise cooking. Ideal for grilling enthusiasts.',cost:8,msrp:30,demandBase:6,vol:.20,ship:3,retRate:.05,tag:'new'},
+  {id:'herb_scissors',name:'Herb Scissors with Brush',emoji:'✂️',cat:'Kitchen',desc:'Multi-blade design, easy to clean. Simplifies meal prep.',cost:4,msrp:15,demandBase:7,vol:.18,ship:2,retRate:.04,tag:'new'},
+  {id:'spice_rack',name:'Magnetic Spice Rack Set',emoji:'🧂',cat:'Kitchen',desc:'Space-saving, shatterproof. Includes labels and marker.',cost:9,msrp:30,demandBase:6,vol:.18,ship:4,retRate:.04,tag:'new'},
+  {id:'water_filter',name:'Water Bottle Filter Replacements',emoji:'💧',cat:'Kitchen',desc:'Customers already own bottles. Ongoing consumable. Subscription potential.',cost:4,msrp:15,demandBase:9,vol:.15,ship:2,retRate:.03,tag:'trend'},
 
-  // FASHION
-  {id:'led_glasses',name:'LED Rave Glasses',emoji:'🕶️',cat:'Fashion',desc:'Viral party accessory. Extremely trend-sensitive — buy when hot, exit fast.',cost:2.20,msrp:15.99,demandBase:7,vol:.55,ship:3,compP:.60,retRate:.06,tag:'hot'},
-  {id:'bucket_hat',name:'Vintage Bucket Hat',emoji:'🪣',cat:'Fashion',desc:'Y2K fashion revival. Influencer-driven. Decent margins.',cost:4.50,msrp:19.99,demandBase:8,vol:.35,ship:4,compP:.58,retRate:.07,tag:'trend'},
-  {id:'mini_bag',name:'Y2K Micro Handbag',emoji:'👜',cat:'Fashion',desc:'Tiny bags, big margins. Fashion-forward buyer will pay premium.',cost:9,msrp:36.99,demandBase:6,vol:.38,ship:5,compP:.55,retRate:.08,tag:'hot'},
+  // ── AUTO ACCESSORIES ──
+  {id:'obd2_scanner',name:'AI-Powered OBD2 Scanner',emoji:'🔧',cat:'Auto',desc:'Real-time repair guidance with AR overlays. High-ticket, car owner loyalty.',cost:22,msrp:82,demandBase:4,vol:.22,ship:4,retRate:.10,tag:'new'},
+  {id:'seat_organizer',name:'Modular Seat Organizer',emoji:'🚗',cat:'Auto',desc:'Fits 97% of 2020-2026 SUVs/trucks. Magnetic expandable design.',cost:14,msrp:50,demandBase:5,vol:.20,ship:4,retRate:.06,tag:'new'},
+  {id:'uvc_wand',name:'UV-C Interior Sanitizer Wand',emoji:'🔦',cat:'Auto',desc:'FDA-registered, 30-second cycle. Marketed to ride-share drivers.',cost:22,msrp:80,demandBase:3,vol:.25,ship:4,retRate:.08,tag:'risky'},
+  {id:'eco_wheel_cover',name:'Eco-Leather Steering Wheel Cover',emoji:'🎡',cat:'Auto',desc:'Vegan, OE-grade stitching. Certified biodegradable backing.',cost:12,msrp:42,demandBase:5,vol:.22,ship:3,retRate:.07,tag:'new'},
+  {id:'tire_monitor',name:'Smart Tire Pressure Monitor',emoji:'⚙️',cat:'Auto',desc:'Solar-charged, 5-year battery, syncs with Apple CarPlay.',cost:17,msrp:60,demandBase:4,vol:.18,ship:4,retRate:.07,tag:'trend'},
+  {id:'lidar_mount',name:'LiDAR Phone Mount',emoji:'📡',cat:'Auto',desc:'Adaptive grip detects phone thickness. Zero slippage in crash tests.',cost:15,msrp:52,demandBase:4,vol:.20,ship:3,retRate:.06,tag:'new'},
+  {id:'led_kit_car',name:'CAN-bus LED Strip Kit',emoji:'💡',cat:'Auto',desc:'Plug-and-play, eliminates dashboard error codes. Car enthusiast niche.',cost:10,msrp:40,demandBase:5,vol:.25,ship:3,retRate:.07,tag:'new'},
+  {id:'shift_knob',name:'Carbon Fiber Shift Knob',emoji:'🎛️',cat:'Auto',desc:'Universal thread with OEM adapter. Car enthusiast upsell.',cost:14,msrp:50,demandBase:4,vol:.22,ship:3,retRate:.05,tag:'new'},
+  {id:'dash_cam_mount',name:'Dual-Lock Windshield Camera Mount',emoji:'📷',cat:'Auto',desc:'Stays secure at 85mph, zero residue, reusable 12+ times.',cost:9,msrp:37,demandBase:5,vol:.20,ship:3,retRate:.05,tag:'new'},
+  {id:'ev_cable_org',name:'EV Charging Cable Organizer',emoji:'🔌',cat:'Auto',desc:'IP67 rated, prevents kinking. EV boom product with niche audience.',cost:14,msrp:55,demandBase:3,vol:.20,ship:4,retRate:.05,tag:'trend'},
 
-  // PET
-  {id:'cat_feeder',name:'Auto Pet Feeder',emoji:'🐾',cat:'Pet',desc:'Scheduled feeding. Pet owners are loyal repeat buyers. High AOV.',cost:11.50,msrp:48.99,demandBase:5,vol:.18,ship:7,compP:.48,retRate:.06,tag:'new'},
-  {id:'dog_toy_set',name:'Dog Chew Toy Bundle',emoji:'🐶',cat:'Pet',desc:'Indestructible chew toys. Repeat buyers every 2-3 months.',cost:5.50,msrp:22.99,demandBase:9,vol:.20,ship:4,compP:.55,retRate:.06,tag:'trend'},
-  {id:'cat_tree',name:'Cat Tree & Scratching Post',emoji:'🐱',cat:'Pet',desc:'High AOV. Pricey to ship but customer satisfaction is high.',cost:24,msrp:79.99,demandBase:4,vol:.22,ship:10,compP:.48,retRate:.08,tag:'new'},
+  // ── PET SUPPLIES ──
+  {id:'ortho_dog_bed',name:'Orthopedic Dog Bed',emoji:'🐕',cat:'Pet',desc:'Memory foam, supports aging joints. Premium pet owners spend freely.',cost:22,msrp:75,demandBase:4,vol:.20,ship:7,retRate:.08,tag:'new'},
+  {id:'slow_feeder',name:'Slow Feeder Dog Bowl',emoji:'🥣',cat:'Pet',desc:'Prevents bloat, non-slip base. Vet-recommended angle drives trust.',cost:6,msrp:25,demandBase:7,vol:.18,ship:3,retRate:.04,tag:'trend'},
+  {id:'dog_puzzle',name:'Interactive Dog Puzzle Toy',emoji:'🧩',cat:'Pet',desc:'Mental stimulation, multiple difficulty levels. Repeat buyer product.',cost:8,msrp:30,demandBase:6,vol:.22,ship:3,retRate:.05,tag:'trend'},
+  {id:'cat_perch',name:'Cat Window Perch',emoji:'🐈',cat:'Pet',desc:'Suction cup mount, heavy-duty. Cat owners will buy multiples.',cost:9,msrp:37,demandBase:5,vol:.20,ship:4,retRate:.06,tag:'new'},
+  {id:'ball_launcher',name:'Automatic Ball Launcher',emoji:'🎾',cat:'Pet',desc:'Keeps dogs entertained, adjustable distance. High AOV impulse buy.',cost:24,msrp:85,demandBase:3,vol:.25,ship:5,retRate:.09,tag:'risky'},
+  {id:'gps_pet',name:'GPS Tracker for Pets',emoji:'📍',cat:'Pet',desc:'Real-time tracking, geofence alerts. Peace-of-mind product — easy sell.',cost:14,msrp:50,demandBase:5,vol:.22,ship:3,retRate:.06,tag:'trend'},
+  {id:'pet_hair_brush',name:'Pet Hair Remover Brush',emoji:'🖤',cat:'Pet',desc:'Removes fur from furniture. Washable, ergonomic. Repeat buyer staple.',cost:4,msrp:20,demandBase:8,vol:.18,ship:2,retRate:.03,tag:'hot'},
+  {id:'waste_bags',name:'Biodegradable Pet Waste Bags',emoji:'🐾',cat:'Pet',desc:'Dog owners need constant supply. Eco angle adds value. Sub potential.',cost:2,msrp:8,demandBase:12,vol:.15,ship:2,retRate:.02,tag:'hot'},
 
-  // TOYS & GAMES
-  {id:'fidget_cube',name:'Pro Fidget Cube',emoji:'🎮',cat:'Toys',desc:'Focus toy for adults and kids. Market is saturated but still moves.',cost:2.50,msrp:12.99,demandBase:8,vol:.25,ship:3,compP:.82,retRate:.05,tag:'sat'},
-  {id:'rc_car',name:'Off-Road RC Buggy',emoji:'🏎️',cat:'Toys',desc:'High-performance RC car. Gift season gold. High AOV.',cost:16,msrp:54.99,demandBase:5,vol:.35,ship:7,compP:.55,retRate:.10,tag:'hot'},
-  {id:'slime_kit',name:'Galaxy Slime Kit',emoji:'🌌',cat:'Toys',desc:'Kids/teens love this. Cheap, light, viral-friendly. Buy in bulk.',cost:3.20,msrp:14.99,demandBase:11,vol:.30,ship:3,compP:.62,retRate:.06,tag:'trend'},
-  {id:'puzzle_1000',name:'1000pc Premium Puzzle',emoji:'🧩',cat:'Toys',desc:'Mindfulness hobby. Growing adult puzzle market. Gifting season performer.',cost:7.50,msrp:28.99,demandBase:7,vol:.18,ship:5,compP:.52,retRate:.04,tag:'new'},
+  // ── FITNESS ──
+  {id:'adj_dumbbells',name:'Adjustable Dumbbell Set',emoji:'🏋️',cat:'Fitness',desc:'Replaces multiple weights, space-saving. Home gym buyers spend big.',cost:30,msrp:100,demandBase:4,vol:.28,ship:9,retRate:.10,tag:'hot'},
+  {id:'resist_bands',name:'Resistance Bands Set',emoji:'💪',cat:'Fitness',desc:'Eventually lose tension. Free workout guides build brand loyalty.',cost:7,msrp:28,demandBase:8,vol:.22,ship:3,retRate:.06,tag:'trend'},
+  {id:'jump_rope',name:'Weighted Jump Rope',emoji:'🪢',cat:'Fitness',desc:'Intensifies workout, improves bone density. Tangle-free design.',cost:6,msrp:25,demandBase:7,vol:.20,ship:2,retRate:.04,tag:'new'},
+  {id:'pullup_bar',name:'Doorway Pull-Up Bar',emoji:'🏃',cat:'Fitness',desc:'No-drill installation, multiple grip positions. Home gym essential.',cost:10,msrp:37,demandBase:6,vol:.22,ship:4,retRate:.07,tag:'trend'},
+  {id:'sliders',name:'Fitness Sliders Dual-Sided',emoji:'⭕',cat:'Fitness',desc:'Core and glute workouts. Works on carpet/hardwood. Comes with bag.',cost:4,msrp:20,demandBase:6,vol:.18,ship:2,retRate:.04,tag:'new'},
+  {id:'foam_roller',name:'High Density Foam Roller',emoji:'🔵',cat:'Fitness',desc:'Muscle recovery, relieves soreness. Durable construction.',cost:8,msrp:30,demandBase:7,vol:.18,ship:4,retRate:.04,tag:'new'},
+  {id:'ab_roller',name:'Ab Roller with Knee Pad',emoji:'⚡',cat:'Fitness',desc:'Targets core, includes resistance bands, non-slip grip.',cost:6,msrp:25,demandBase:6,vol:.20,ship:3,retRate:.05,tag:'new'},
+
+  // ── OUTDOORS ──
+  {id:'solar_espresso',name:'Solar-Powered Espresso Maker',emoji:'☀️',cat:'Outdoors',desc:'Brews 9-bar espresso using sunlight. Van-lifer niche. Ultra-premium.',cost:85,msrp:229,demandBase:2,vol:.30,ship:6,retRate:.12,tag:'risky'},
+  {id:'water_bottle_ins',name:'Insulated Water Bottle 40oz',emoji:'🫙',cat:'Outdoors',desc:'Keeps cold 24h, fits cup holders. Durable finish, gifting staple.',cost:12,msrp:42,demandBase:7,vol:.22,ship:4,retRate:.05,tag:'trend'},
+  {id:'hammock',name:'Camping Hammock with Straps',emoji:'🏕️',cat:'Outdoors',desc:'Lightweight, easy setup, 500lb support. Great gift, great margins.',cost:13,msrp:50,demandBase:5,vol:.25,ship:4,retRate:.06,tag:'trend'},
+  {id:'camp_shower',name:'Portable Camping Shower',emoji:'🚿',cat:'Outdoors',desc:'Rechargeable submersible pump. Ideal for beach and camping.',cost:12,msrp:42,demandBase:4,vol:.22,ship:5,retRate:.08,tag:'new'},
+  {id:'flashlight',name:'Tactical Rechargeable Flashlight',emoji:'🔦',cat:'Outdoors',desc:'High lumen, multiple modes, water-resistant. Emergency prep niche.',cost:8,msrp:32,demandBase:6,vol:.22,ship:3,retRate:.05,tag:'trend'},
+  {id:'hiking_poles',name:'Collapsible Hiking Poles',emoji:'🏔️',cat:'Outdoors',desc:'Lightweight aluminum, shock-absorbent. Outdoor community is loyal.',cost:14,msrp:50,demandBase:4,vol:.22,ship:5,retRate:.06,tag:'new'},
+  {id:'cooling_towel',name:'Cooling Towel',emoji:'🧊',cat:'Outdoors',desc:'Activated by water, stays cool for hours. Sports/gym/outdoor use.',cost:3,msrp:12,demandBase:8,vol:.25,ship:2,retRate:.04,tag:'hot'},
+
+  // ── OFFICE ──
+  {id:'desk_elliptical',name:'Under-Desk Elliptical',emoji:'🏃',cat:'Office',desc:'For sedentary workers, tracks steps/calories. WFH health angle.',cost:28,msrp:100,demandBase:3,vol:.28,ship:7,retRate:.10,tag:'trend'},
+  {id:'laptop_stand',name:'Foldable Laptop Stand',emoji:'💻',cat:'Office',desc:'Ergonomic, improves posture. Compatible with all laptops. WFH must-have.',cost:8,msrp:32,demandBase:7,vol:.20,ship:3,retRate:.05,tag:'trend'},
+  {id:'foot_rest',name:'Memory Foam Foot Rest',emoji:'🦶',cat:'Office',desc:'Reduces leg fatigue, promotes circulation. Washable cover.',cost:10,msrp:37,demandBase:5,vol:.18,ship:4,retRate:.05,tag:'new'},
+  {id:'presenter_remote',name:'Wireless Presenter Remote',emoji:'🎯',cat:'Office',desc:'Plug-and-play, long range, rechargeable. Professional presenter niche.',cost:6,msrp:25,demandBase:5,vol:.18,ship:2,retRate:.04,tag:'new'},
+  {id:'desk_organizer_charger',name:'Desk Organizer with Wireless Charger',emoji:'🗂️',cat:'Office',desc:'Multi-compartment, charges phone/earbuds. Reduces desk clutter.',cost:12,msrp:42,demandBase:5,vol:.20,ship:4,retRate:.06,tag:'trend'},
+
+  // ── TRAVEL ──
+  {id:'sleep_mask_bt',name:'Noise-Canceling Sleep Mask',emoji:'😴',cat:'Travel',desc:'Built-in Bluetooth speakers, ultra-soft. Ideal for flights and hotels.',cost:10,msrp:37,demandBase:6,vol:.22,ship:3,retRate:.07,tag:'trend'},
+  {id:'passport_holder',name:'RFID Blocking Passport Holder',emoji:'🛂',cat:'Travel',desc:'Protects against ID theft. Multiple card slots. Travel anxiety product.',cost:4,msrp:20,demandBase:7,vol:.18,ship:2,retRate:.04,tag:'trend'},
+  {id:'packing_cubes',name:'Packing Cubes Set of 6',emoji:'🧳',cat:'Travel',desc:'Organizes luggage, compresses clothes. Gifting and repeat purchase.',cost:7,msrp:28,demandBase:7,vol:.20,ship:3,retRate:.04,tag:'trend'},
+  {id:'jewelry_org',name:'Travel Jewelry Organizer',emoji:'💍',cat:'Travel',desc:'Prevents tangling, multiple compartments. Compact roll-up design.',cost:5,msrp:20,demandBase:6,vol:.18,ship:2,retRate:.04,tag:'new'},
+  {id:'travel_pillow',name:'Inflatable Travel Pillow',emoji:'✈️',cat:'Travel',desc:'Compact when deflated, ergonomic support. Impulse airport buy.',cost:5,msrp:25,demandBase:7,vol:.20,ship:2,retRate:.05,tag:'trend'},
+
+  // ── BABY PRODUCTS ──
+  {id:'sleep_sack',name:'Baby Sleep Sack Wearable Blanket',emoji:'👶',cat:'Baby',desc:'Safe sleep alternative. TOG ratings for seasons. Parent trust product.',cost:10,msrp:37,demandBase:5,vol:.22,ship:4,retRate:.07,tag:'new'},
+  {id:'high_chair',name:'Convertible Baby High Chair',emoji:'🪑',cat:'Baby',desc:'Grows with child, multiple positions. High AOV, parent community.',cost:28,msrp:100,demandBase:3,vol:.22,ship:7,retRate:.09,tag:'new'},
+  {id:'changing_pad',name:'Portable Baby Changing Pad',emoji:'🧷',cat:'Baby',desc:'Waterproof, folds compact, wipes pocket. Every new parent needs one.',cost:8,msrp:30,demandBase:5,vol:.18,ship:3,retRate:.06,tag:'new'},
+  {id:'nose_aspirator',name:'Electric Nose Aspirator',emoji:'👃',cat:'Baby',desc:'Gentle suction, multiple tips. Easy to clean. Parent panic buy product.',cost:11,msrp:42,demandBase:4,vol:.20,ship:3,retRate:.07,tag:'new'},
+  {id:'teething_mitt',name:'Teething Mittens',emoji:'🧤',cat:'Baby',desc:'Protects hands from scratching. Textured for chewing. Set of 2.',cost:4,msrp:15,demandBase:5,vol:.18,ship:2,retRate:.05,tag:'new'},
+  {id:'food_maker',name:'Baby Food Maker Steam+Blend',emoji:'🥣',cat:'Baby',desc:'One-touch operation, dishwasher-safe. Fresh purees angle over jars.',cost:22,msrp:75,demandBase:3,vol:.22,ship:5,retRate:.09,tag:'new'},
+  {id:'white_noise',name:'White Noise Machine for Baby',emoji:'💤',cat:'Baby',desc:'Soothing sounds, night light, timer. Tired parents are easy buyers.',cost:10,msrp:37,demandBase:5,vol:.20,ship:3,retRate:.06,tag:'trend'},
+
+  // ── GARDEN ──
+  {id:'garden_hose',name:'Expandable Garden Hose',emoji:'🌿',cat:'Garden',desc:'Lightweight, kink-resistant, multiple spray patterns. Spring/summer peak.',cost:11,msrp:42,demandBase:5,vol:.30,ship:5,retRate:.08,tag:'trend'},
+  {id:'raised_bed',name:'Fabric Raised Garden Bed Kit',emoji:'🌱',cat:'Garden',desc:'Portable, promotes root growth. Collapsible for storage. Homestead trend.',cost:9,msrp:37,demandBase:5,vol:.25,ship:4,retRate:.06,tag:'trend'},
+  {id:'pathway_lights',name:'Solar Pathway Lights',emoji:'🌟',cat:'Garden',desc:'Auto on/off, weather-resistant. Enhances curb appeal effortlessly.',cost:9,msrp:37,demandBase:5,vol:.25,ship:4,retRate:.05,tag:'trend'},
+  {id:'self_watering',name:'Self-Watering Plant Pots',emoji:'🌺',cat:'Garden',desc:'Ideal for forgetful owners. Water reservoir, modern design.',cost:8,msrp:32,demandBase:6,vol:.20,ship:4,retRate:.05,tag:'new'},
+  {id:'bird_cam',name:'Bird Feeder with Camera',emoji:'🐦',cat:'Garden',desc:'Motion-activated, connects to app. Wildlife photography angle.',cost:24,msrp:85,demandBase:3,vol:.28,ship:5,retRate:.09,tag:'risky'},
+  {id:'heated_bath',name:'Heated Bird Bath',emoji:'🛁',cat:'Garden',desc:'Prevents freezing in winter. Safe for birds, durable. Niche seasonal.',cost:14,msrp:50,demandBase:3,vol:.22,ship:5,retRate:.06,tag:'new'},
+  {id:'plant_food',name:'Slow-Release Plant Food Sticks',emoji:'🌾',cat:'Garden',desc:'Houseplant boom. Consumable necessity. Bundle with moisture meters.',cost:1,msrp:5,demandBase:10,vol:.15,ship:2,retRate:.03,tag:'hot'},
+
+  // ── TECH & GADGETS ──
+  {id:'retro_console',name:'Retro Game Console 500+ Games',emoji:'🎮',cat:'Tech',desc:'Nostalgia appeal, HDMI output, wireless controllers. Perfect gift.',cost:18,msrp:60,demandBase:5,vol:.35,ship:5,retRate:.09,tag:'hot'},
+  {id:'photo_studio',name:'Portable LED Photo Studio Box',emoji:'📸',cat:'Tech',desc:'Small product photography, foldable. Sellers and creators love this.',cost:20,msrp:70,demandBase:4,vol:.25,ship:5,retRate:.08,tag:'new'},
+  {id:'smart_mug',name:'Smart Mug App-Controlled Temp',emoji:'☕',cat:'Tech',desc:'Keeps beverages at perfect temperature. Customizable presets.',cost:14,msrp:50,demandBase:5,vol:.25,ship:4,retRate:.07,tag:'trend'},
+  {id:'uv_charger',name:'UV Phone Sanitizer + Wireless Charger',emoji:'🔋',cat:'Tech',desc:'Kills 99.9% of germs and charges phone. Kills two birds with one stone.',cost:12,msrp:42,demandBase:5,vol:.22,ship:3,retRate:.07,tag:'trend'},
+  {id:'eco_phone_case',name:'Compostable Phone Case',emoji:'♻️',cat:'Tech',desc:'Biodegradable materials. Eco-conscious buyers pay premium willingly.',cost:9,msrp:35,demandBase:5,vol:.22,ship:3,retRate:.06,tag:'new'},
+
+  // ── HOME DECOR ──
+  {id:'galaxy_proj',name:'App-Controlled Galaxy Projector',emoji:'🌌',cat:'Home',desc:'Calming atmosphere, strong social media visual appeal. Bedroom staple.',cost:16,msrp:62,demandBase:6,vol:.35,ship:4,retRate:.07,tag:'hot'},
+  {id:'sunset_lamp',name:'Sunset Color-Changing Lamp',emoji:'🌅',cat:'Home',desc:'Instagram aesthetic mood lighting. Bundle with smart bulbs.',cost:12,msrp:49,demandBase:6,vol:.30,ship:4,retRate:.06,tag:'hot'},
+  {id:'flame_diffuser',name:'Flame Effect Essential Oil Diffuser',emoji:'🕯️',cat:'Home',desc:'Multi-sensory experience. Sell oils for repeat revenue.',cost:18,msrp:67,demandBase:5,vol:.25,ship:5,retRate:.07,tag:'trend'},
+  {id:'led_clock',name:'Minimalist LED Digital Clock',emoji:'⏰',cat:'Home',desc:'Clean aesthetic, functional, fits any decor. Impulse home buy.',cost:9,msrp:37,demandBase:6,vol:.22,ship:3,retRate:.05,tag:'new'},
+  {id:'diat_bathmat',name:'Diatomite Super-Absorbent Bath Mat',emoji:'🛁',cat:'Home',desc:'Solves wet floor problem. Eco-friendly angle. Quick-dry magic.',cost:10,msrp:40,demandBase:6,vol:.22,ship:4,retRate:.05,tag:'trend'},
+  {id:'wall_shelves',name:'Adhesive No-Drill Wall Shelves',emoji:'📚',cat:'Home',desc:'Renter-friendly, damage-free. Sell in sets for gallery walls.',cost:7,msrp:30,demandBase:7,vol:.22,ship:3,retRate:.06,tag:'trend'},
+  {id:'dino_plushie',name:'Weighted Dinosaur Plushie',emoji:'🦕',cat:'Home',desc:'Childhood nostalgia + anxiety relief. Emotional support dinosaur.',cost:10,msrp:40,demandBase:6,vol:.30,ship:4,retRate:.05,tag:'hot'},
+
+  // ── FOOD & BEVERAGE ──
+  {id:'mushroom_coffee',name:'Mushroom Coffee Packets',emoji:'🍄',cat:'Food',desc:'"Health Goth" functional beverage trend. Subscription model potential.',cost:1,msrp:3,demandBase:10,vol:.30,ship:2,retRate:.04,tag:'trend'},
+
+  // ── PERSONAL CARE ──
+  {id:'water_flosser',name:'Cordless Water Flosser',emoji:'🦷',cat:'Health',desc:'Replaces expensive dental visits. Multiple pressure modes, portable.',cost:13,msrp:50,demandBase:5,vol:.22,ship:4,retRate:.07,tag:'trend'},
+  {id:'callus_remover',name:'Electric Callus Remover',emoji:'🦵',cat:'Health',desc:'Pedicure-quality results at home. Rechargeable, multiple rollers.',cost:7,msrp:25,demandBase:5,vol:.22,ship:3,retRate:.06,tag:'new'},
+  {id:'facial_steamer',name:'Nano-Ionic Facial Steamer',emoji:'💨',cat:'Beauty',desc:'Opens pores for deep cleansing. Enhances skincare routine.',cost:12,msrp:42,demandBase:5,vol:.25,ship:4,retRate:.07,tag:'trend'},
 ];
 
 const UPGRADES = [
-  {id:'express_ship',icon:'✈️',name:'Express Shipping Deal',desc:'Cut all shipping delays by 3 days. Customers love it, reviews improve.',cost:18,effect:'ship-3'},
-  {id:'bulk_deal',icon:'📦',name:'Bulk Sourcing Contract',desc:'Source all products 22% cheaper. More margin on every order.',cost:30,effect:'cost-.22'},
-  {id:'ad_campaign',icon:'📣',name:'Paid Ad Blitz (14 days)',desc:'50% demand boost for 14 days. High cost, high reward.',cost:28,effect:'ads14'},
-  {id:'smart_reprice',icon:'🤖',name:'Auto-Repricer AI',desc:'Daily automatic optimal price adjustments. Maintain competitive edge.',cost:50,effect:'repricer'},
-  {id:'review_booster',icon:'⭐',name:'Review Accelerator',desc:'Instantly gain +25 reputation. Better reviews = more organic sales.',cost:20,effect:'rep+25'},
-  {id:'vip_supplier',icon:'🏭',name:'VIP Supplier Network',desc:'Unlock all 32 products and get 10% extra cost reduction.',cost:65,effect:'vip'},
-  {id:'return_shield',icon:'🛡️',name:'Return Shield',desc:'Reduce return rates by 60% across all products. Protect your margins.',cost:38,effect:'ret-.6'},
-  {id:'email_list',icon:'📧',name:'Email Marketing Engine',desc:'+30% repeat demand every day. Loyal customer base = consistent sales.',cost:45,effect:'email+.3'},
-  {id:'multi_channel',icon:'🌐',name:'Multi-Channel Listing',desc:'List products on 3 platforms simultaneously. +40% total demand.',cost:55,effect:'channel+.4'},
-  {id:'warehouse',icon:'🏬',name:'Mini Warehouse',desc:'No stock limit. Store unlimited inventory without overflow penalties.',cost:80,effect:'warehouse'},
+  {id:'express_ship',icon:'✈️',name:'Express Shipping Deal',desc:'Cut all shipping delays by 3 days. Critical when customers are impatient.',cost:35,effect:'ship-3'},
+  {id:'bulk_deal',icon:'📦',name:'Bulk Sourcing Contract',desc:'Source all products 20% cheaper. Essential for high-volume categories.',cost:60,effect:'cost-.20'},
+  {id:'ad_campaign',icon:'📣',name:'Paid Ad Blitz (10 days)',desc:'40% demand boost for 10 days. Short window — pick the right products.',cost:55,effect:'ads10'},
+  {id:'smart_reprice',icon:'🤖',name:'Auto-Repricer AI',desc:'Daily automatic price optimization. Stays competitive without you watching.',cost:90,effect:'repricer'},
+  {id:'review_booster',icon:'⭐',name:'Review Accelerator',desc:'+20 reputation instantly. Better rep = better conversion. Hard to build otherwise.',cost:45,effect:'rep+20'},
+  {id:'vip_supplier',icon:'🏭',name:'VIP Supplier Network',desc:'Unlock all 99 products. Extra 10% cost cut. Expensive — worth it long-term.',cost:120,effect:'vip'},
+  {id:'return_shield',icon:'🛡️',name:'Return Shield Insurance',desc:'Reduce return rates by 50%. Returns will hurt you — this helps.',cost:70,effect:'ret-.5'},
+  {id:'email_list',icon:'📧',name:'Email Marketing Engine',desc:'+25% repeat demand daily. Loyal customer base = predictable revenue.',cost:80,effect:'email+.25'},
+  {id:'multi_channel',icon:'🌐',name:'Multi-Channel Listing',desc:'+35% total demand. Expensive, but demand is the hardest problem to solve.',cost:100,effect:'channel+.35'},
+  {id:'warehouse',icon:'🏬',name:'Mini Warehouse',desc:'Remove stock caps. Without this, your growth will be physically throttled.',cost:150,effect:'warehouse'},
 ];
 
 const EVENTS = [
-  {icon:'🔥',head:'Viral TikTok post',detail:'Influencer showcased your niche — all trending categories +65% demand.',impact:'hi',type:'good',fx:'d+.65'},
-  {icon:'🚢',head:'Port congestion strike',detail:'Major delays — all pending orders pushed back 4 extra days.',impact:'hi',type:'bad',fx:'ship+4'},
-  {icon:'📉',head:'Platform price war',detail:'Competitors mass-undercut. Average market prices drop 20%.',impact:'hi',type:'bad',fx:'price-.20'},
-  {icon:'⭐',head:'Fake review attack',detail:'Competitor review-bombed your store. Reputation −18.',impact:'hi',type:'bad',fx:'rep-18'},
-  {icon:'🎄',head:'Holiday shopping surge',detail:'Seasonal demand explodes. All categories +80% for 3 days.',impact:'hi',type:'good',fx:'d+.80'},
-  {icon:'💳',head:'Payment processor hold',detail:'$35 frozen for 5 days under fraud review.',impact:'hi',type:'bad',fx:'hold35'},
-  {icon:'📱',head:'Algorithm update',detail:'Platform reach halved. Organic traffic drops 45% for 6 days.',impact:'med',type:'bad',fx:'reach-.45'},
-  {icon:'📦',head:'Supplier price hike',detail:'Raw material costs up. Product sourcing +22% for 7 days.',impact:'med',type:'bad',fx:'cost+.22'},
-  {icon:'📰',head:'Press mention',detail:'Trade publication featured your store. +20 reputation.',impact:'lo',type:'good',fx:'rep+20'},
-  {icon:'↩️',head:'Customer return wave',detail:'Poor batch — 18% of recent inventory returned.',impact:'hi',type:'bad',fx:'ret.18'},
-  {icon:'🏷️',head:'Flash sale trend',detail:'Customers hunting deals. Price-sensitivity lower today. +25% demand.',impact:'lo',type:'good',fx:'d+.25'},
-  {icon:'🃏',head:'Pokémon card mania',detail:'New set announced! Collectibles demand rockets +150% for 5 days.',impact:'hi',type:'good',fx:'poke+1.5'},
-  {icon:'💀',head:'Competitor shutdown',detail:'CheapDropz99 ran out of cash. Their market share is up for grabs.',impact:'med',type:'good',fx:'comp-'},
-  {icon:'🌊',head:'Supplier shortage',detail:'Key products out of stock at supplier. Costs rise +30% for 5 days.',impact:'hi',type:'bad',fx:'cost+.30'},
-  {icon:'🎮',head:'Gaming product surge',detail:'Toys & collectibles trending hard. +70% demand in those categories.',impact:'med',type:'good',fx:'toys+.70'},
-  {icon:'💰',head:'Customer loyalty spike',detail:'Your reputation crossed a threshold. +10 rep, natural demand boost.',impact:'lo',type:'good',fx:'rep+10'},
+  {icon:'🔥',head:'Viral short-form video',detail:'Your niche went viral — trending products +60% demand for 4 days.',impact:'hi',type:'good',fx:'d+.60'},
+  {icon:'🚢',head:'Port strike & delays',detail:'All pending shipments delayed 5 extra days. Plan around it.',impact:'hi',type:'bad',fx:'ship+5'},
+  {icon:'📉',head:'Brutal platform price war',detail:'Competitors mass-undercut. Your listing prices drop 25%.',impact:'hi',type:'bad',fx:'price-.25'},
+  {icon:'⭐',head:'Review bombing campaign',detail:'Competitor attacked your reviews. Reputation −22.',impact:'hi',type:'bad',fx:'rep-22'},
+  {icon:'🎄',head:'Holiday shopping surge',detail:'Seasonal demand spike. All categories +90% for 2 days.',impact:'hi',type:'good',fx:'d+.90'},
+  {icon:'💳',head:'Payment processor freeze',detail:'$50 frozen for 6 days under fraud review.',impact:'hi',type:'bad',fx:'hold50'},
+  {icon:'📱',head:'Algorithm suppression',detail:'Organic reach cut 55% for 7 days. Sales will stall.',impact:'med',type:'bad',fx:'reach-.55'},
+  {icon:'📦',head:'Supplier cost spike',detail:'Supply chain crunch. All sourcing +28% for 8 days.',impact:'med',type:'bad',fx:'cost+.28'},
+  {icon:'📰',head:'Press feature',detail:'Industry blog featured your store. +18 reputation.',impact:'lo',type:'good',fx:'rep+18'},
+  {icon:'↩️',head:'Mass return wave',detail:'Defective batch — 22% of recent stock returned.',impact:'hi',type:'bad',fx:'ret.22'},
+  {icon:'🏷️',head:'Flash deal trend',detail:'Bargain hunters flooding the market. +28% demand today.',impact:'lo',type:'good',fx:'d+.28'},
+  {icon:'💀',head:'Competitor collapse',detail:'CheapDropz99 went bankrupt. Their customers need a new seller.',impact:'med',type:'good',fx:'comp-'},
+  {icon:'🌊',head:'Supplier shortage',detail:'Key suppliers dry up. Costs +35% for 6 days.',impact:'hi',type:'bad',fx:'cost+.35'},
+  {icon:'💰',head:'Loyalty program spike',detail:'Your rep hit a milestone. +12 rep, natural demand boost.',impact:'lo',type:'good',fx:'rep+12'},
+  {icon:'🏥',head:'Health trend surge',detail:'Wellness content exploding online. Health products +80% demand.',impact:'med',type:'good',fx:'health+.80'},
+  {icon:'🏠',head:'Home improvement boom',detail:'Home & decor trending hard after viral content. +65% demand.',impact:'med',type:'good',fx:'home+.65'},
+  {icon:'⚠️',head:'Customs inspection hold',detail:'All incoming orders held for 3 extra days at customs.',impact:'med',type:'bad',fx:'ship+3'},
+  {icon:'📊',head:'Competitor price dump',detail:'Rival dropped prices to cost. Your sales drop 40% today.',impact:'hi',type:'bad',fx:'reach-.40'},
+  {icon:'🌍',head:'Eco trend surge',detail:'Sustainability content viral. Eco-labeled products +70% demand.',impact:'med',type:'good',fx:'d+.40'},
+  {icon:'💸',head:'Unexpected chargeback',detail:'Customer dispute — $25 clawed back from your account.',impact:'med',type:'bad',fx:'cash-25'},
 ];
+
+
 
 /* ══════════════════════════════════════════════
    GAME STATE
@@ -924,7 +1023,7 @@ let modalData = {pid:null, qty:1, restock:false, idx:-1};
 
 function initGame() {
   G = {
-    cash:10, day:1, rep:50,
+    cash:8, day:1, rep:30,
     totalRev:0, totalExp:0, totalOrd:0, totalRet:0, unitsSold:0,
     bestDay:0, revHistory:[],
     inventory:[],
@@ -936,12 +1035,12 @@ function initGame() {
     shipDelay:0, shipDelayDays:0,
     costMult:1, costDays:0,
     newsLog:[],
-    comp:{cash:150, rep:60, pf:0.87},
+    comp:{cash:300, rep:75, pf:0.82},
     lastOrdered:{},
   };
   PRODUCTS.forEach(p => { G.trends[p.id] = 0.70 + Math.random() * 0.60; });
   renderAll();
-  addFeed('🚀','Game started. You have $10.00. Source your first product.','sys');
+  addFeed('🚀','HARD MODE. You have $8.00. Every dollar counts. Choose wisely.','warn');
   updateTicker();
 }
 
@@ -1008,8 +1107,8 @@ function advanceDay() {
     G.trends[p.id] = Math.max(.20, Math.min(3.0, (G.trends[p.id]||1)+d));
   });
 
-  // 4. Random event (8% chance — rare, meaningful)
-  if (Math.random() < .08) {
+  // 4. Random event (12% chance — hard mode)
+  if (Math.random() < .12) {
     const ev = EVENTS[Math.floor(Math.random()*EVENTS.length)];
     applyEvent(ev);
     G.newsLog.push({...ev, day:G.day});
@@ -1039,8 +1138,9 @@ function advanceDay() {
     }
     const rawDem = p.demandBase * trend * repF * priceF * adF * reachF * emailF * chanF * compF;
     // Slow & realistic: sales trickle in, scaling with reputation over time
-    const slowFactor = 0.18 + (G.rep / 100) * 0.22;
-    const sold = Math.min(item.qty, Math.max(0, Math.round(rawDem * slowFactor * (0.3 + Math.random() * 0.9))));
+    // HARD MODE: sales start tiny, reputation gates growth heavily
+    const slowFactor = 0.08 + (G.rep / 100) * 0.18;
+    const sold = Math.min(item.qty, Math.max(0, Math.round(rawDem * slowFactor * (0.2 + Math.random() * 0.7))));
     if (sold > 0) {
       const rr = getRetRate(p);
       const rets = Math.floor(sold*rr);
@@ -1066,7 +1166,7 @@ function advanceDay() {
   else if (dayRev === 0 && G.inventory.some(i=>i.qty>0) && G.day % 4 === 0) addFeed('📉',`Day ${G.day-1}: No sales. Try adjusting your prices.`,'bad');
 
   // 8. Rep decay
-  G.rep = Math.max(5, G.rep-.12);
+  G.rep = Math.max(5, G.rep-.20); // HARD: faster rep decay
 
   // 9. Bankruptcy check
   if (G.cash <= 0 && G.inventory.every(i=>i.qty===0&&!(i.pendingQty>0))) {
@@ -1091,11 +1191,11 @@ function priceDemand(price, msrp) {
 
 function tickComp() {
   const c = G.comp;
-  c.cash += 2 + Math.random() * 6;
-  if (Math.random() < .05) { c.pf = Math.max(.55, c.pf-.02); addFeed('⚔️','CheapDropz99 quietly lowered their prices.','warn'); }
-  if (Math.random() < .04) c.pf = Math.min(.96, c.pf+.03);
-  c.rep += (Math.random()-.48) * 1.2;
-  c.rep = Math.max(8, Math.min(95, c.rep));
+  c.cash += 5 + Math.random() * 14;
+  if (Math.random() < .10) { c.pf = Math.max(.50, c.pf-.03); addFeed('⚔️','CheapDropz99 undercut your prices again.','warn'); }
+  if (Math.random() < .05) c.pf = Math.min(.97, c.pf+.04);
+  c.rep += (Math.random()-.44) * 2.0;
+  c.rep = Math.max(8, Math.min(98, c.rep));
 }
 
 function applyEvent(ev) {
@@ -1118,6 +1218,9 @@ function applyEvent(ev) {
     G.inventory.forEach(i=>{ const r=Math.floor(i.qty*.18); if(r>0){ const cost=r*i.price; G.cash=Math.max(0,G.cash-cost); G.totalRet+=r; i.qty+=r; G.totalRev-=cost; } });
   }
   if(fx==='comp-') { G.comp.rep=Math.max(5,G.comp.rep-35); G.comp.cash=Math.max(0,G.comp.cash-100); }
+  if(fx==='cash-25') { const cb=Math.min(25,G.cash*.4); G.cash=Math.max(0,G.cash-cb); addFeed('💸',`Chargeback: lost $${cb.toFixed(2)}.`,'bad'); }
+  if(fx==='health+.80') PRODUCTS.filter(p=>p.cat==='Health'||p.cat==='Beauty').forEach(p=>{ G.trends[p.id]=Math.min(3,G.trends[p.id]*1.80); });
+  if(fx==='home+.65') PRODUCTS.filter(p=>p.cat==='Home'||p.cat==='Garden').forEach(p=>{ G.trends[p.id]=Math.min(3,G.trends[p.id]*1.65); });
 }
 
 /* ══════════════════════════════════════════════
@@ -1222,7 +1325,7 @@ function setFilter(f) {
 }
 function renderCatalog() {
   const q=(document.getElementById('cat-search')?.value||'').toLowerCase();
-  let prods = G.upgrades.has('vip_supplier') ? PRODUCTS : PRODUCTS.slice(0,22);
+  let prods = G.upgrades.has('vip_supplier') ? PRODUCTS : PRODUCTS.slice(0,30);
   if(catFilter!=='All') prods=prods.filter(p=>p.cat===catFilter);
   if(q) prods=prods.filter(p=>p.name.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q));
   const grid=document.getElementById('cat-grid');
@@ -1644,11 +1747,14 @@ function restartGame() {
   startAutoDay();
 }
 
-// On page load: check existing session
+// On page load: restore session from localStorage (survives refresh)
 window.addEventListener('load', () => {
-  const sess=getSession();
-  if(sess){ currentUser=sess; enterGame(); }
+  const sess = getSession();
+  if (sess) { currentUser = sess; enterGame(); }
 });
+
+// Save immediately before the page closes/refreshes
+window.addEventListener('beforeunload', () => { saveGame(); });
 </script>
 </body>
 </html>
