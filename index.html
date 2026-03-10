@@ -495,112 +495,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .estat .ev{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--y);display:block}
 .estat .el{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px}
 
-
-/* ════════════ SHOPS ════════════ */
-.shops-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
-.shop-card{
-  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
-  padding:16px;position:relative;overflow:hidden;transition:all .18s;cursor:pointer;
-}
-.shop-card:hover{border-color:var(--p);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.4)}
-.shop-card.owned{cursor:default;border-color:rgba(0,214,143,.25);background:linear-gradient(135deg,rgba(0,214,143,.04),var(--bg2))}
-.shop-card.owned:hover{transform:none}
-.shop-card.cant{opacity:.45;cursor:not-allowed}
-.shop-card.cant:hover{transform:none;border-color:var(--border)}
-.sh-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.sh-emoji{font-size:32px}
-.sh-status{
-  font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
-  padding:3px 8px;border-radius:4px;
-}
-.sh-status.for-sale{background:rgba(155,109,255,.12);color:var(--p);border:1px solid rgba(155,109,255,.2)}
-.sh-status.running{background:rgba(0,214,143,.1);color:var(--g);border:1px solid rgba(0,214,143,.2)}
-.sh-name{font-size:14px;font-weight:700;color:#fff;margin-bottom:3px}
-.sh-type{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
-.sh-desc{font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:11px}
-.sh-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:11px}
-.shs{background:var(--bg3);border-radius:5px;padding:6px 8px}
-.shs .sv{font-family:var(--mono);font-size:12px;font-weight:700;display:block}
-.shs .sl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
-.sh-price{
-  display:flex;justify-content:space-between;align-items:center;
-  background:var(--bg3);border-radius:6px;padding:8px 11px;
-}
-.sh-price-val{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--y)}
-.sh-buy-btn{
-  background:var(--p);border:none;border-radius:6px;color:#fff;
-  font-family:var(--font);font-size:12px;font-weight:700;
-  padding:7px 14px;cursor:pointer;transition:all .13s;
-}
-.sh-buy-btn:hover{background:#7c4dff;box-shadow:0 0 18px rgba(155,109,255,.4)}
-.sh-income{
-  display:flex;align-items:center;gap:6px;margin-top:10px;
-  background:rgba(0,214,143,.06);border:1px solid rgba(0,214,143,.14);
-  border-radius:6px;padding:7px 11px;font-size:11px;
-}
-.sh-income .si-val{font-family:var(--mono);font-weight:700;color:var(--g);margin-left:auto}
-.sh-pulse{
-  width:7px;height:7px;border-radius:50%;background:var(--g);flex-shrink:0;
-  box-shadow:0 0 6px var(--g);animation:blink 1.4s ease infinite;
-}
-
-/* ════════════ CRYPTO ════════════ */
-.crypto-layout{display:grid;grid-template-columns:1fr 320px;gap:12px;height:100%}
-.crypto-main{display:flex;flex-direction:column;gap:10px;overflow-y:auto}
-.crypto-sidebar{display:flex;flex-direction:column;gap:10px}
-.coin-card{
-  background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px;
-}
-.coin-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.coin-icon{font-size:24px}
-.coin-name{font-size:13px;font-weight:700;color:#fff}
-.coin-sym{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
-.coin-price{margin-left:auto;text-align:right}
-.coin-usd{font-family:var(--mono);font-size:16px;font-weight:700;color:#fff}
-.coin-chg{font-family:var(--mono);font-size:11px;font-weight:700;margin-top:2px}
-.coin-chg.up{color:var(--g)}.coin-chg.dn{color:var(--r)}
-.coin-chart{height:54px;display:flex;align-items:flex-end;gap:2px;margin-bottom:10px}
-.cc-bar{flex:1;border-radius:1px 1px 0 0;min-height:2px;transition:height .3s}
-.coin-actions{display:flex;gap:7px}
-.coin-inp{
-  flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;
-  padding:7px 10px;color:var(--y);font-family:var(--mono);font-size:13px;font-weight:700;
-  outline:none;transition:border-color .15s;
-}
-.coin-inp:focus{border-color:var(--b)}
-.cbtn{
-  padding:7px 14px;border:none;border-radius:6px;font-family:var(--font);
-  font-size:12px;font-weight:700;cursor:pointer;transition:all .13s;
-}
-.cbtn.buy{background:rgba(0,214,143,.15);color:var(--g);border:1px solid rgba(0,214,143,.25)}
-.cbtn.buy:hover{background:var(--g);color:#000}
-.cbtn.sell{background:rgba(255,68,102,.12);color:var(--r);border:1px solid rgba(255,68,102,.22)}
-.cbtn.sell:hover{background:var(--r);color:#fff}
-.cbtn:disabled{opacity:.35;cursor:not-allowed}
-.portfolio-card{
-  background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px;
-}
-.port-title{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
-.port-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
-.port-row:last-child{border:none}
-.pr-name{font-size:12px;font-weight:600;color:var(--text)}
-.pr-sub{font-size:10px;color:var(--text3);margin-top:1px}
-.pr-val{text-align:right}
-.pr-usd{font-family:var(--mono);font-size:12px;font-weight:700}
-.pr-pnl{font-family:var(--mono);font-size:10px;font-weight:700}
-.pr-pnl.up{color:var(--g)}.pr-pnl.dn{color:var(--r)}
-.crypto-warn{
-  background:rgba(255,204,68,.06);border:1px solid rgba(255,204,68,.18);
-  border-radius:8px;padding:10px 13px;font-size:11px;color:var(--y);line-height:1.6;
-  margin-bottom:4px;flex-shrink:0;
-}
-.crypto-total{
-  background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:13px;
-}
-.ct-big{font-family:var(--mono);font-size:22px;font-weight:700;color:#fff;display:block;margin-bottom:2px}
-.ct-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
-.ct-pnl{font-family:var(--mono);font-size:13px;font-weight:700;margin-top:6px;display:block}
-
 /* scrollbar */
 ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
@@ -724,8 +618,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
           <button class="nbtn" id="nav-analytics" onclick="goTab('analytics')"><span class="ni">📊</span>Analytics</button>
           <button class="nbtn" id="nav-upgrades" onclick="goTab('upgrades')"><span class="ni">⚡</span>Upgrades</button>
           <button class="nbtn" id="nav-news" onclick="goTab('news')"><span class="ni">📰</span>News<span class="nb" id="news-badge" style="display:none">NEW</span></button>
-          <button class="nbtn" id="nav-shops" onclick="goTab('shops')"><span class="ni">🏪</span>Buy Shops</button>
-          <button class="nbtn" id="nav-crypto" onclick="goTab('crypto')"><span class="ni">₿</span>Crypto</button>
         </div>
       </div>
       <div style="flex:1"></div>
@@ -739,8 +631,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
         <button class="tbtn" id="tab-analytics" onclick="goTab('analytics')">📊 Analytics</button>
         <button class="tbtn" id="tab-upgrades" onclick="goTab('upgrades')">⚡ Upgrades</button>
         <button class="tbtn" id="tab-news" onclick="goTab('news')">📰 News</button>
-        <button class="tbtn" id="tab-shops" onclick="goTab('shops')">🏪 Shops</button>
-        <button class="tbtn" id="tab-crypto" onclick="goTab('crypto')">₿ Crypto</button>
       </div>
       <div class="tcontent active" id="tc-catalog">
         <div class="cat-toolbar">
@@ -768,8 +658,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
       <div class="tcontent" id="tc-analytics"><div class="an-grid" id="an-grid"></div></div>
       <div class="tcontent" id="tc-upgrades"><div class="upg-grid" id="upg-grid"></div></div>
       <div class="tcontent" id="tc-news"><div class="news-list" id="news-list"></div></div>
-      <div class="tcontent" id="tc-shops"><div id="shops-wrap"></div></div>
-      <div class="tcontent" id="tc-crypto"><div id="crypto-wrap"></div></div>
     </div>
 
     <!-- RIGHT -->
@@ -930,18 +818,6 @@ function loadGame() {
     const g = JSON.parse(raw);
     g.upgrades = new Set(Array.isArray(g.upgrades) ? g.upgrades : []);
     if (!g.lastOrdered) g.lastOrdered = {};
-    if (!g.shops) g.shops = [];
-    if (!g.shopRevHistory) g.shopRevHistory = [];
-    if (!g.crypto) g.crypto = {};
-    if (!g.coinPrices) g.coinPrices = {};
-    if (!g.coinHistory) g.coinHistory = {};
-    // Ensure all coins are initialised
-    COINS.forEach(c => {
-      if (!g.coinPrices[c.id]) g.coinPrices[c.id] = c.basePrice;
-      if (!g.coinHistory[c.id]) g.coinHistory[c.id] = [g.coinPrices[c.id]];
-      if (!g.crypto[c.id]) g.crypto[c.id] = {units:0, avgBuy:0};
-    });
-    if (g.cryptoPnl === undefined) g.cryptoPnl = 0;
     return g;
   } catch(e) { console.warn('Load failed:', e); return null; }
 }
@@ -1091,85 +967,11 @@ const UPGRADES = [
   {id:'ad_campaign',icon:'📣',name:'Paid Ad Blitz (10 days)',desc:'40% demand boost for 10 days. Short window — pick the right products.',cost:55,effect:'ads10'},
   {id:'smart_reprice',icon:'🤖',name:'Auto-Repricer AI',desc:'Daily automatic price optimization. Stays competitive without you watching.',cost:90,effect:'repricer'},
   {id:'review_booster',icon:'⭐',name:'Review Accelerator',desc:'+20 reputation instantly. Better rep = better conversion. Hard to build otherwise.',cost:45,effect:'rep+20'},
-  {id:'vip_supplier',icon:'🏭',name:'VIP Supplier Network',desc:'Unlock all 99 products and get 10% extra cost reduction. Worth every penny.',cost:120,effect:'vip'},
+  {id:'vip_supplier',icon:'🏭',name:'VIP Supplier Network',desc:'Unlock all 99 products. Extra 10% cost cut. Expensive — worth it long-term.',cost:120,effect:'vip'},
   {id:'return_shield',icon:'🛡️',name:'Return Shield Insurance',desc:'Reduce return rates by 50%. Returns will hurt you — this helps.',cost:70,effect:'ret-.5'},
   {id:'email_list',icon:'📧',name:'Email Marketing Engine',desc:'+25% repeat demand daily. Loyal customer base = predictable revenue.',cost:80,effect:'email+.25'},
   {id:'multi_channel',icon:'🌐',name:'Multi-Channel Listing',desc:'+35% total demand. Expensive, but demand is the hardest problem to solve.',cost:100,effect:'channel+.35'},
   {id:'warehouse',icon:'🏬',name:'Mini Warehouse',desc:'Remove stock caps. Without this, your growth will be physically throttled.',cost:150,effect:'warehouse'},
-];
-
-/* ══════════════════════════════════════════════
-   SHOPS — buyable stores that auto-run for you
-══════════════════════════════════════════════ */
-const SHOPS = [
-  {
-    id:'micro_store',name:'Micro Dropship Booth',emoji:'🛒',type:'Dropshipping',
-    desc:'A tiny automated listing that sources and sells cheap impulse items on its own. No management needed — just cash flow.',
-    cost:250, incomePerDay:4, incomeVar:0.5, repBoost:0.05,
-    autoSources:['mushroom_coffee','plant_food','waste_bags'],
-    detail:'Sells low-cost consumables autonomously. Slow but reliable.',
-  },
-  {
-    id:'health_store',name:'Wellness Boutique',emoji:'💚',type:'Health Shop',
-    desc:'A staffed online store focused on health and beauty. Auto-sources trending wellness products and reprices daily.',
-    cost:600, incomePerDay:14, incomeVar:0.6, repBoost:0.1,
-    autoSources:['gua_sha','scalp_massager','acupressure_mat','lip_oil_spf'],
-    detail:'Higher income. Trend-sensitive — events affect this store.',
-  },
-  {
-    id:'pet_empire',name:'Paw & Claw Pet Empire',emoji:'🐾',type:'Pet Store',
-    desc:'Fully automated pet supplies storefront. Dog and cat owners are repeat buyers — revenue is consistent once established.',
-    cost:900, incomePerDay:22, incomeVar:0.45, repBoost:0.12,
-    autoSources:['waste_bags','slow_feeder','pet_hair_brush','dog_puzzle'],
-    detail:'One of the most stable income sources. Great for long-term.',
-  },
-  {
-    id:'tech_hub',name:'GadgetHub Tech Store',emoji:'⚡',type:'Tech Store',
-    desc:'High-ticket gadget dropshipping. Auto-manages inventory, pricing, returns. Volatile but high ceiling.',
-    cost:1500, incomePerDay:38, incomeVar:0.85, repBoost:0.15,
-    autoSources:['retro_console','smart_mug','uv_charger','eco_phone_case'],
-    detail:'High income variance. Huge upside on good days, rough on bad ones.',
-  },
-  {
-    id:'home_decor_shop',name:'Aesthetic Home Studio',emoji:'🌅',type:'Home Decor',
-    desc:'Viral-ready home decor shop. Fully automated with trend-chasing algorithm. Performs well after social media events.',
-    cost:2200, incomePerDay:55, incomeVar:0.70, repBoost:0.18,
-    autoSources:['galaxy_proj','sunset_lamp','dino_plushie','wall_shelves'],
-    detail:'Social media events can 3× this store's income temporarily.',
-  },
-  {
-    id:'mega_mall',name:'MegaMall Automated Empire',emoji:'🏬',type:'Full Automation',
-    desc:'A fully autonomous multi-category dropship operation. Sources, prices, sells and handles returns without you touching anything.',
-    cost:5000, incomePerDay:130, incomeVar:0.55, repBoost:0.30,
-    autoSources:null,
-    detail:'The endgame shop. Extremely expensive but transforms your income.',
-  },
-];
-
-/* ══════════════════════════════════════════════
-   CRYPTO COINS — realistic volatile assets
-══════════════════════════════════════════════ */
-const COINS = [
-  {id:'btc',name:'Bitcoin',sym:'BTC',emoji:'₿',
-   basePrice:42000, volatility:0.04, trend:0.001,
-   desc:'The OG. Least volatile of the bunch but still brutal. Moves on macro news.',
-   color:'#f7931a'},
-  {id:'eth',name:'Ethereum',sym:'ETH',emoji:'Ξ',
-   basePrice:2200, volatility:0.055, trend:0.0015,
-   desc:'Smart contract king. Moves with BTC but amplified. Dev activity matters.',
-   color:'#627eea'},
-  {id:'sol',name:'Solana',sym:'SOL',emoji:'◎',
-   basePrice:110, volatility:0.09, trend:0.002,
-   desc:'High speed, high risk. Can pump 40% in a day or dump 35%. Meme-sensitive.',
-   color:'#9945ff'},
-  {id:'doge',name:'Dogecoin',sym:'DOGE',emoji:'🐕',
-   basePrice:0.12, volatility:0.18, trend:-0.001,
-   desc:'Pure speculation. Follows viral moments and influencer posts. Extremely dangerous.',
-   color:'#c2a633'},
-  {id:'pepe',name:'PEPE',sym:'PEPE',emoji:'🐸',
-   basePrice:0.0000082, volatility:0.28, trend:-0.002,
-   desc:'Meme coin. Can 10× or go to zero. No fundamentals. Gamble only.',
-   color:'#48b04a'},
 ];
 
 const EVENTS = [
@@ -1224,19 +1026,7 @@ function initGame() {
     newsLog:[],
     comp:{cash:300, rep:75, pf:0.82},
     lastOrdered:{},
-    shops:[],       // owned shop ids
-    shopRevHistory:[],
-    crypto:{},      // {coinId: {units, avgBuy}}
-    coinPrices:{},  // current prices
-    coinHistory:{}, // price arrays for charts
-    cryptoPnl:0,
   };
-  // Init crypto prices close to base
-  COINS.forEach(c => {
-    G.coinPrices[c.id] = c.basePrice * (0.9 + Math.random()*0.2);
-    G.coinHistory[c.id] = [G.coinPrices[c.id]];
-    G.crypto[c.id] = {units:0, avgBuy:0};
-  });
   PRODUCTS.forEach(p => { G.trends[p.id] = 0.70 + Math.random() * 0.60; });
   renderAll();
   addFeed('🚀','HARD MODE. You have $8.00. Every dollar counts. Choose wisely.','warn');
@@ -1367,12 +1157,6 @@ function advanceDay() {
   // 8. Rep decay
   G.rep = Math.max(5, G.rep-.20); // HARD: faster rep decay
 
-  // 9b. Shop income tick
-  tickShops();
-
-  // 9c. Crypto price tick
-  tickCrypto();
-
   // 9. Bankruptcy check
   if (G.cash <= 0 && G.inventory.every(i=>i.qty===0&&!(i.pendingQty>0))) {
     stopAutoDay(); showScreen('s-gameover');
@@ -1458,14 +1242,12 @@ function showScreen(id) {
 }
 function goTab(t) {
   curTab = t;
-  ['catalog','store','analytics','upgrades','news','shops','crypto'].forEach(n=>{
+  ['catalog','store','analytics','upgrades','news'].forEach(n=>{
     document.getElementById('tab-'+n)?.classList.toggle('active',n===t);
     document.getElementById('tc-'+n)?.classList.toggle('active',n===t);
     document.getElementById('nav-'+n)?.classList.toggle('active',n===t);
   });
   if(t==='news') document.getElementById('news-badge').style.display='none';
-  if(t==='crypto') renderCrypto();
-  if(t==='shops') renderShops();
   renderTab(t);
 }
 function renderTab(t) {
@@ -1474,291 +1256,12 @@ function renderTab(t) {
   else if(t==='analytics') renderAnalytics();
   else if(t==='upgrades') renderUpgrades();
   else if(t==='news') renderNews();
-  else if(t==='shops') renderShops();
-  else if(t==='crypto') renderCrypto();
 }
 function renderAll() {
   renderHUD();
   renderLeftPanel();
   renderTab(curTab);
   renderRight();
-}
-
-
-/* ══════════════════════════════════════════════
-   SHOPS ENGINE
-══════════════════════════════════════════════ */
-function tickShops() {
-  if (!G.shops || !G.shops.length) return;
-  let totalShopRev = 0;
-  G.shops.forEach(sid => {
-    const sh = SHOPS.find(s => s.id === sid); if (!sh) return;
-    // Income varies by event effects and day randomness
-    const variance = 1 - sh.incomeVar/2 + Math.random() * sh.incomeVar;
-    const eventBoost = (G.reachMult < 1) ? 0.6 : 1; // algorithm hit hurts shops too
-    const inc = sh.incomePerDay * variance * eventBoost;
-    G.cash += inc;
-    G.totalRev += inc;
-    totalShopRev += inc;
-    G.rep = Math.min(100, G.rep + sh.repBoost);
-  });
-  if (totalShopRev > 0.5) {
-    G.shopRevHistory = G.shopRevHistory || [];
-    G.shopRevHistory.push(totalShopRev);
-    if (G.shopRevHistory.length > 30) G.shopRevHistory.shift();
-    if (G.day % 5 === 0) addFeed('🏪', `Your shops earned $${totalShopRev.toFixed(2)} today.`, 'good');
-  }
-}
-
-function buyShop(sid) {
-  const sh = SHOPS.find(s => s.id === sid); if (!sh) return;
-  if (G.shops.includes(sid)) { toast('You already own this shop.','warn'); return; }
-  if (G.cash < sh.cost) { toast('Not enough cash to buy this shop.','bad'); return; }
-  G.cash -= sh.cost;
-  G.totalExp += sh.cost;
-  if (!G.shops) G.shops = [];
-  G.shops.push(sid);
-  addFeed('🏪', `Purchased: ${sh.name}! It now earns $${sh.incomePerDay}/day automatically.`, 'good');
-  toast(`✅ ${sh.name} is now running! ~$${sh.incomePerDay}/day`, 'good');
-  renderAll();
-}
-
-function renderShops() {
-  const wrap = document.getElementById('shops-wrap');
-  if (!G.shops) G.shops = [];
-  const totalShopIncome = G.shops.reduce((s, sid) => {
-    const sh = SHOPS.find(x => x.id === sid);
-    return s + (sh ? sh.incomePerDay : 0);
-  }, 0);
-
-  let html = '';
-  if (G.shops.length > 0) {
-    html += `<div style="background:rgba(0,214,143,.06);border:1px solid rgba(0,214,143,.15);border-radius:9px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
-      <span style="font-size:22px">🏪</span>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#fff;">You own ${G.shops.length} shop${G.shops.length>1?'s':''}</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px;">Earning ~<span style="color:var(--g);font-family:var(--mono);font-weight:700;">$${totalShopIncome.toFixed(0)}/day</span> automatically while you focus on other things.</div>
-      </div>
-    </div>`;
-  }
-
-  html += `<div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:7px;">Available Shops <span style="flex:1;height:1px;background:var(--border);display:block"></span></div>`;
-  html += '<div class="shops-grid">';
-
-  SHOPS.forEach(sh => {
-    const owned = G.shops.includes(sh.id);
-    const cant = !owned && G.cash < sh.cost;
-    const cls = owned ? 'owned' : cant ? 'cant' : '';
-    const avgIncome = sh.incomePerDay;
-    const roi = (sh.cost / avgIncome).toFixed(0);
-    html += `<div class="shop-card ${cls}" onclick="${owned ? '' : `buyShop('${sh.id}')`}">
-      <div class="sh-top">
-        <span class="sh-emoji">${sh.emoji}</span>
-        <span class="sh-status ${owned ? 'running' : 'for-sale'}">${owned ? '● RUNNING' : 'FOR SALE'}</span>
-      </div>
-      <div class="sh-name">${sh.name}</div>
-      <div class="sh-type">${sh.type}</div>
-      <div class="sh-desc">${sh.desc}</div>
-      <div class="sh-stats">
-        <div class="shs"><span class="sv" style="color:var(--g)">$${avgIncome}/d</span><span class="sl">Avg Income</span></div>
-        <div class="shs"><span class="sv" style="color:var(--y)">${roi}d</span><span class="sl">Payback</span></div>
-        <div class="shs"><span class="sv" style="color:var(--b)">${(sh.incomeVar*100).toFixed(0)}%</span><span class="sl">Variance</span></div>
-      </div>
-      <div style="font-size:10px;color:var(--text3);margin-bottom:9px;font-style:italic;">${sh.detail}</div>
-      ${owned
-        ? `<div class="sh-income"><div class="sh-pulse"></div><span style="color:var(--text2)">Generating income every day</span><span class="si-val">+$${avgIncome}/d</span></div>`
-        : `<div class="sh-price"><span class="sh-price-val">$${sh.cost.toLocaleString()}</span><button class="sh-buy-btn" ${cant?'disabled':''} onclick="event.stopPropagation();buyShop('${sh.id}')">${cant?'Need More Cash':'Buy Shop'}</button></div>`
-      }
-    </div>`;
-  });
-  html += '</div>';
-  wrap.innerHTML = html;
-}
-
-/* ══════════════════════════════════════════════
-   CRYPTO ENGINE — realistic & brutal
-══════════════════════════════════════════════ */
-function tickCrypto() {
-  COINS.forEach(c => {
-    const prev = G.coinPrices[c.id];
-    // GBM-style price movement: drift + random shock
-    const drift = c.trend;
-    const shock = (Math.random() - 0.5) * 2 * c.volatility;
-    // Occasional fat-tail events (5% chance)
-    const fat = Math.random() < 0.05 ? (Math.random() < 0.5 ? 1 : -1) * c.volatility * 2.5 * Math.random() : 0;
-    let mult = 1 + drift + shock + fat;
-    mult = Math.max(0.5, Math.min(2.0, mult)); // cap single-day move at ±100% (realistic for memes)
-    G.coinPrices[c.id] = Math.max(0.000001, prev * mult);
-    if (!G.coinHistory[c.id]) G.coinHistory[c.id] = [];
-    G.coinHistory[c.id].push(G.coinPrices[c.id]);
-    if (G.coinHistory[c.id].length > 30) G.coinHistory[c.id].shift();
-  });
-
-  // Update unrealized PnL
-  G.cryptoPnl = 0;
-  COINS.forEach(c => {
-    const pos = G.crypto[c.id];
-    if (pos && pos.units > 0) {
-      G.cryptoPnl += (G.coinPrices[c.id] - pos.avgBuy) * pos.units;
-    }
-  });
-}
-
-function cryptoBuy(coinId) {
-  const c = COINS.find(x => x.id === coinId); if (!c) return;
-  const inp = document.getElementById('ci-' + coinId);
-  const usdAmt = parseFloat(inp?.value || 0);
-  if (!usdAmt || usdAmt <= 0) { toast('Enter a USD amount to invest.','warn'); return; }
-  if (usdAmt > G.cash) { toast('Not enough cash.','bad'); return; }
-  if (usdAmt < 1) { toast('Minimum investment is $1.','warn'); return; }
-  const price = G.coinPrices[coinId];
-  const units = usdAmt / price;
-  G.cash -= usdAmt;
-  G.totalExp += usdAmt;
-  const pos = G.crypto[coinId];
-  const prevTotal = (pos.units * pos.avgBuy);
-  pos.units += units;
-  pos.avgBuy = pos.units > 0 ? (prevTotal + usdAmt) / pos.units : price;
-  addFeed('₿', `Bought $${usdAmt.toFixed(2)} of ${c.sym} @ $${fmtPrice(price)}.`, 'sys');
-  toast(`Bought ${fmtUnits(units)} ${c.sym}`, 'info');
-  inp.value = '';
-  renderCrypto();
-}
-
-function cryptoSell(coinId) {
-  const c = COINS.find(x => x.id === coinId); if (!c) return;
-  const inp = document.getElementById('ci-' + coinId);
-  const usdAmt = parseFloat(inp?.value || 0);
-  const pos = G.crypto[coinId];
-  if (!pos || pos.units <= 0) { toast('You have no ' + c.sym + ' to sell.','warn'); return; }
-  const price = G.coinPrices[coinId];
-  const maxUsd = pos.units * price;
-  const sellUsd = usdAmt > 0 ? Math.min(usdAmt, maxUsd) : maxUsd;
-  const sellUnits = sellUsd / price;
-  const proceeds = sellUnits * price;
-  const cost = sellUnits * pos.avgBuy;
-  const pnl = proceeds - cost;
-  G.cash += proceeds;
-  G.totalRev += proceeds;
-  pos.units -= sellUnits;
-  if (pos.units < 0.000001) pos.units = 0;
-  G.cryptoPnl += pnl;
-  addFeed(pnl >= 0 ? '💰' : '📉', `Sold ${c.sym}: ${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)} PnL`, pnl >= 0 ? 'good' : 'bad');
-  toast(`${pnl >= 0 ? '✅' : '❌'} ${c.sym} sold. PnL: ${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}`, pnl >= 0 ? 'good' : 'bad');
-  inp.value = '';
-  renderCrypto();
-}
-
-function fmtPrice(p) {
-  if (p >= 1000) return '$' + p.toLocaleString(undefined, {maximumFractionDigits:0});
-  if (p >= 1) return '$' + p.toFixed(2);
-  if (p >= 0.01) return '$' + p.toFixed(4);
-  return '$' + p.toFixed(8);
-}
-function fmtUnits(u) {
-  if (u >= 1) return u.toFixed(4);
-  return u.toFixed(8);
-}
-
-function renderCrypto() {
-  const wrap = document.getElementById('crypto-wrap');
-  if (!wrap) return;
-
-  // Total portfolio value
-  let totalInvested = 0, totalValue = 0;
-  COINS.forEach(c => {
-    const pos = G.crypto[c.id];
-    if (pos && pos.units > 0) {
-      totalInvested += pos.units * pos.avgBuy;
-      totalValue += pos.units * G.coinPrices[c.id];
-    }
-  });
-  const totalPnl = totalValue - totalInvested;
-
-  // Build portfolio rows
-  let portRows = '';
-  COINS.forEach(c => {
-    const pos = G.crypto[c.id];
-    if (!pos || pos.units < 0.0000001) return;
-    const val = pos.units * G.coinPrices[c.id];
-    const pnl = val - (pos.units * pos.avgBuy);
-    portRows += `<div class="port-row">
-      <div><div class="pr-name">${c.emoji} ${c.sym}</div><div class="pr-sub">${fmtUnits(pos.units)} units</div></div>
-      <div class="pr-val">
-        <div class="pr-usd">${fmtPrice(val)}</div>
-        <div class="pr-pnl ${pnl>=0?'up':'dn'}">${pnl>=0?'+':''}$${pnl.toFixed(2)}</div>
-      </div>
-    </div>`;
-  });
-
-  // Build coin cards
-  let coinsHtml = COINS.map(c => {
-    const hist = G.coinHistory[c.id] || [G.coinPrices[c.id]];
-    const maxH = Math.max(...hist), minH = Math.min(...hist);
-    const range = maxH - minH || 1;
-    const bars = hist.slice(-20).map(v => {
-      const h = Math.max(4, ((v - minH) / range * 50 + 4).toFixed(0));
-      const isUp = v >= (hist[hist.indexOf(v)-1] || v);
-      return `<div class="cc-bar" style="height:${h}px;background:${isUp?c.color:'#ff4466'};opacity:.7"></div>`;
-    }).join('');
-    const prev = hist.length >= 2 ? hist[hist.length-2] : hist[0];
-    const chgPct = ((G.coinPrices[c.id] - prev) / prev * 100).toFixed(2);
-    const pos = G.crypto[c.id];
-    const holding = pos && pos.units > 0;
-    return `<div class="coin-card">
-      <div class="coin-hdr">
-        <span class="coin-icon">${c.emoji}</span>
-        <div><div class="coin-name">${c.name}</div><div class="coin-sym">${c.sym}</div></div>
-        <div class="coin-price">
-          <div class="coin-usd">${fmtPrice(G.coinPrices[c.id])}</div>
-          <div class="coin-chg ${+chgPct>=0?'up':'dn'}">${+chgPct>=0?'▲':'▼'} ${Math.abs(chgPct)}%</div>
-        </div>
-      </div>
-      <div class="coin-chart">${bars}</div>
-      <div style="font-size:10.5px;color:var(--text3);margin-bottom:10px;line-height:1.5;">${c.desc}</div>
-      ${holding ? `<div style="font-size:10px;color:var(--text2);background:var(--bg3);border-radius:5px;padding:5px 9px;margin-bottom:8px;">
-        Holding: <span style="color:#fff;font-family:var(--mono);font-weight:700;">${fmtUnits(pos.units)} ${c.sym}</span>
-        · Avg: ${fmtPrice(pos.avgBuy)}
-        · PnL: <span style="${(pos.units*(G.coinPrices[c.id]-pos.avgBuy))>=0?'color:var(--g)':'color:var(--r)'}; font-family:var(--mono);font-weight:700;">${(pos.units*(G.coinPrices[c.id]-pos.avgBuy))>=0?'+':''}$${(pos.units*(G.coinPrices[c.id]-pos.avgBuy)).toFixed(2)}</span>
-      </div>` : ''}
-      <div class="coin-actions">
-        <input class="coin-inp" id="ci-${c.id}" type="number" placeholder="USD amount" min="1" step="1">
-        <button class="cbtn buy" onclick="cryptoBuy('${c.id}')">BUY</button>
-        <button class="cbtn sell" onclick="cryptoSell('${c.id}')" ${(!holding)?'disabled':''}>SELL</button>
-      </div>
-    </div>`;
-  }).join('');
-
-  wrap.innerHTML = `<div class="crypto-layout">
-    <div class="crypto-main">
-      <div class="crypto-warn">⚠️ <strong>Crypto is extremely high risk.</strong> Prices are volatile — you can lose your entire investment. Never invest money you cannot afford to lose. This is harder than the dropshipping side.</div>
-      ${coinsHtml}
-    </div>
-    <div class="crypto-sidebar">
-      <div class="crypto-total">
-        <span class="ct-lbl">Portfolio Value</span>
-        <span class="ct-big">${fmtPrice(totalValue)}</span>
-        <span class="ct-pnl" style="color:${totalPnl>=0?'var(--g)':'var(--r)'}">
-          ${totalPnl>=0?'▲ +':'▼ '}$${Math.abs(totalPnl).toFixed(2)} unrealized PnL
-        </span>
-        <div style="font-size:10px;color:var(--text3);margin-top:6px;">Invested: $${totalInvested.toFixed(2)}</div>
-      </div>
-      <div class="portfolio-card">
-        <div class="port-title">Your Positions</div>
-        ${portRows || '<div style="color:var(--text3);font-size:11px;padding:4px 0">No open positions. Buy a coin to start.</div>'}
-      </div>
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px;">
-        <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Tips</div>
-        <div style="font-size:11px;color:var(--text2);line-height:1.7;">
-          💡 Start small — this is <em>real</em> volatility.<br>
-          📉 Markets can crash 50% in days.<br>
-          🐸 PEPE & DOGE are pure gambling.<br>
-          ⏳ BTC/ETH reward patience.<br>
-          💸 Only invest dropship profits, never your core cash.
-        </div>
-      </div>
-    </div>
-  </div>`;
 }
 
 /* ══════════════════════════════════════════════
