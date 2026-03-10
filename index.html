@@ -727,9 +727,9 @@ const SAVE_KEY = 'dropforge_save_';
 
 function getUsers() { try { return JSON.parse(localStorage.getItem(DB_KEY) || '{}'); } catch { return {}; } }
 function saveUsers(u) { localStorage.setItem(DB_KEY, JSON.stringify(u)); }
-function getSession() { try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null'); } catch { return null; } }
-function setSession(u) { sessionStorage.setItem(SESSION_KEY, JSON.stringify(u)); }
-function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
+function getSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch { return null; } }
+function setSession(u) { localStorage.setItem(SESSION_KEY, JSON.stringify(u)); }
+function clearSession() { localStorage.removeItem(SESSION_KEY); }
 
 let currentUser = null;
 
@@ -778,7 +778,10 @@ function doSignup() {
 }
 
 function doGuest() {
-  currentUser = { email: 'guest_' + Date.now(), name: 'Guest Player', guest: true };
+  // Guest gets a stable ID stored in localStorage so refreshing keeps their save
+  let guestId = localStorage.getItem('dropforge_guest_id');
+  if (!guestId) { guestId = 'guest_' + Date.now(); localStorage.setItem('dropforge_guest_id', guestId); }
+  currentUser = { username: guestId, name: 'Guest Player', guest: true };
   setSession(currentUser);
   enterGame();
 }
@@ -797,30 +800,33 @@ function enterGame() {
   document.getElementById('biz-name').textContent = currentUser.name + "'s Store";
   showScreen('s-game');
   const saved = loadGame();
-  if (saved) { G = saved; renderAll(); addFeed('💾','Welcome back! Your progress was restored.','sys'); }
-  else { initGame(); }
-  startAutoDay();
+  if (saved) { G = saved; renderAll(); addFeed('💾', 'Welcome back! Progress restored.', 'sys'); startAutoDay(); }
+  else { initGame(); startAutoDay(); }
 }
 
 function saveGame() {
-  if (!currentUser || currentUser.guest) return;
-  try { localStorage.setItem(SAVE_KEY + currentUser.username, JSON.stringify(G)); } catch {}
+  if (!currentUser) return;
+  try {
+    // Serialize Set as array before saving
+    const toSave = { ...G, upgrades: [...G.upgrades] };
+    localStorage.setItem(SAVE_KEY + currentUser.username, JSON.stringify(toSave));
+  } catch(e) { console.warn('Save failed:', e); }
 }
 
 function loadGame() {
-  if (!currentUser || currentUser.guest) return null;
+  if (!currentUser) return null;
   try {
     const raw = localStorage.getItem(SAVE_KEY + currentUser.username);
     if (!raw) return null;
     const g = JSON.parse(raw);
-    // Restore Set
-    g.upgrades = new Set(g.upgrades || []);
+    g.upgrades = new Set(Array.isArray(g.upgrades) ? g.upgrades : []);
+    if (!g.lastOrdered) g.lastOrdered = {};
     return g;
-  } catch { return null; }
+  } catch(e) { console.warn('Load failed:', e); return null; }
 }
 
-// Auto-save every 10 seconds
-setInterval(saveGame, 10000);
+// Auto-save every 8 seconds
+setInterval(saveGame, 8000);
 
 /* ══════════════════════════════════════════════
    PRODUCTS — 32 items across 7 categories
