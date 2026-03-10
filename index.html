@@ -582,9 +582,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     <div class="tb-ticker"><span class="tb-ticker-inner" id="ticker-txt">Loading market data...</span></div>
     <div class="speed-controls">
       <span class="speed-label">Speed</span>
-      <button class="speed-btn active" id="sp1" onclick="setSpeed(1)">1×</button>
-      <button class="speed-btn" id="sp2" onclick="setSpeed(2)">2×</button>
-      <button class="speed-btn" id="sp3" onclick="setSpeed(5)">5×</button>
+      <button class="speed-btn active" id="sp1" onclick="setSpeed(1)">Slow</button>
+      <button class="speed-btn" id="sp2" onclick="setSpeed(2)">Normal</button>
+      <button class="speed-btn" id="sp3" onclick="setSpeed(5)">Fast</button>
     </div>
     <button class="pause-btn" id="pause-btn" onclick="togglePause()">⏸ Pause</button>
     <div class="tb-sep"></div>
@@ -804,13 +804,13 @@ function enterGame() {
 
 function saveGame() {
   if (!currentUser || currentUser.guest) return;
-  try { localStorage.setItem(SAVE_KEY + currentUser.email, JSON.stringify(G)); } catch {}
+  try { localStorage.setItem(SAVE_KEY + currentUser.username, JSON.stringify(G)); } catch {}
 }
 
 function loadGame() {
   if (!currentUser || currentUser.guest) return null;
   try {
-    const raw = localStorage.getItem(SAVE_KEY + currentUser.email);
+    const raw = localStorage.getItem(SAVE_KEY + currentUser.username);
     if (!raw) return null;
     const g = JSON.parse(raw);
     // Restore Set
@@ -943,8 +943,8 @@ function initGame() {
 ══════════════════════════════════════════════ */
 function startAutoDay() {
   stopAutoDay();
-  const intervals = {1:3000, 2:1500, 5:600};
-  const ms = intervals[autoSpeed] || 3000;
+  const intervals = {1:8000, 2:4000, 5:1800};
+  const ms = intervals[autoSpeed] || 8000;
   autoTimer = setInterval(() => {
     if (!autoPaused) advanceDay();
   }, ms);
@@ -995,14 +995,14 @@ function advanceDay() {
   if (G.shipDelayDays > 0) { G.shipDelayDays--; if (!G.shipDelayDays) G.shipDelay=0; }
   if (G.costDays > 0) { G.costDays--; if (!G.costDays) G.costMult=1; }
 
-  // 3. Update trends
+  // 3. Update trends — slow gradual drift
   PRODUCTS.forEach(p => {
-    const d = (Math.random()-.5)*p.vol*.28;
+    const d = (Math.random()-.5)*p.vol*.08;
     G.trends[p.id] = Math.max(.20, Math.min(3.0, (G.trends[p.id]||1)+d));
   });
 
-  // 4. Random event (20% chance)
-  if (Math.random() < .20) {
+  // 4. Random event (8% chance — rare, meaningful)
+  if (Math.random() < .08) {
     const ev = EVENTS[Math.floor(Math.random()*EVENTS.length)];
     applyEvent(ev);
     G.newsLog.push({...ev, day:G.day});
@@ -1031,7 +1031,9 @@ function advanceDay() {
       if (cp < item.price && G.comp.rep > G.rep*.70) compF = .50 + Math.random()*.30;
     }
     const rawDem = p.demandBase * trend * repF * priceF * adF * reachF * emailF * chanF * compF;
-    const sold = Math.min(item.qty, Math.max(0, Math.round(rawDem*(.4+Math.random()*1.2))));
+    // Slow & realistic: sales trickle in, scaling with reputation over time
+    const slowFactor = 0.18 + (G.rep / 100) * 0.22;
+    const sold = Math.min(item.qty, Math.max(0, Math.round(rawDem * slowFactor * (0.3 + Math.random() * 0.9))));
     if (sold > 0) {
       const rr = getRetRate(p);
       const rets = Math.floor(sold*rr);
@@ -1053,8 +1055,8 @@ function advanceDay() {
   if (dayRev > G.bestDay) G.bestDay = dayRev;
   G.revHistory.push(dayRev);
   if (G.revHistory.length > 30) G.revHistory.shift();
-  if (dayRev > 0.01) addFeed('💰',`Day ${G.day-1} revenue: $${dayRev.toFixed(2)}`,'good');
-  else if (G.inventory.some(i=>i.qty>0)) addFeed('📉',`Day ${G.day-1}: $0 revenue. Adjust pricing or restock.`,'bad');
+  if (dayRev > 0.01 && G.day % 3 === 0) addFeed('💰',`Day ${G.day-1} summary: $${dayRev.toFixed(2)} revenue today.`,'good');
+  else if (dayRev === 0 && G.inventory.some(i=>i.qty>0) && G.day % 4 === 0) addFeed('📉',`Day ${G.day-1}: No sales. Try adjusting your prices.`,'bad');
 
   // 8. Rep decay
   G.rep = Math.max(5, G.rep-.12);
@@ -1082,10 +1084,10 @@ function priceDemand(price, msrp) {
 
 function tickComp() {
   const c = G.comp;
-  c.cash += 6 + Math.random()*20;
-  if (Math.random()<.13) { c.pf = Math.max(.50, c.pf-.04); addFeed('⚔️','CheapDropz99 slashed prices. Watch your sales.','warn'); }
-  if (Math.random()<.07) c.pf = Math.min(.96, c.pf+.06);
-  c.rep += (Math.random()-.45)*2.5;
+  c.cash += 2 + Math.random() * 6;
+  if (Math.random() < .05) { c.pf = Math.max(.55, c.pf-.02); addFeed('⚔️','CheapDropz99 quietly lowered their prices.','warn'); }
+  if (Math.random() < .04) c.pf = Math.min(.96, c.pf+.03);
+  c.rep += (Math.random()-.48) * 1.2;
   c.rep = Math.max(8, Math.min(95, c.rep));
 }
 
@@ -1495,23 +1497,57 @@ function updateTicker() {
   if(t) t.textContent=' · '+msgs.join('  ·  ')+'  ·  ';
 }
 
+// Feed queue — messages drip in one at a time with a delay
+const feedQueue = [];
+let feedBusy = false;
 function addFeed(icon, txt, type='sys') {
-  const feed=document.getElementById('feed'); if(!feed) return;
-  const el=document.createElement('div');
-  el.className=`fi ${type}`;
-  el.innerHTML=`<span class="ficon">${icon}</span><span class="ftxt">${txt}</span><span class="fday">D${G.day}</span>`;
-  feed.insertBefore(el,feed.firstChild);
-  while(feed.children.length>80) feed.removeChild(feed.lastChild);
+  feedQueue.push({icon, txt, type, day: G.day});
+  if (!feedBusy) drainFeed();
+}
+function drainFeed() {
+  if (!feedQueue.length) { feedBusy = false; return; }
+  feedBusy = true;
+  const {icon, txt, type, day} = feedQueue.shift();
+  const feed = document.getElementById('feed'); if (!feed) { drainFeed(); return; }
+  const el = document.createElement('div');
+  el.className = `fi ${type}`;
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(-6px)';
+  el.style.transition = 'opacity 0.6s ease, transform 0.5s ease';
+  el.innerHTML = `<span class="ficon">${icon}</span><span class="ftxt">${txt}</span><span class="fday">D${day}</span>`;
+  feed.insertBefore(el, feed.firstChild);
+  while (feed.children.length > 60) feed.removeChild(feed.lastChild);
+  // Fade in
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    el.style.opacity = '1'; el.style.transform = 'translateY(0)';
+  }));
+  // Next message after a pause (1.8s between feed items)
+  setTimeout(drainFeed, 1800);
 }
 
+// Toast queue — one toast at a time, each stays 5s
+const toastQueue = [];
+let toastBusy = false;
 function toast(msg, type='good') {
-  const root=document.getElementById('toast-root');
-  const el=document.createElement('div');
-  el.className=`toast ${type}`;
-  const icons={good:'✅',bad:'❌',warn:'⚠️',info:'ℹ️'};
-  el.innerHTML=`<span class="ti">${icons[type]||'●'}</span><span class="tt">${msg}</span>`;
+  toastQueue.push({msg, type});
+  if (!toastBusy) drainToast();
+}
+function drainToast() {
+  if (!toastQueue.length) { toastBusy = false; return; }
+  toastBusy = true;
+  const {msg, type} = toastQueue.shift();
+  const root = document.getElementById('toast-root');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icons = {good:'✅', bad:'❌', warn:'⚠️', info:'ℹ️'};
+  el.innerHTML = `<span class="ti">${icons[type]||'●'}</span><span class="tt">${msg}</span>`;
   root.appendChild(el);
-  setTimeout(()=>{ el.style.transition='opacity .3s'; el.style.opacity='0'; setTimeout(()=>el.remove(),350); },3200);
+  // Fade out after 5s, then show next after 1s gap
+  setTimeout(() => {
+    el.style.transition = 'opacity 0.5s';
+    el.style.opacity = '0';
+    setTimeout(() => { el.remove(); setTimeout(drainToast, 800); }, 500);
+  }, 5000);
 }
 
 function buildEndStats() {
