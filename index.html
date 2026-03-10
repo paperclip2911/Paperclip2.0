@@ -931,6 +931,7 @@ function initGame() {
     costMult:1, costDays:0,
     newsLog:[],
     comp:{cash:150, rep:60, pf:0.87},
+    lastOrdered:{},
   };
   PRODUCTS.forEach(p => { G.trends[p.id] = 0.70 + Math.random() * 0.60; });
   renderAll();
@@ -1420,12 +1421,49 @@ function renderRight() {
 /* ══════════════════════════════════════════════
    MODAL
 ══════════════════════════════════════════════ */
+// Max units you can order per product based on cash tier
+function getMaxOrder(p) {
+  const cost = getCost(p);
+  const afford = Math.floor(G.cash / cost); // hard cash limit — never exceed this
+  const supplierCap = G.cash < 50 ? 5 : G.cash < 200 ? 15 : G.cash < 500 ? 30 : 50;
+  return Math.max(0, Math.min(afford, supplierCap)); // cash always wins
+}
+
+// Total stock already held or incoming for a product
+function getCurrentStock(pid) {
+  const it = G.inventory.find(x => x.pid === pid);
+  return it ? (it.qty + (it.pendingQty || 0)) : 0;
+}
+
+// Max stock you're allowed to hold per product (warehouse upgrade removes cap)
+function getStockCap(p) {
+  if (G.upgrades.has('warehouse')) return 999;
+  return G.cash < 100 ? 10 : G.cash < 500 ? 25 : 40;
+}
+
 function openModal(pid, restock=false, idx=-1) {
   const p=byId(pid); if(!p) return;
+
+  // Check stock cap
+  const held = getCurrentStock(pid);
+  const cap = getStockCap(p);
+  if (held >= cap && !G.upgrades.has('warehouse')) {
+    toast(`⚠️ You're already holding max stock for ${p.name}. Sell some first.`, 'warn');
+    return;
+  }
+
+  // Check reorder cooldown (can't reorder same product within 2 days)
+  const lastOrder = G.lastOrdered?.[pid] || 0;
+  if (!restock && G.day - lastOrder < 2 && lastOrder > 0) {
+    toast(`⏳ You just ordered ${p.name}. Wait ${2 - (G.day - lastOrder)} more day(s) before reordering.`, 'warn');
+    return;
+  }
+
   modalData={pid, qty:1, restock, idx};
   document.getElementById('m-title').textContent = restock?`Restock: ${p.name}`:`Source: ${p.name}`;
   document.getElementById('m-sub').textContent = restock?`Add more units to your listing.`:`Review before placing supplier order.`;
   const cost=getCost(p);
+  const maxOrd = Math.min(getMaxOrder(p), cap - held);
   document.getElementById('m-prev').innerHTML=`
     <span style="font-size:34px">${p.emoji}</span>
     <div><div class="mp-name">${p.name}</div><div class="mp-cat">${p.cat} · Ships in ${getShip(p)} days</div></div>
@@ -1434,33 +1472,68 @@ function openModal(pid, restock=false, idx=-1) {
     <div class="mrow"><span class="ml">Suggested Price</span><span class="mr" style="color:var(--y)">$${p.msrp}</span></div>
     <div class="mrow"><span class="ml">Max Margin</span><span class="mr" style="color:var(--g)">${(((p.msrp-cost)/p.msrp)*100).toFixed(0)}%</span></div>
     <div class="mrow"><span class="ml">Est. Demand</span><span class="mr">~${Math.round(p.demandBase*(G.trends[p.id]||1))}/day</span></div>
-    <div class="mrow"><span class="ml">Return Rate</span><span class="mr" style="color:var(--r)">${(getRetRate(p)*100).toFixed(0)}%</span></div>`;
+    <div class="mrow"><span class="ml">Return Rate</span><span class="mr" style="color:var(--r)">${(getRetRate(p)*100).toFixed(0)}%</span></div>
+    <div class="mrow"><span class="ml">Stock Held / Cap</span><span class="mr" style="color:${held>=cap*0.8?'var(--y)':'var(--text)'}">${held} / ${cap} units</span></div>
+    <div class="mrow"><span class="ml">Max Order Now</span><span class="mr">${maxOrd} units</span></div>`;
   calcModal();
   document.getElementById('buy-modal').classList.add('open');
 }
 function closeModal(){ document.getElementById('buy-modal').classList.remove('open'); }
 function qd(d) {
   const p=byId(modalData.pid); if(!p) return;
-  const mx=Math.max(1,Math.floor(G.cash/getCost(p)));
-  modalData.qty=Math.max(1,Math.min(mx,modalData.qty+d));
+  const held = getCurrentStock(modalData.pid);
+  const cap = getStockCap(p);
+  const mx = Math.min(getMaxOrder(p), cap - held);
+  modalData.qty=Math.max(1,Math.min(mx, modalData.qty+d));
   document.getElementById('m-qty').textContent=modalData.qty;
   calcModal();
 }
 function calcModal() {
   const p=byId(modalData.pid); if(!p) return;
-  const cost=getCost(p), total=cost*modalData.qty, rem=G.cash-total, pp=p.msrp-cost;
-  document.getElementById('m-total').textContent='$'+total.toFixed(2);
-  document.getElementById('m-remain').textContent='$'+rem.toFixed(2);
-  document.getElementById('m-remain').style.color=rem<0?'var(--r)':rem<5?'var(--y)':'var(--text)';
-  document.getElementById('m-profit').textContent=(pp>=0?'+':'')+'$'+pp.toFixed(2)+'/unit';
-  document.getElementById('m-profit').style.color=pp>=0?'var(--g)':'var(--r)';
-  document.getElementById('m-confirm').disabled=rem<0||modalData.qty<1;
+  const cost=getCost(p);
+  const held = getCurrentStock(modalData.pid);
+  const cap = getStockCap(p);
+  const maxOrd = Math.min(getMaxOrder(p), Math.max(0, cap - held));
+  // Always clamp qty to what's actually affordable & allowed
+  modalData.qty = Math.max(1, Math.min(modalData.qty, maxOrd));
+  document.getElementById('m-qty').textContent = modalData.qty;
+  const total = parseFloat((cost * modalData.qty).toFixed(2));
+  const rem = parseFloat((G.cash - total).toFixed(2));
+  const pp = p.msrp - cost;
+  document.getElementById('m-total').textContent = '$' + total.toFixed(2);
+  document.getElementById('m-remain').textContent = '$' + rem.toFixed(2);
+  document.getElementById('m-remain').style.color = rem < 0 ? 'var(--r)' : rem < 5 ? 'var(--y)' : 'var(--text)';
+  document.getElementById('m-profit').textContent = (pp>=0?'+':'') + '$' + pp.toFixed(2) + '/unit';
+  document.getElementById('m-profit').style.color = pp >= 0 ? 'var(--g)' : 'var(--r)';
+  document.getElementById('m-confirm').disabled = rem < 0 || modalData.qty < 1 || maxOrd < 1 || total > G.cash;
 }
 function confirmOrder() {
   const p=byId(modalData.pid); if(!p) return;
-  const cost=getCost(p), total=cost*modalData.qty;
-  if(total>G.cash){ toast('Not enough cash.','bad'); return; }
+  const cost=getCost(p);
+  const total = parseFloat((cost * modalData.qty).toFixed(2));
+
+  // Hard cash guard — never allow spending more than you have
+  if (total > G.cash) {
+    toast('❌ Not enough cash for this order.', 'bad');
+    closeModal(); return;
+  }
+  // Clamp qty down if somehow modal slipped past
+  if (modalData.qty > Math.floor(G.cash / cost)) {
+    modalData.qty = Math.floor(G.cash / cost);
+    if (modalData.qty < 1) { toast('❌ Not enough cash.', 'bad'); closeModal(); return; }
+  }
+
+  // Final stock cap check
+  const held = getCurrentStock(p.id);
+  const cap = getStockCap(p);
+  if (held + modalData.qty > cap && !G.upgrades.has('warehouse')) {
+    toast(`⚠️ Order exceeds your storage cap of ${cap} units.`, 'warn'); return;
+  }
+
   G.cash-=total; G.totalExp+=total; G.totalOrd++;
+  if (!G.lastOrdered) G.lastOrdered = {};
+  G.lastOrdered[p.id] = G.day;
+
   const ship=getShip(p);
   const sugPrice=parseFloat((p.msrp*(0.85+Math.random()*.25)).toFixed(2));
   if(modalData.restock&&modalData.idx>=0) {
