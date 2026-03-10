@@ -3,680 +3,1763 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🍄 Mycelium Empire</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<title>DropForge — Business Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+/* ═══════════════════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════════════════ */
 :root {
-  --bg: #0d0a08; --panel: rgba(26,18,8,0.95); --panel2: rgba(34,24,10,0.9);
-  --border: #3d2a10; --border2: #5a3f18; --spore: #c8ff00; --spore2: #88bb00;
-  --glow: #00ffaa; --glow2: #00cc88; --amber: #ffaa22; --amber2: #ff7700;
-  --purple: #cc44ff; --text: #e8d5a0; --text2: #9a7a44; --red: #ff4444;
+  --bg:        #07090d;
+  --bg1:       #0c0f16;
+  --bg2:       #111520;
+  --bg3:       #171d2e;
+  --bg4:       #1d2438;
+  --border:    rgba(255,255,255,0.06);
+  --border2:   rgba(255,255,255,0.10);
+  --text:      #e8edf8;
+  --text2:     #8b95b0;
+  --text3:     #515c78;
+  --green:     #00d68f;
+  --green2:    #00a86b;
+  --red:       #ff4d6a;
+  --red2:      #cc3352;
+  --yellow:    #ffc542;
+  --blue:      #3d9eff;
+  --purple:    #9b6dff;
+  --orange:    #ff7c3e;
+  --font:      'Outfit', sans-serif;
+  --mono:      'JetBrains Mono', monospace;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-html, body { width:100%; min-height:100vh; background:var(--bg); color:var(--text); font-family:'Crimson Text',Georgia,serif; overflow-x:hidden; cursor:default; }
-body::before { content:''; position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse at 20% 80%,rgba(0,255,100,0.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(200,100,0,0.05) 0%,transparent 50%),radial-gradient(ellipse at 50% 50%,rgba(0,200,100,0.03) 0%,transparent 70%); pointer-events:none !important; }
-canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !important; opacity:0.4; }
-.wrap { position:relative; z-index:1; display:grid; grid-template-columns:260px 1fr 300px; min-height:100vh; }
-@media(max-width:960px){ .wrap{grid-template-columns:1fr;} .sidebar-left,.sidebar-right{display:none;} }
-.topbar { grid-column:1/-1; background:linear-gradient(180deg,#0a0805 0%,rgba(10,8,5,0.97) 100%); border-bottom:2px solid var(--border2); padding:12px 24px; display:flex; align-items:center; gap:20px; position:sticky; top:0; z-index:200; box-shadow:0 4px 30px rgba(0,0,0,0.8); }
-.game-logo { font-family:'Cinzel',serif; font-size:20px; font-weight:900; color:var(--spore); text-shadow:0 0 20px rgba(200,255,0,0.5); white-space:nowrap; letter-spacing:1px; }
-.top-stat { background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; padding:5px 14px; text-align:center; }
-.top-stat .lbl { font-size:10px; color:var(--text2); letter-spacing:1px; text-transform:uppercase; display:block; }
-.top-stat .val { font-family:'Cinzel',serif; font-size:14px; color:var(--spore); }
-.ascend-btn { margin-left:auto; padding:8px 20px; border-radius:6px; border:2px solid var(--purple); background:rgba(136,0,204,0.12); color:var(--purple); font-family:'Cinzel',serif; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; white-space:nowrap; letter-spacing:1px; }
-.ascend-btn:hover:not(:disabled) { background:rgba(136,0,204,0.3); }
-.ascend-btn:disabled { opacity:0.3; cursor:not-allowed; }
-.open-shop-btn { padding:7px 16px; border-radius:6px; border:2px solid var(--amber2); background:rgba(255,120,0,0.1); color:var(--amber); font-family:'Cinzel',serif; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s; white-space:nowrap; letter-spacing:1px; }
-.open-shop-btn:hover { background:rgba(255,120,0,0.25); }
-.shop-cd { font-size:9px; display:block; color:var(--text2); margin-top:1px; }
-.boosts-bar { grid-column:1/-1; background:rgba(10,8,5,0.85); border-bottom:1px solid var(--border); padding:5px 20px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; min-height:34px; }
-.boost-chip { background:rgba(0,255,170,0.08); border:1px solid var(--glow2); border-radius:20px; padding:3px 10px; font-size:11px; color:var(--glow); display:flex; align-items:center; gap:5px; font-family:'Cinzel',serif; }
-.boost-chip-timer { color:var(--text2); font-size:10px; }
-.boosts-label { font-size:10px; color:var(--text2); letter-spacing:1px; text-transform:uppercase; margin-right:4px; }
-.sidebar-left { border-right:1px solid var(--border); padding:16px; overflow-y:auto; background:linear-gradient(180deg,rgba(20,14,5,0.8) 0%,rgba(16,11,4,0.9) 100%); }
-.main { display:flex; flex-direction:column; align-items:center; padding:24px 20px 80px; overflow-y:auto; gap:18px; }
-.sidebar-right { border-left:1px solid var(--border); padding:16px; overflow-y:auto; background:linear-gradient(180deg,rgba(20,14,5,0.8) 0%,rgba(16,11,4,0.9) 100%); }
-.sec-head { font-family:'Cinzel',serif; font-size:11px; letter-spacing:2px; color:var(--text2); text-transform:uppercase; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
-.shroom-stage { position:relative; width:220px; height:220px; cursor:pointer; user-select:none; }
-.shroom-ground { position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:180px; height:30px; background:radial-gradient(ellipse,#3a2508 0%,transparent 70%); border-radius:50%; }
-.shroom-stem { position:absolute; bottom:30px; left:50%; transform:translateX(-50%); width:28px; height:90px; background:linear-gradient(180deg,#d4c080 0%,#a89050 50%,#8a7040 100%); border-radius:14px 14px 8px 8px; box-shadow:inset -4px 0 8px rgba(0,0,0,0.3),inset 2px 0 6px rgba(255,255,255,0.1); }
-.shroom-stem::after { content:''; position:absolute; top:40%; left:0; right:0; height:4px; background:rgba(255,255,255,0.15); border-radius:2px; }
-.shroom-cap { position:absolute; bottom:110px; left:50%; transform:translateX(-50%); width:160px; height:100px; border-radius:80px 80px 10px 10px; background:radial-gradient(ellipse at 35% 35%,#ff4422,#cc1100 50%,#881100); box-shadow:0 0 30px rgba(255,68,0,0.4),0 0 60px rgba(255,68,0,0.15),inset -15px -10px 30px rgba(0,0,0,0.4),inset 8px 6px 20px rgba(255,150,100,0.2); transition:transform 0.05s,box-shadow 0.08s; }
-.shroom-cap:hover { box-shadow:0 0 50px rgba(255,68,0,0.6),inset -15px -10px 30px rgba(0,0,0,0.4); }
-.spot { position:absolute; background:rgba(255,255,255,0.7); border-radius:50%; box-shadow:0 0 6px rgba(255,255,255,0.5); }
-.shroom-gills { position:absolute; bottom:108px; left:50%; transform:translateX(-50%); width:160px; height:18px; background:linear-gradient(180deg,#cc9966 0%,#aa7744 100%); border-radius:0 0 8px 8px; overflow:hidden; }
-.gill-line { position:absolute; width:1px; height:100%; background:rgba(0,0,0,0.3); top:0; }
-.spore-particle { position:absolute; width:4px; height:4px; border-radius:50%; background:var(--spore); box-shadow:0 0 6px var(--spore); pointer-events:none; animation:sporeFloat 3s ease-in infinite; opacity:0; }
-@keyframes sporeFloat { 0%{opacity:0;transform:translateY(0) scale(1);} 20%{opacity:0.8;} 100%{opacity:0;transform:translateY(-120px) translateX(var(--drift)) scale(0.3);} }
-.res-panel { background:var(--panel); border:1px solid var(--border2); border-radius:12px; padding:20px 24px; text-align:center; width:100%; max-width:400px; box-shadow:0 0 40px rgba(0,0,0,0.5); }
-.spore-count { font-family:'Cinzel',serif; font-size:42px; font-weight:900; color:var(--spore); text-shadow:0 0 30px rgba(200,255,0,0.5); line-height:1; }
-.spore-label { font-size:14px; color:var(--text2); margin-top:4px; font-style:italic; }
-.auto-rate { font-size:15px; color:var(--glow); margin-top:10px; font-weight:600; }
-.click-rate { font-size:12px; color:var(--text2); margin-top:3px; }
-.stage-panel { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px 20px; width:100%; max-width:400px; }
-.stage-name { font-family:'Cinzel',serif; font-size:16px; color:var(--amber); margin-bottom:6px; }
-.stage-bar-bg { height:8px; background:rgba(255,255,255,0.06); border-radius:4px; overflow:hidden; margin-bottom:5px; }
-.stage-bar-fill { height:100%; background:linear-gradient(90deg,var(--spore2),var(--spore)); border-radius:4px; transition:width 0.5s; box-shadow:0 0 8px rgba(200,255,0,0.4); }
-.stage-desc { font-size:12px; color:var(--text2); font-style:italic; }
-.log-panel { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px; width:100%; max-width:400px; }
-.upg-card { background:var(--panel2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:8px; cursor:pointer; transition:all 0.15s; position:relative; overflow:hidden; }
-.upg-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--spore); opacity:0; transition:opacity 0.2s; }
-.upg-card.affordable::before { opacity:1; }
-.upg-card.affordable { border-color:var(--border2); }
-.upg-card:hover:not(.bought) { transform:translateX(4px); border-color:var(--amber); }
-.upg-card.bought { opacity:0.45; cursor:default; }
-.upg-card.bought::after { content:'✓'; position:absolute; right:10px; top:50%; transform:translateY(-50%); color:var(--glow); font-size:16px; font-weight:900; }
-.upg-icon { font-size:20px; float:left; margin-right:8px; line-height:1.2; }
-.upg-name { font-family:'Cinzel',serif; font-size:12px; color:var(--text); }
-.upg-desc { font-size:11px; color:var(--text2); margin-top:2px; font-style:italic; }
-.upg-cost { font-size:11px; color:var(--amber); margin-top:3px; font-family:'Cinzel',serif; }
-.bld-card { background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px; cursor:pointer; transition:all 0.15s; }
-.bld-card:hover:not(.locked) { border-color:var(--glow2); background:rgba(0,200,100,0.04); }
-.bld-card.affordable { border-color:var(--glow); box-shadow:0 0 15px rgba(0,255,170,0.08); }
-.bld-card.locked { opacity:0.3; cursor:not-allowed; filter:saturate(0); }
-.bld-top { display:flex; align-items:center; gap:10px; }
-.bld-icon { font-size:26px; flex-shrink:0; }
-.bld-info { flex:1; }
-.bld-name { font-family:'Cinzel',serif; font-size:13px; color:var(--text); }
-.bld-desc { font-size:11px; color:var(--text2); margin-top:2px; font-style:italic; }
-.bld-bottom { display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
-.bld-count { font-family:'Cinzel',serif; font-size:24px; font-weight:900; color:var(--glow); }
-.bld-cost { font-family:'Cinzel',serif; font-size:11px; color:var(--amber); }
-.bld-cps { font-size:11px; color:var(--glow2); }
-.bld-prog { height:2px; background:rgba(0,255,170,0.1); border-radius:1px; margin-top:6px; overflow:hidden; }
-.bld-prog-fill { height:100%; background:var(--glow2); border-radius:1px; transition:width 0.4s; }
-.ach-card { display:flex; gap:8px; align-items:flex-start; background:var(--panel2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; margin-bottom:6px; transition:all 0.3s; }
-.ach-card.unlocked { border-color:var(--amber2); background:rgba(255,150,0,0.05); }
-.ach-card.locked { opacity:0.3; filter:saturate(0.2); }
-.ach-icon { font-size:18px; flex-shrink:0; }
-.ach-name { font-family:'Cinzel',serif; font-size:11px; color:var(--text); }
-.ach-desc { font-size:10px; color:var(--text2); font-style:italic; }
-@keyframes floatUp { 0%{opacity:1;transform:translateY(0) scale(1);} 70%{opacity:1;transform:translateY(-70px) scale(1.1);} 100%{opacity:0;transform:translateY(-100px) scale(0.8);} }
-@keyframes eventSlide { from{opacity:0;transform:translateX(-50%) translateY(-20px) scale(0.95)} to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)} }
-.gold-shroom { position:fixed; font-size:44px; cursor:pointer; z-index:500; animation:shroomBounce 0.6s ease-in-out infinite alternate; filter:drop-shadow(0 0 20px #ffaa22) drop-shadow(0 0 8px #ffff00); user-select:none; }
-@keyframes shroomBounce { from{transform:scale(1) rotate(-8deg);} to{transform:scale(1.2) rotate(8deg);} }
-.notif { position:fixed; bottom:24px; right:24px; background:var(--panel); border:2px solid var(--amber2); border-radius:10px; padding:12px 18px; font-size:13px; font-weight:600; z-index:1000; max-width:280px; animation:notifSlide 0.4s ease; box-shadow:0 0 30px rgba(255,150,0,0.2); color:var(--text); }
-@keyframes notifSlide { from{transform:translateX(110%)} to{transform:translateX(0)} }
-.ascend-panel { background:rgba(136,0,204,0.06); border:1px solid rgba(136,0,204,0.25); border-radius:10px; padding:12px; margin-top:10px; font-size:11px; color:var(--text2); font-style:italic; line-height:1.6; }
-.ascend-panel strong { color:var(--purple); font-style:normal; }
-.ticker { position:fixed; bottom:0; left:0; right:0; background:rgba(10,8,5,0.96); border-top:1px solid var(--border); padding:6px 20px; font-size:12px; color:var(--text2); font-style:italic; z-index:100; white-space:nowrap; overflow:hidden; }
-.ticker-inner { display:inline-block; animation:tickerScroll 40s linear infinite; }
-@keyframes tickerScroll { from{transform:translateX(100vw)} to{transform:translateX(-100%)} }
-::-webkit-scrollbar { width:4px; }
-::-webkit-scrollbar-track { background:transparent; }
-::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
-.shop-overlay { position:fixed; inset:0; z-index:800; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; animation:fadeIn 0.2s ease; }
-@keyframes fadeIn { from{opacity:0} to{opacity:1} }
-.shop-box { background:linear-gradient(180deg,#1a1008 0%,#0f0a04 100%); border:2px solid var(--amber2); border-radius:16px; padding:24px 28px; width:520px; max-width:95vw; box-shadow:0 0 60px rgba(255,120,0,0.25); position:relative; }
-.shop-title { font-family:'Cinzel',serif; font-size:20px; font-weight:900; color:var(--amber); text-align:center; margin-bottom:4px; text-shadow:0 0 20px rgba(255,170,0,0.5); }
-.shop-timer { text-align:center; font-size:12px; color:var(--text2); font-style:italic; margin-bottom:16px; }
-.shop-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.shop-item { background:rgba(255,255,255,0.03); border:1px solid var(--border2); border-radius:10px; padding:12px; cursor:pointer; transition:all 0.15s; position:relative; overflow:hidden; }
-.shop-item:hover:not(.sold) { border-color:var(--amber); background:rgba(255,170,0,0.06); transform:translateY(-2px); }
-.shop-item.sold { opacity:0.4; cursor:default; }
-.shop-item.sold::after { content:'VENDU'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-15deg); font-family:'Cinzel',serif; font-size:22px; font-weight:900; color:var(--red); opacity:0.8; }
-.shop-item-rarity { font-size:9px; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
-.shop-item-icon { font-size:28px; margin-bottom:6px; }
-.shop-item-name { font-family:'Cinzel',serif; font-size:13px; color:var(--text); margin-bottom:3px; }
-.shop-item-desc { font-size:11px; color:var(--text2); font-style:italic; margin-bottom:8px; }
-.shop-item-cost { font-family:'Cinzel',serif; font-size:12px; }
-.shop-close { position:absolute; top:14px; right:16px; background:none; border:none; color:var(--text2); font-size:22px; cursor:pointer; line-height:1; }
-.shop-close:hover { color:var(--text); }
-.shop-btn { display:block; width:100%; margin-top:14px; padding:10px; border-radius:8px; border:2px solid var(--amber2); background:rgba(255,120,0,0.1); color:var(--amber); font-family:'Cinzel',serif; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s; }
-.shop-btn:hover { background:rgba(255,120,0,0.25); }
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { font-size:13px; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCREENS
+═══════════════════════════════════════════════════════════ */
+.screen { display:none !important; }
+.screen.show { display:flex !important; }
+
+/* ═══════════════════════════════════════════════════════════
+   INTRO
+═══════════════════════════════════════════════════════════ */
+#screen-intro {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0,214,143,0.12) 0%, transparent 70%),
+              radial-gradient(ellipse 50% 40% at 80% 80%, rgba(61,158,255,0.07) 0%, transparent 60%),
+              var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+#screen-intro::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+.intro-inner { position:relative; z-index:1; text-align:center; max-width:600px; padding:40px 24px; }
+
+.intro-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(0,214,143,0.1); border: 1px solid rgba(0,214,143,0.25);
+  color: var(--green); font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase; padding: 5px 14px; border-radius: 20px; margin-bottom: 28px;
+}
+.intro-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--green); animation: blink 1.4s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+.intro-title {
+  font-size: clamp(52px, 8vw, 88px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -2px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.intro-title span { color: var(--green); }
+
+.intro-tagline {
+  font-size: 15px; color: var(--text2); margin-bottom: 40px; line-height: 1.6; font-weight: 400;
+}
+.intro-tagline strong { color: var(--text); font-weight: 600; }
+
+.intro-kpis {
+  display: flex; gap: 12px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap;
+}
+.kpi-card {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 16px 24px; min-width: 120px;
+}
+.kpi-card .kv { font-family: var(--mono); font-size: 26px; font-weight: 700; color: var(--yellow); display:block; }
+.kpi-card .kl { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+.btn-start {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--green); color: #000;
+  font-family: var(--font); font-size: 15px; font-weight: 700; letter-spacing: .3px;
+  border: none; border-radius: 8px; padding: 14px 40px; cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  box-shadow: 0 0 0 0 rgba(0,214,143,0);
+}
+.btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,214,143,0.35); }
+.btn-start:active { transform: translateY(0); }
+
+.intro-warning {
+  margin-top: 24px; font-size: 11.5px; color: var(--text3);
+  font-family: var(--mono); line-height: 1.7;
+}
+.intro-warning span { color: var(--red); }
+
+/* ═══════════════════════════════════════════════════════════
+   MAIN GAME LAYOUT — HORIZONTAL
+═══════════════════════════════════════════════════════════ */
+#screen-game {
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ─── TOPBAR ─── */
+#topbar {
+  height: 48px; min-height: 48px;
+  background: var(--bg1);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 16px; gap: 16px;
+  z-index: 50;
+}
+.tb-logo { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -.3px; display:flex; align-items:center; gap:7px; }
+.tb-logo-dot { width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green); animation: blink 1.4s ease infinite; }
+
+.tb-sep { width:1px; height:22px; background:var(--border2); }
+
+.tb-kpi { display:flex; flex-direction:column; }
+.tb-kpi .tv { font-family: var(--mono); font-size: 14px; font-weight: 700; line-height: 1; }
+.tb-kpi .tl { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); margin-top: 2px; }
+.tb-kpi.money .tv { color: var(--green); }
+.tb-kpi.net .tv { color: var(--yellow); }
+.tb-kpi.rep .tv { color: var(--blue); }
+.tb-kpi.day .tv { color: var(--text); }
+
+.tb-spacer { flex: 1; }
+
+.tb-event-ticker {
+  flex: 1; overflow: hidden; font-size: 11px; font-family: var(--mono);
+  color: var(--text3); white-space: nowrap;
+}
+.tb-event-ticker span { display: inline-block; animation: tickerScroll 30s linear infinite; }
+@keyframes tickerScroll { 0%{transform:translateX(100%)} 100%{transform:translateX(-100%)} }
+
+.btn-nextday {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--green); color: #000;
+  font-family: var(--font); font-size: 12px; font-weight: 700; letter-spacing: .3px;
+  border: none; border-radius: 6px; padding: 8px 18px; cursor: pointer;
+  transition: all .15s; white-space: nowrap;
+}
+.btn-nextday:hover { background: #00f0a0; box-shadow: 0 0 20px rgba(0,214,143,0.3); }
+.btn-nextday:active { transform: scale(.97); }
+.btn-nextday:disabled { opacity:.4; cursor:default; }
+
+.day-progress-wrap {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; color: var(--text3); font-family: var(--mono);
+}
+.day-progress-bar {
+  width: 90px; height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden;
+}
+.day-progress-fill {
+  height: 100%; background: var(--green); border-radius: 2px; transition: width .4s;
+}
+
+/* ─── MAIN CONTENT (HORIZONTAL 3-PANEL) ─── */
+#game-body {
+  display: grid;
+  grid-template-columns: 230px 1fr 270px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ─── LEFT PANEL: NAV + STATS ─── */
+#left-panel {
+  background: var(--bg1);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow-y: auto; overflow-x: hidden;
+}
+#left-panel::-webkit-scrollbar { width: 3px; }
+#left-panel::-webkit-scrollbar-thumb { background: var(--bg4); border-radius:2px; }
+
+.lp-section { padding: 12px; border-bottom: 1px solid var(--border); }
+.lp-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; }
+
+/* Business summary */
+.business-card {
+  background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; padding: 12px;
+}
+.bc-name { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.bc-row { display:flex; justify-content:space-between; align-items:center; padding: 3px 0; }
+.bc-row .bcl { font-size: 11px; color: var(--text3); }
+.bc-row .bcv { font-family: var(--mono); font-size: 12px; font-weight: 600; }
+.bc-bar { height: 3px; background: var(--bg4); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+.bc-bar-fill { height: 100%; border-radius: 2px; transition: width .5s; }
+
+/* Nav */
+.nav-btn {
+  display: flex; align-items: center; gap: 9px;
+  width: 100%; padding: 9px 12px; border: none; border-radius: 6px;
+  background: transparent; color: var(--text2);
+  font-family: var(--font); font-size: 12.5px; font-weight: 500;
+  cursor: pointer; transition: all .12s; margin-bottom: 2px; text-align: left;
+}
+.nav-btn:hover { background: var(--bg3); color: var(--text); }
+.nav-btn.active { background: rgba(0,214,143,.1); color: var(--green); }
+.nav-btn .nb-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+.nav-btn .nb-badge {
+  margin-left: auto; background: var(--red); color: #fff;
+  font-size: 10px; font-weight: 700; border-radius: 10px;
+  padding: 1px 6px; font-family: var(--mono);
+}
+
+/* Metrics row */
+.metric-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px 12px;
+}
+.metric-box {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+  padding: 8px 10px;
+}
+.metric-box .mv { font-family: var(--mono); font-size: 15px; font-weight: 700; display: block; }
+.metric-box .ml { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-top: 1px; }
+
+/* Competitor widget */
+.competitor-widget {
+  margin: 0 12px 12px;
+  background: linear-gradient(135deg, rgba(255,77,106,.05), rgba(255,77,106,.02));
+  border: 1px solid rgba(255,77,106,.2); border-radius: 8px; padding: 11px;
+}
+.cw-title { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--red); margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+.cw-row { display:flex; justify-content:space-between; padding: 2.5px 0; font-size: 11px; }
+.cw-row .cl { color: var(--text3); }
+.cw-row .cv { font-family: var(--mono); font-weight: 600; }
+
+/* ─── CENTER PANEL: TABS ─── */
+#center-panel {
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.tab-bar {
+  display: flex; align-items: center;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg1);
+  padding: 0 16px; gap: 0;
+  flex-shrink: 0;
+}
+.tab-btn {
+  padding: 12px 16px; border: none; background: none;
+  color: var(--text3); font-family: var(--font); font-size: 12px; font-weight: 600;
+  cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .12s, border-color .12s; white-space: nowrap;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
+
+.tab-content { display: none; flex: 1; overflow-y: auto; padding: 16px; }
+.tab-content::-webkit-scrollbar { width: 4px; }
+.tab-content::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+.tab-content.active { display: block; }
+
+/* ─── RIGHT PANEL: LIVE FEED ─── */
+#right-panel {
+  background: var(--bg1);
+  border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.rp-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text3);
+  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+}
+.rp-header::before { content:''; width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.4s ease infinite; }
+
+#live-feed {
+  flex: 1; overflow-y: auto; padding: 6px 10px;
+  display: flex; flex-direction: column; gap: 1px;
+}
+#live-feed::-webkit-scrollbar { width: 3px; }
+#live-feed::-webkit-scrollbar-thumb { background: var(--bg4); }
+
+.feed-item {
+  display: flex; gap: 8px; align-items: flex-start;
+  padding: 6px 8px; border-radius: 5px;
+  font-size: 11px; line-height: 1.5;
+  animation: feedIn .2s ease;
+  border: 1px solid transparent;
+}
+@keyframes feedIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+.feed-item .fi-icon { flex-shrink: 0; font-size: 13px; margin-top: 1px; }
+.feed-item .fi-text { color: var(--text2); flex: 1; }
+.feed-item .fi-text strong { font-weight: 600; }
+.feed-item .fi-time { font-family: var(--mono); font-size: 9px; color: var(--text3); flex-shrink: 0; margin-top: 2px; }
+.feed-item.good { background: rgba(0,214,143,.04); border-color: rgba(0,214,143,.08); }
+.feed-item.good .fi-text { color: rgba(0,214,143,.85); }
+.feed-item.bad { background: rgba(255,77,106,.04); border-color: rgba(255,77,106,.08); }
+.feed-item.bad .fi-text { color: rgba(255,77,106,.85); }
+.feed-item.warn { background: rgba(255,197,66,.04); border-color: rgba(255,197,66,.08); }
+.feed-item.warn .fi-text { color: rgba(255,197,66,.85); }
+.feed-item.system { background: rgba(61,158,255,.04); border-color: rgba(61,158,255,.08); }
+.feed-item.system .fi-text { color: rgba(61,158,255,.85); }
+
+.rp-section { border-top: 1px solid var(--border); padding: 10px; flex-shrink: 0; }
+.rp-section-title { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; }
+
+/* Market pulse mini chart */
+.sparkline-row { display: flex; gap: 4px; align-items: flex-end; height: 28px; margin-bottom: 4px; }
+.spark { flex: 1; border-radius: 2px 2px 0 0; min-height: 2px; background: var(--green); opacity: .5; transition: height .3s; }
+
+/* ═══════════════════════════════════════════════════════════
+   PRODUCT CATALOG
+═══════════════════════════════════════════════════════════ */
+.catalog-toolbar {
+  display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap;
+}
+.catalog-search {
+  flex: 1; min-width: 180px;
+  background: var(--bg2); border: 1px solid var(--border2); border-radius: 6px;
+  padding: 7px 12px; color: var(--text); font-family: var(--font); font-size: 12px;
+  outline: none; transition: border-color .15s;
+}
+.catalog-search:focus { border-color: var(--green); }
+.catalog-search::placeholder { color: var(--text3); }
+.filter-btn {
+  background: var(--bg2); border: 1px solid var(--border2); border-radius: 6px;
+  padding: 7px 12px; color: var(--text2); font-family: var(--font); font-size: 11.5px;
+  cursor: pointer; transition: all .12s; white-space: nowrap;
+}
+.filter-btn:hover, .filter-btn.active { border-color: var(--green); color: var(--green); background: rgba(0,214,143,.05); }
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.product-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all .18s;
+  position: relative;
+  overflow: hidden;
+}
+.product-card::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--green), var(--blue));
+  transform: scaleX(0); transform-origin: left; transition: transform .2s;
+}
+.product-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+.product-card:hover::after { transform: scaleX(1); }
+.product-card.unaffordable { opacity: .4; cursor: not-allowed; }
+.product-card.unaffordable:hover { transform: none; box-shadow: none; }
+
+.pc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.pc-emoji { font-size: 28px; line-height: 1; }
+.pc-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 7px; border-radius: 4px;
+  font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+}
+.badge.hot { background: rgba(255,124,62,.15); color: var(--orange); border: 1px solid rgba(255,124,62,.2); }
+.badge.trending { background: rgba(0,214,143,.12); color: var(--green); border: 1px solid rgba(0,214,143,.2); }
+.badge.cold { background: rgba(139,149,176,.08); color: var(--text3); border: 1px solid rgba(139,149,176,.12); }
+.badge.risky { background: rgba(255,77,106,.12); color: var(--red); border: 1px solid rgba(255,77,106,.18); }
+.badge.new { background: rgba(61,158,255,.12); color: var(--blue); border: 1px solid rgba(61,158,255,.18); }
+.badge.saturated { background: rgba(155,109,255,.1); color: var(--purple); border: 1px solid rgba(155,109,255,.15); }
+
+.pc-name { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+.pc-cat { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.pc-desc { font-size: 11px; color: var(--text2); line-height: 1.5; margin-bottom: 10px; }
+
+.pc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.pc-stat { background: var(--bg3); border-radius: 5px; padding: 6px 8px; }
+.pc-stat .ps-val { font-family: var(--mono); font-size: 12px; font-weight: 700; display: block; }
+.pc-stat .ps-lbl { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .8px; }
+
+.pc-trend { margin-top: 8px; }
+.pc-trend-bar { height: 3px; background: var(--bg4); border-radius: 2px; overflow: hidden; margin-top: 4px; }
+.pc-trend-fill { height: 100%; border-radius: 2px; transition: width .5s; }
+
+/* ═══════════════════════════════════════════════════════════
+   STORE / INVENTORY
+═══════════════════════════════════════════════════════════ */
+.store-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 200px; color: var(--text3); text-align: center; gap: 10px;
+}
+.store-empty .se-icon { font-size: 40px; }
+.store-empty .se-text { font-size: 13px; }
+
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+
+.listing-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px; position: relative;
+}
+.listing-card.has-pending { border-left: 3px solid var(--yellow); }
+.listing-card.out-of-stock { border-left: 3px solid var(--red); opacity: .7; }
+.listing-card.healthy { border-left: 3px solid var(--green); }
+
+.lc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.lc-name { font-size: 13.5px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px; }
+.lc-stock { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--green); text-align: right; line-height: 1; }
+.lc-stock-lbl { font-size: 9px; color: var(--text3); text-transform: uppercase; text-align: right; }
+
+.lc-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
+.lc-stat { background: var(--bg3); border-radius: 5px; padding: 6px 8px; }
+.lc-stat .lsv { font-family: var(--mono); font-size: 12px; font-weight: 700; display: block; }
+.lc-stat .lsl { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; }
+
+/* Mini sparkline */
+.mini-chart { display: flex; align-items: flex-end; gap: 2px; height: 24px; margin-bottom: 10px; }
+.mc-bar { flex: 1; border-radius: 1px 1px 0 0; background: var(--blue); opacity: .5; min-height: 1px; }
+
+/* Price control */
+.price-row {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px;
+  padding: 6px 10px; margin-bottom: 8px;
+}
+.price-row label { font-size: 11px; color: var(--text3); flex: 1; }
+.price-input {
+  background: transparent; border: none; color: var(--yellow);
+  font-family: var(--mono); font-size: 15px; font-weight: 700;
+  width: 90px; text-align: right; outline: none;
+}
+.price-input::-webkit-inner-spin-button { opacity: 0; }
+.price-margin { font-size: 10px; font-family: var(--mono); font-weight: 700; }
+
+.lc-actions { display: flex; gap: 6px; }
+.btn-sm {
+  flex: 1; background: var(--bg3); border: 1px solid var(--border2);
+  color: var(--text2); font-family: var(--font); font-size: 11px; font-weight: 600;
+  border-radius: 5px; padding: 7px; cursor: pointer; transition: all .12s;
+  text-align: center;
+}
+.btn-sm:hover { border-color: var(--blue); color: var(--blue); }
+.btn-sm.danger:hover { border-color: var(--red); color: var(--red); }
+.btn-sm.success:hover { border-color: var(--green); color: var(--green); }
+
+/* ═══════════════════════════════════════════════════════════
+   ANALYTICS TAB
+═══════════════════════════════════════════════════════════ */
+.analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.analytics-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 16px;
+}
+.ac-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); margin-bottom: 14px; }
+.ac-big { font-family: var(--mono); font-size: 32px; font-weight: 700; color: #fff; display: block; }
+.ac-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* Revenue chart bars */
+.rev-chart { display: flex; align-items: flex-end; gap: 4px; height: 80px; margin-top: 12px; }
+.rev-bar { flex: 1; border-radius: 3px 3px 0 0; background: linear-gradient(to top, var(--green2), var(--green)); min-height: 2px; transition: height .5s; position: relative; }
+.rev-bar:hover .rev-tooltip { display: block; }
+.rev-tooltip {
+  display: none; position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+  background: var(--bg4); border: 1px solid var(--border2); border-radius: 4px;
+  padding: 3px 7px; font-family: var(--mono); font-size: 10px; white-space: nowrap; z-index: 10;
+}
+
+.breakdown-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.bl-row { display: flex; align-items: center; gap: 8px; }
+.bl-name { font-size: 11.5px; flex: 1; color: var(--text2); }
+.bl-bar-wrap { flex: 2; height: 5px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+.bl-bar-fill { height: 100%; border-radius: 3px; background: var(--blue); transition: width .5s; }
+.bl-val { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--text); width: 50px; text-align: right; }
+
+/* ═══════════════════════════════════════════════════════════
+   UPGRADES TAB
+═══════════════════════════════════════════════════════════ */
+.upgrades-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.upgrade-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px; cursor: pointer; transition: all .18s; position: relative;
+}
+.upgrade-card:hover { border-color: var(--purple); transform: translateY(-1px); }
+.upgrade-card.owned { opacity: .55; cursor: default; border-color: rgba(0,214,143,.2); }
+.upgrade-card.owned:hover { transform: none; }
+.upgrade-card.cant-afford:hover { border-color: var(--red); }
+
+.uc-icon { font-size: 26px; margin-bottom: 10px; display: block; }
+.uc-name { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+.uc-desc { font-size: 11.5px; color: var(--text2); line-height: 1.5; margin-bottom: 12px; }
+.uc-cost { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--yellow); }
+.uc-owned-badge { font-size: 10px; color: var(--green); font-weight: 700; font-family: var(--mono); }
+
+/* ═══════════════════════════════════════════════════════════
+   MARKET NEWS TAB
+═══════════════════════════════════════════════════════════ */
+.news-list { display: flex; flex-direction: column; gap: 8px; }
+.news-item {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.news-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+.news-body { flex: 1; }
+.news-headline { font-size: 12.5px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.news-detail { font-size: 11px; color: var(--text3); line-height: 1.5; }
+.news-day { font-family: var(--mono); font-size: 10px; color: var(--text3); flex-shrink: 0; }
+.news-item.impact-high { border-left: 3px solid var(--red); }
+.news-item.impact-med { border-left: 3px solid var(--yellow); }
+.news-item.impact-low { border-left: 3px solid var(--green); }
+
+/* ═══════════════════════════════════════════════════════════
+   MARKET TRENDS (right side)
+═══════════════════════════════════════════════════════════ */
+.trend-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 5px 0; border-bottom: 1px solid var(--border);
+  font-size: 11px;
+}
+.trend-item:last-child { border: none; }
+.ti-name { color: var(--text2); display: flex; align-items: center; gap: 5px; }
+.ti-change { font-family: var(--mono); font-size: 11px; font-weight: 700; }
+.ti-change.up { color: var(--green); }
+.ti-change.down { color: var(--red); }
+
+/* ═══════════════════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════════════════ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 100;
+  background: rgba(7,9,13,.85); align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg2); border: 1px solid var(--border2); border-radius: 14px;
+  padding: 28px; max-width: 460px; width: 95%; position: relative;
+  box-shadow: 0 24px 80px rgba(0,0,0,.7);
+}
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  background: var(--bg3); border: none; color: var(--text2); border-radius: 50%;
+  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 14px; transition: all .12s;
+}
+.modal-close:hover { color: var(--text); background: var(--bg4); }
+
+.modal-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.modal-sub { font-size: 12px; color: var(--text3); margin-bottom: 20px; }
+
+.modal-product-preview {
+  display: flex; gap: 12px; align-items: center;
+  background: var(--bg3); border-radius: 8px; padding: 12px 14px; margin-bottom: 18px;
+}
+.mpp-emoji { font-size: 32px; }
+.mpp-name { font-size: 14px; font-weight: 700; color: #fff; }
+.mpp-cat { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.mpp-cost { margin-left: auto; font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--red); }
+
+.modal-divider { height: 1px; background: var(--border); margin: 14px 0; }
+.modal-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
+.modal-row .mr-l { color: var(--text3); }
+.modal-row .mr-r { font-family: var(--mono); font-weight: 600; }
+
+.qty-control { display: flex; align-items: center; gap: 10px; margin: 16px 0; }
+.qty-control label { font-size: 12px; color: var(--text3); flex: 1; }
+.qty-btn {
+  background: var(--bg3); border: 1px solid var(--border2); border-radius: 5px;
+  color: var(--text); width: 32px; height: 32px; cursor: pointer;
+  font-size: 16px; display: flex; align-items: center; justify-content: center;
+  transition: all .12s;
+}
+.qty-btn:hover { border-color: var(--green); color: var(--green); }
+.qty-display { font-family: var(--mono); font-size: 22px; font-weight: 700; min-width: 48px; text-align: center; }
+
+.modal-confirm-btn {
+  width: 100%; padding: 13px; background: var(--green); border: none; border-radius: 7px;
+  color: #000; font-family: var(--font); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all .15s; margin-top: 6px;
+}
+.modal-confirm-btn:hover { box-shadow: 0 0 24px rgba(0,214,143,.35); }
+.modal-confirm-btn:disabled { opacity: .4; cursor: default; }
+
+/* ═══════════════════════════════════════════════════════════
+   TOAST SYSTEM
+═══════════════════════════════════════════════════════════ */
+#toast-root {
+  position: fixed; bottom: 20px; right: 20px;
+  display: flex; flex-direction: column-reverse; gap: 8px; z-index: 200;
+}
+.toast {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px;
+  padding: 10px 14px; min-width: 220px; max-width: 320px;
+  font-size: 12px; line-height: 1.4;
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  animation: toastIn .2s cubic-bezier(.175,.885,.32,1.275);
+}
+@keyframes toastIn { from{transform:translateX(120%);opacity:0} to{transform:translateX(0);opacity:1} }
+.toast-icon { font-size: 16px; flex-shrink: 0; }
+.toast-text { flex: 1; color: var(--text); }
+.toast.good { border-left: 3px solid var(--green); }
+.toast.bad  { border-left: 3px solid var(--red); }
+.toast.warn { border-left: 3px solid var(--yellow); }
+.toast.info { border-left: 3px solid var(--blue); }
+
+/* ═══════════════════════════════════════════════════════════
+   END SCREENS
+═══════════════════════════════════════════════════════════ */
+#screen-gameover, #screen-win {
+  flex-direction: column; align-items: center; justify-content: center;
+  height: 100vh; padding: 40px;
+  text-align: center;
+}
+#screen-gameover {
+  background: radial-gradient(ellipse 60% 50% at 50% 20%, rgba(255,77,106,.12), transparent 70%), var(--bg);
+}
+#screen-win {
+  background: radial-gradient(ellipse 60% 50% at 50% 20%, rgba(0,214,143,.12), transparent 70%), var(--bg);
+}
+.end-title {
+  font-size: clamp(64px, 10vw, 120px); font-weight: 800; letter-spacing: -3px; line-height: 1;
+  margin-bottom: 10px;
+}
+.end-title.bad { color: var(--red); }
+.end-title.good { color: var(--green); }
+.end-sub { font-size: 15px; color: var(--text2); max-width: 480px; line-height: 1.7; margin-bottom: 32px; }
+.end-stats { display: flex; gap: 14px; margin-bottom: 36px; flex-wrap: wrap; justify-content: center; }
+.end-stat {
+  background: var(--bg2); border: 1px solid var(--border2); border-radius: 10px;
+  padding: 16px 24px; min-width: 130px;
+}
+.end-stat .esv { font-family: var(--mono); font-size: 28px; font-weight: 700; color: var(--yellow); display: block; }
+.end-stat .esl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 3px; }
+
+/* ═══════════════════════════════════════════════════════════
+   SCROLLBAR GLOBAL
+═══════════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION LABEL
+═══════════════════════════════════════════════════════════ */
+.section-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* profit indicator */
+.profit-pill {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; font-family: var(--mono);
+}
+.profit-pill.pos { background: rgba(0,214,143,.12); color: var(--green); }
+.profit-pill.neg { background: rgba(255,77,106,.12); color: var(--red); }
 </style>
 </head>
 <body>
-<canvas id="roots"></canvas>
-<div class="wrap">
-  <div class="topbar">
-    <div class="game-logo">🍄 Mycelium Empire</div>
-    <div class="top-stat"><span class="lbl">Spores</span><span class="val" id="tSpores">0</span></div>
-    <div class="top-stat"><span class="lbl">Par Sec</span><span class="val" id="tSPS">0</span></div>
-    <div class="top-stat"><span class="lbl">Harvest x</span><span class="val" id="tMult">1.00</span></div>
-    <div class="top-stat"><span class="lbl">Total</span><span class="val" id="tLife">0</span></div>
-    <button class="open-shop-btn" onclick="openShop()">🏪 Marche<span class="shop-cd" id="shopCdTxt">Nouveau dans 5:00</span></button>
-    <button class="ascend-btn" id="ascBtn" disabled onclick="doAscend()">🌀 Ascend</button>
-  </div>
-  <div class="boosts-bar" id="boostsBar">
-    <span class="boosts-label">Actifs:</span>
-    <span style="color:var(--text2);font-size:11px;font-style:italic" id="noBoosts">Aucun boost actif</span>
-  </div>
-  <div class="sidebar-left">
-    <div class="sec-head">🔬 Recherche</div>
-    <div id="upgList"></div>
-    <div class="sec-head" style="margin-top:12px">🏅 Decouvertes</div>
-    <div id="achList"></div>
-    <div class="ascend-panel">
-      <strong>🌀 Ascension</strong><br>
-      Atteins <strong>1 Quadrillion spores</strong> pour Ascender.<br>
-      Sacrifie tout pour un multiplicateur permanent <strong id="ascMultPrev">x1.60</strong>.<br>
-      Chaque Ascension se cumule pour toujours.
+
+<!-- ══════════════════════════════════════════
+     INTRO SCREEN
+══════════════════════════════════════════ -->
+<div id="screen-intro" class="screen show">
+  <div class="intro-inner">
+    <div class="intro-badge">● Live Market Simulator</div>
+    <h1 class="intro-title">Drop<span>Forge</span></h1>
+    <p class="intro-tagline">
+      A <strong>realistic dropshipping simulator</strong>. Source products, manage pricing, outrun competitors,
+      and survive real market dynamics — starting with just <strong>$10</strong>.
+    </p>
+    <div class="intro-kpis">
+      <div class="kpi-card"><span class="kv">$10</span><span class="kl">Start Capital</span></div>
+      <div class="kpi-card"><span class="kv">100</span><span class="kl">Days</span></div>
+      <div class="kpi-card"><span class="kv">$10K</span><span class="kl">Goal</span></div>
+      <div class="kpi-card"><span class="kv">12</span><span class="kl">Products</span></div>
     </div>
-  </div>
-  <div class="main">
-    <div class="res-panel">
-      <div class="spore-count" id="sporeCount">0</div>
-      <div class="spore-label">Spores</div>
-      <div class="auto-rate">🍄 <span id="spsDisplay">0</span> spores / seconde</div>
-      <div class="click-rate">👆 <span id="spcDisplay">1</span> par clic</div>
+    <button class="btn-start" onclick="startGame()">
+      ▶ &nbsp;Launch Your Business
+    </button>
+    <div class="intro-warning">
+      Markets fluctuate · Competitors underprice you · Customers return items<br>
+      <span>Suppliers delay shipments · Algorithms change overnight</span>
     </div>
-    <div class="shroom-stage" id="shroomStage" onclick="onClickShroom(event)">
-      <div class="spore-particle" style="left:40%;bottom:115px;animation-delay:0s;--drift:-20px"></div>
-      <div class="spore-particle" style="left:50%;bottom:118px;animation-delay:0.8s;--drift:10px"></div>
-      <div class="spore-particle" style="left:60%;bottom:115px;animation-delay:1.5s;--drift:-5px"></div>
-      <div class="spore-particle" style="left:45%;bottom:112px;animation-delay:2.2s;--drift:25px"></div>
-      <div class="spore-particle" style="left:55%;bottom:116px;animation-delay:0.4s;--drift:-30px"></div>
-      <div class="shroom-gills">
-        <div class="gill-line" style="left:10%"></div><div class="gill-line" style="left:20%"></div>
-        <div class="gill-line" style="left:30%"></div><div class="gill-line" style="left:40%"></div>
-        <div class="gill-line" style="left:50%"></div><div class="gill-line" style="left:60%"></div>
-        <div class="gill-line" style="left:70%"></div><div class="gill-line" style="left:80%"></div>
-        <div class="gill-line" style="left:90%"></div>
-      </div>
-      <div class="shroom-cap" id="shroomCap">
-        <div class="spot" style="width:22px;height:16px;top:20%;left:20%"></div>
-        <div class="spot" style="width:14px;height:11px;top:15%;left:55%"></div>
-        <div class="spot" style="width:18px;height:13px;top:40%;left:65%"></div>
-        <div class="spot" style="width:10px;height:8px;top:50%;left:30%"></div>
-        <div class="spot" style="width:8px;height:6px;top:25%;left:38%"></div>
-      </div>
-      <div class="shroom-stem"></div>
-      <div class="shroom-ground"></div>
-    </div>
-    <div class="stage-panel">
-      <div class="stage-name" id="stageName">🌱 Spore Solitaire</div>
-      <div class="stage-bar-bg"><div class="stage-bar-fill" id="stageBar" style="width:0%"></div></div>
-      <div class="stage-desc" id="stageDesc">La foret attend ton empire...</div>
-    </div>
-    <div class="log-panel">
-      <div class="sec-head">📜 Chronique</div>
-      <div id="logDiv" style="max-height:130px;overflow-y:auto"></div>
-    </div>
-  </div>
-  <div class="sidebar-right">
-    <div class="sec-head">🏗️ Colonies</div>
-    <div id="bldList"></div>
-  </div>
-</div>
-<div class="ticker"><div class="ticker-inner" id="tickerText">🍄 La foret s eveille... ton empire commence par un seul clic.</div></div>
-<div class="shop-overlay" id="shopOverlay" style="display:none">
-  <div class="shop-box">
-    <button class="shop-close" onclick="closeShop()">✕</button>
-    <div class="shop-title">🏪 Marche des Spores</div>
-    <div class="shop-timer" id="shopTimerTxt">Se renouvelle dans 5:00</div>
-    <div class="shop-grid" id="shopGrid"></div>
-    <button class="shop-btn" onclick="closeShop()">Fermer</button>
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════
+     MAIN GAME SCREEN
+══════════════════════════════════════════ -->
+<div id="screen-game" class="screen" style="flex-direction:column;height:100vh;">
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="tb-logo"><div class="tb-logo-dot"></div>DropForge</div>
+    <div class="tb-sep"></div>
+    <div class="tb-kpi money">
+      <span class="tv" id="hud-cash">$10.00</span>
+      <span class="tl">Cash</span>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-kpi net">
+      <span class="tv" id="hud-profit">$0.00</span>
+      <span class="tl">Total Profit</span>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-kpi rep">
+      <span class="tv" id="hud-rep">50</span>
+      <span class="tl">Reputation</span>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-kpi day">
+      <span class="tv" id="hud-day">Day 1</span>
+      <span class="tl">of 100</span>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="day-progress-wrap">
+      <div class="day-progress-bar"><div class="day-progress-fill" id="day-bar" style="width:1%"></div></div>
+      <span id="day-pct" style="font-size:10px;color:var(--text3);font-family:var(--mono)">1%</span>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-event-ticker"><span id="ticker-text">Loading market data...</span></div>
+    <button class="btn-nextday" id="btn-next" onclick="advanceDay()">⏭ Next Day</button>
+  </div>
+
+  <!-- GAME BODY: 3 horizontal panels -->
+  <div id="game-body">
+
+    <!-- LEFT PANEL -->
+    <div id="left-panel">
+      <div class="lp-section">
+        <div class="lp-label">Your Business</div>
+        <div class="business-card">
+          <div class="bc-name" id="business-name">My Store</div>
+          <div class="bc-row"><span class="bcl">Revenue</span><span class="bcv" id="bc-rev" style="color:var(--green)">$0.00</span></div>
+          <div class="bc-row"><span class="bcl">Expenses</span><span class="bcv" id="bc-exp" style="color:var(--red)">$0.00</span></div>
+          <div class="bc-row"><span class="bcl">Orders</span><span class="bcv" id="bc-orders">0</span></div>
+          <div class="bc-row"><span class="bcl">Returns</span><span class="bcv" id="bc-returns" style="color:var(--red)">0</span></div>
+          <div class="bc-bar"><div class="bc-bar-fill" id="goal-bar" style="width:0%;background:var(--green)"></div></div>
+          <div style="font-size:9px;color:var(--text3);margin-top:4px;font-family:var(--mono)" id="goal-pct">Goal: 0%</div>
+        </div>
+      </div>
+
+      <div class="metric-row">
+        <div class="metric-box"><span class="mv" id="m-listings" style="color:var(--blue)">0</span><span class="ml">Listings</span></div>
+        <div class="metric-box"><span class="mv" id="m-stock" style="color:var(--yellow)">0</span><span class="ml">In Stock</span></div>
+        <div class="metric-box"><span class="mv" id="m-sales" style="color:var(--green)">0</span><span class="ml">Units Sold</span></div>
+        <div class="metric-box"><span class="mv" id="m-daily" style="color:var(--orange)">$0</span><span class="ml">Today</span></div>
+      </div>
+
+      <div class="lp-section" style="padding:10px 12px 0;">
+        <div class="lp-label">Navigation</div>
+        <button class="nav-btn active" onclick="switchTab('catalog')" id="nav-catalog"><span class="nb-icon">🛍️</span>Product Catalog</button>
+        <button class="nav-btn" onclick="switchTab('store')" id="nav-store"><span class="nb-icon">🏪</span>My Store <span class="nb-badge" id="store-badge" style="display:none">!</span></button>
+        <button class="nav-btn" onclick="switchTab('analytics')" id="nav-analytics"><span class="nb-icon">📊</span>Analytics</button>
+        <button class="nav-btn" onclick="switchTab('upgrades')" id="nav-upgrades"><span class="nb-icon">⚡</span>Upgrades</button>
+        <button class="nav-btn" onclick="switchTab('news')" id="nav-news"><span class="nb-icon">📰</span>Market News <span class="nb-badge" id="news-badge" style="display:none">!</span></button>
+      </div>
+
+      <div style="flex:1"></div>
+
+      <div class="competitor-widget">
+        <div class="cw-title">⚔️ Competitor Intel</div>
+        <div id="competitor-panel"></div>
+      </div>
+    </div>
+
+    <!-- CENTER PANEL -->
+    <div id="center-panel">
+      <div class="tab-bar">
+        <button class="tab-btn active" id="tab-catalog" onclick="switchTab('catalog')">🛍 Catalog</button>
+        <button class="tab-btn" id="tab-store" onclick="switchTab('store')">🏪 My Store</button>
+        <button class="tab-btn" id="tab-analytics" onclick="switchTab('analytics')">📊 Analytics</button>
+        <button class="tab-btn" id="tab-upgrades" onclick="switchTab('upgrades')">⚡ Upgrades</button>
+        <button class="tab-btn" id="tab-news" onclick="switchTab('news')">📰 News</button>
+      </div>
+
+      <!-- CATALOG -->
+      <div class="tab-content active" id="content-catalog">
+        <div class="catalog-toolbar">
+          <input class="catalog-search" placeholder="🔍  Search products..." id="search-input" oninput="renderCatalog()">
+          <button class="filter-btn active" id="filter-all" onclick="setFilter('all')">All</button>
+          <button class="filter-btn" id="filter-Fashion" onclick="setFilter('Fashion')">Fashion</button>
+          <button class="filter-btn" id="filter-Health" onclick="setFilter('Health')">Health</button>
+          <button class="filter-btn" id="filter-Tech" onclick="setFilter('Tech')">Tech</button>
+          <button class="filter-btn" id="filter-Home" onclick="setFilter('Home')">Home</button>
+          <button class="filter-btn" id="filter-Pet" onclick="setFilter('Pet')">Pet</button>
+        </div>
+        <div class="catalog-grid" id="catalog-grid"></div>
+      </div>
+
+      <!-- STORE -->
+      <div class="tab-content" id="content-store">
+        <div class="section-label">Active Listings</div>
+        <div id="store-grid-wrap"></div>
+      </div>
+
+      <!-- ANALYTICS -->
+      <div class="tab-content" id="content-analytics">
+        <div class="section-label">Business Overview</div>
+        <div class="analytics-grid" id="analytics-grid"></div>
+      </div>
+
+      <!-- UPGRADES -->
+      <div class="tab-content" id="content-upgrades">
+        <div class="section-label">Business Upgrades</div>
+        <div class="upgrades-grid" id="upgrades-grid"></div>
+      </div>
+
+      <!-- NEWS -->
+      <div class="tab-content" id="content-news">
+        <div class="section-label">Market Intelligence</div>
+        <div class="news-list" id="news-list"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div id="right-panel">
+      <div class="rp-header">Live Activity Feed</div>
+      <div id="live-feed"></div>
+
+      <div class="rp-section">
+        <div class="rp-section-title">Market Trends</div>
+        <div id="market-trends-list"></div>
+      </div>
+
+      <div class="rp-section">
+        <div class="rp-section-title">Revenue (Last 7 Days)</div>
+        <div class="sparkline-row" id="revenue-sparkline"></div>
+        <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:4px" id="avg-daily">Avg: $0/day</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     GAME OVER SCREEN
+══════════════════════════════════════════ -->
+<div id="screen-gameover" class="screen">
+  <div class="end-title bad">BANKRUPT</div>
+  <p class="end-sub" id="gameover-msg">You ran out of cash with no inventory to recover. The market is brutal.</p>
+  <div class="end-stats" id="gameover-stats"></div>
+  <button class="btn-start" onclick="resetGame()" style="background:var(--red);box-shadow:none;">↺ &nbsp;Try Again</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     WIN SCREEN
+══════════════════════════════════════════ -->
+<div id="screen-win" class="screen">
+  <div class="end-title good">EMPIRE</div>
+  <p class="end-sub" id="win-msg">You turned $10 into a real business. Legendary.</p>
+  <div class="end-stats" id="win-stats"></div>
+  <button class="btn-start" onclick="resetGame()">↺ &nbsp;Play Again</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     BUY MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="buy-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modal-title">Source Product</div>
+    <div class="modal-sub" id="modal-sub">Review the details before ordering.</div>
+    <div class="modal-product-preview" id="modal-preview"></div>
+    <div id="modal-details"></div>
+    <div class="modal-divider"></div>
+    <div class="qty-control">
+      <label>Order Quantity</label>
+      <button class="qty-btn" onclick="qtyChange(-10)">−10</button>
+      <button class="qty-btn" onclick="qtyChange(-1)">−</button>
+      <span class="qty-display" id="modal-qty">1</span>
+      <button class="qty-btn" onclick="qtyChange(1)">+</button>
+      <button class="qty-btn" onclick="qtyChange(10)">+10</button>
+    </div>
+    <div class="modal-row">
+      <span class="mr-l">Total Cost</span>
+      <span class="mr-r" id="modal-total" style="color:var(--red)">$0.00</span>
+    </div>
+    <div class="modal-row">
+      <span class="mr-l">Cash Remaining</span>
+      <span class="mr-r" id="modal-remain">$0.00</span>
+    </div>
+    <div class="modal-row">
+      <span class="mr-l">Est. Sell Price</span>
+      <span class="mr-r" id="modal-sellprice" style="color:var(--yellow)">$0.00</span>
+    </div>
+    <div class="modal-row">
+      <span class="mr-l">Est. Profit/Unit</span>
+      <span class="mr-r" id="modal-profit">$0.00</span>
+    </div>
+    <button class="modal-confirm-btn" id="modal-confirm" onclick="confirmOrder()">Place Order</button>
+  </div>
+</div>
+
+<div id="toast-root"></div>
+
+<!-- ══════════════════════════════════════════
+     GAME SCRIPT
+══════════════════════════════════════════ -->
 <script>
-const rc=document.getElementById('roots'),rx=rc.getContext('2d');
-function resizeRoots(){rc.width=window.innerWidth;rc.height=window.innerHeight;}
-resizeRoots();window.addEventListener('resize',resizeRoots);
-const RN=[];
-for(let i=0;i<60;i++)RN.push({x:Math.random()*9999,y:Math.random()*9999,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,p:Math.random()*Math.PI*2});
-function drawRoots(){
-  rx.clearRect(0,0,rc.width,rc.height);
-  RN.forEach(n=>{n.x=(n.x+n.vx+rc.width*2)%(rc.width*2)-rc.width*0.5;n.y=(n.y+n.vy+rc.height*2)%(rc.height*2)-rc.height*0.5;n.p+=0.02;});
-  for(let i=0;i<RN.length;i++)for(let j=i+1;j<RN.length;j++){
-    const dx=RN[i].x-RN[j].x,dy=RN[i].y-RN[j].y,d=Math.sqrt(dx*dx+dy*dy);
-    if(d<180){const a=(1-d/180)*0.25*(0.5+0.5*Math.sin(RN[i].p));rx.beginPath();rx.moveTo(RN[i].x,RN[i].y);rx.quadraticCurveTo((RN[i].x+RN[j].x)/2+dy*0.2,(RN[i].y+RN[j].y)/2-dx*0.2,RN[j].x,RN[j].y);rx.strokeStyle='rgba(100,220,80,'+a+')';rx.lineWidth=0.8;rx.stroke();}
-  }
-  requestAnimationFrame(drawRoots);
-}
-drawRoots();
-
-function fmt(n){
-  if(n<1e3)return Math.floor(n).toLocaleString();
-  const S=['','K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc'];
-  let i=0,v=n;while(v>=1000&&i<S.length-1){v/=1000;i++;}
-  return v.toFixed(i>0?2:0)+' '+S[i];
-}
-
-let G={spores:0,lifetime:0,totalClicks:0,ascendCount:0,ascendMult:1,bld:{},upg:{},ach:{},time:0,shielded:false};
-
-const BUILDINGS=[
-  {id:'spore',  name:'Spore Pod',       icon:'🫧',base:12,     cps:0.1,  desc:'Libere des spores en continu.',          unlock:0},
-  {id:'mycel',  name:'Mycelium Thread', icon:'🕸️',base:80,     cps:0.4,  desc:'Les filaments absorbent les nutriments.', unlock:40},
-  {id:'fairy',  name:'Fairy Ring',      icon:'💫',base:450,    cps:1.8,  desc:'Les anneaux anciens canalisent la magie.',unlock:200},
-  {id:'truffle',name:'Truffle Network', icon:'🌰',base:2500,   cps:8,    desc:'Les reseaux de truffes cultivent le sol.',unlock:1000},
-  {id:'giant',  name:'Giant Shroom',    icon:'🍄',base:12000,  cps:35,   desc:'Un champignon colossal plein de puissance.',unlock:5000},
-  {id:'cave',   name:'Cave Colony',     icon:'🦇',base:65000,  cps:150,  desc:'Les grottes profondes cultivent des fungi.',unlock:25000},
-  {id:'spire',  name:'Fungal Spire',    icon:'🗼',base:350000, cps:600,  desc:'Une fleche repand des spores au loin.',   unlock:120000},
-  {id:'forest', name:'Enchanted Forest',icon:'🌲',base:1800000,cps:2500, desc:'Une foret entiere sous controle myco.',  unlock:600000},
-  {id:'world',  name:'World Root',      icon:'🌍',base:9000000,cps:10000,desc:'Le mycelium enveloppe la planete.',       unlock:3000000},
-  {id:'beyond', name:'Spore Dimension', icon:'🌀',base:4e8,    cps:60000,desc:'Une dimension de pur champignon.',        unlock:1e8},
+/* ═══════════════════════════════════════════════════════════
+   DATA: PRODUCTS
+═══════════════════════════════════════════════════════════ */
+const PRODUCTS = [
+  {
+    id:'posture_brace', name:'Posture Corrector Pro', emoji:'🦴', cat:'Health',
+    desc:'Medical-grade posture brace. Huge TikTok health trend. High reorder rate.',
+    cost:4.80, msrp:24.99, demandBase:9, volatility:.22, shipDays:5,
+    competitorPresence:.72, returnRate:.09, tags:['trending','health']
+  },
+  {
+    id:'led_strip', name:'Smart LED Strip', emoji:'💡', cat:'Home',
+    desc:'WiFi-controlled RGB lighting. Viral home decor item. Consistent demand.',
+    cost:6.20, msrp:29.99, demandBase:8, volatility:.25, shipDays:6,
+    competitorPresence:.65, returnRate:.07, tags:['new','home']
+  },
+  {
+    id:'cat_feeder', name:'Auto Pet Feeder', emoji:'🐾', cat:'Pet',
+    desc:'Scheduled automatic feeder. Pet owners are loyal repeat buyers.',
+    cost:11.50, msrp:48.99, demandBase:5, volatility:.18, shipDays:7,
+    competitorPresence:.48, returnRate:.06, tags:['stable','pet']
+  },
+  {
+    id:'phone_ring', name:'MagSafe Phone Grip', emoji:'📱', cat:'Tech',
+    desc:'Magnetic phone ring holder. Saturated but high volume. Compete on price.',
+    cost:1.40, msrp:9.99, demandBase:15, volatility:.20, shipDays:3,
+    competitorPresence:.88, returnRate:.05, tags:['saturated','tech']
+  },
+  {
+    id:'teeth_kit', name:'Teeth Whitening Kit', emoji:'🦷', cat:'Health',
+    desc:'At-home whitening with LED light. Great margins, high return risk.',
+    cost:5.50, msrp:32.99, demandBase:7, volatility:.32, shipDays:5,
+    competitorPresence:.68, returnRate:.14, tags:['risky','health']
+  },
+  {
+    id:'yoga_mat', name:'Foldable Travel Yoga Mat', emoji:'🧘', cat:'Health',
+    desc:'Lightweight foldable yoga mat. Wellness boom drives steady traffic.',
+    cost:9.20, msrp:38.99, demandBase:5, volatility:.18, shipDays:8,
+    competitorPresence:.55, returnRate:.07, tags:['stable','health']
+  },
+  {
+    id:'succulent_set', name:'Succulent Starter Kit', emoji:'🌵', cat:'Home',
+    desc:'3-pot succulent set with soil. Impulse buy. Gift potential is strong.',
+    cost:2.80, msrp:14.99, demandBase:9, volatility:.15, shipDays:4,
+    competitorPresence:.50, returnRate:.04, tags:['trending','home']
+  },
+  {
+    id:'led_glasses', name:'Neon LED Party Glasses', emoji:'🕶️', cat:'Fashion',
+    desc:'Viral rave accessory. Trend-sensitive. Buy when trending, exit fast.',
+    cost:2.20, msrp:15.99, demandBase:6, volatility:.55, shipDays:3,
+    competitorPresence:.60, returnRate:.06, tags:['hot','fashion']
+  },
+  {
+    id:'mini_drone', name:'Pocket Mini Drone', emoji:'🚁', cat:'Tech',
+    desc:'High AOV, high satisfaction. Returns happen. Build rep before scaling.',
+    cost:19.00, msrp:69.99, demandBase:3, volatility:.42, shipDays:9,
+    competitorPresence:.45, returnRate:.18, tags:['risky','tech']
+  },
+  {
+    id:'resistance_bands', name:'Resistance Band Set (5pc)', emoji:'💪', cat:'Health',
+    desc:'Evergreen fitness product. Low cost, high volume, steady margins.',
+    cost:3.40, msrp:17.99, demandBase:11, volatility:.14, shipDays:4,
+    competitorPresence:.70, returnRate:.05, tags:['stable','health']
+  },
+  {
+    id:'silk_pillowcase', name:'Silk Pillowcase (2-Pack)', emoji:'🛏️', cat:'Home',
+    desc:'Premium sleep product. Beauty influencer darling. Low returns.',
+    cost:7.80, msrp:34.99, demandBase:6, volatility:.20, shipDays:6,
+    competitorPresence:.52, returnRate:.05, tags:['new','home']
+  },
+  {
+    id:'car_mount', name:'Magnetic Car Phone Mount', emoji:'🚗', cat:'Tech',
+    desc:'Universal magnetic mount. Commuter essential. Fast ship, cheap cost.',
+    cost:2.10, msrp:12.99, demandBase:12, volatility:.16, shipDays:3,
+    competitorPresence:.80, returnRate:.05, tags:['saturated','tech']
+  },
 ];
 
-const UPGRADES=[
-  {id:'c1',name:'Doigts Calleux',     icon:'🖐️',cost:80,     eff:'x2 puissance clic',    type:'click',mult:2,  req:()=>G.lifetime>=40},
-  {id:'c2',name:'Gants de Spores',    icon:'🧤',cost:1500,   eff:'x3 puissance clic',    type:'click',mult:3,  req:()=>G.lifetime>=800},
-  {id:'c3',name:'Injection Enzyme',   icon:'💉',cost:40000,  eff:'x5 puissance clic',    type:'click',mult:5,  req:()=>G.lifetime>=20000},
-  {id:'c4',name:'Gants Myco',         icon:'⚡',cost:800000, eff:'x10 puissance clic',   type:'click',mult:10, req:()=>G.lifetime>=400000},
-  {id:'c5',name:'Apotheose Fongique', icon:'🌟',cost:5e7,    eff:'x20 puissance clic',   type:'click',mult:20, req:()=>G.lifetime>=2e7},
-  {id:'sp1',name:'Pods Plus Forts',   icon:'🫧',cost:400,    eff:'Pods x2 SPS',          type:'bld',bld:'spore',  mult:2,req:()=>bldN('spore')>=5},
-  {id:'sp2',name:'Nuage Dense',       icon:'🫧',cost:6000,   eff:'Pods x3 SPS',          type:'bld',bld:'spore',  mult:3,req:()=>bldN('spore')>=15},
-  {id:'sp3',name:'Canon de Spores',   icon:'🫧',cost:80000,  eff:'Pods x5 SPS',          type:'bld',bld:'spore',  mult:5,req:()=>bldN('spore')>=30},
-  {id:'my1',name:'Filaments Larges',  icon:'🕸️',cost:2500,   eff:'Mycelium x2 SPS',      type:'bld',bld:'mycel',  mult:2,req:()=>bldN('mycel')>=5},
-  {id:'my2',name:'Fungi Neural',      icon:'🕸️',cost:35000,  eff:'Mycelium x3 SPS',      type:'bld',bld:'mycel',  mult:3,req:()=>bldN('mycel')>=15},
-  {id:'fr1',name:'Resonance Anneau',  icon:'💫',cost:14000,  eff:'Fairy Rings x2 SPS',   type:'bld',bld:'fairy',  mult:2,req:()=>bldN('fairy')>=5},
-  {id:'fr2',name:'Pacte Ancien',      icon:'💫',cost:180000, eff:'Fairy Rings x3 SPS',   type:'bld',bld:'fairy',  mult:3,req:()=>bldN('fairy')>=15},
-  {id:'tr1',name:'Arome Profond',     icon:'🌰',cost:75000,  eff:'Truffles x2 SPS',      type:'bld',bld:'truffle',mult:2,req:()=>bldN('truffle')>=5},
-  {id:'tr2',name:'Extrait de Truffe', icon:'🌰',cost:1000000,eff:'Truffles x3 SPS',      type:'bld',bld:'truffle',mult:3,req:()=>bldN('truffle')>=15},
-  {id:'gs1',name:'Goutte Fertilisant',icon:'🍄',cost:400000, eff:'Giant Shrooms x2 SPS', type:'bld',bld:'giant',  mult:2,req:()=>bldN('giant')>=5},
-  {id:'gs2',name:'Croissance Titan',  icon:'🍄',cost:5000000,eff:'Giant Shrooms x3 SPS', type:'bld',bld:'giant',  mult:3,req:()=>bldN('giant')>=15},
-  {id:'g1',name:'Alliance Foret',     icon:'🌿',cost:4000,   eff:'Tout SPS x1.5',        type:'global',mult:1.5,req:()=>G.lifetime>=2000},
-  {id:'g2',name:'Guilde Decomposeurs',icon:'♻️',cost:80000,  eff:'Tout SPS x2',          type:'global',mult:2,  req:()=>G.lifetime>=40000},
-  {id:'g3',name:'Conscience Myco',    icon:'🧠',cost:1500000,eff:'Tout SPS x3',          type:'global',mult:3,  req:()=>G.lifetime>=800000},
-  {id:'g4',name:'Overmind Hyphae',    icon:'🌐',cost:3e7,    eff:'Tout SPS x5',          type:'global',mult:5,  req:()=>G.lifetime>=1.5e7},
-  {id:'g5',name:'Singularite Spore',  icon:'∞', cost:8e8,    eff:'Tout SPS x10',         type:'global',mult:10, req:()=>G.lifetime>=4e8},
+const UPGRADES = [
+  { id:'express_ship', icon:'✈️', name:'Express Shipping Deal', desc:'Reduce all shipping delays by 3 days. Customers love fast delivery.', cost:18, effect:'ship-3' },
+  { id:'bulk_sourcing', icon:'📦', name:'Bulk Sourcing Contract', desc:'Cut product sourcing costs by 22%. Negotiate better with suppliers.', cost:30, effect:'cost-.22' },
+  { id:'paid_ads', icon:'📣', name:'Paid Ad Campaign', desc:'Boost demand by 50% for 14 days. Burns cash but drives volume.', cost:25, effect:'ads14' },
+  { id:'smart_repricing', icon:'🤖', name:'Smart Repricing Tool', desc:'Auto-adjusts your prices to optimal levels each day.', cost:45, effect:'repricer' },
+  { id:'review_boost', icon:'⭐', name:'Review Accelerator', desc:'+25 reputation instantly. Better reviews = more organic sales.', cost:20, effect:'rep+25' },
+  { id:'vip_supplier', icon:'🏭', name:'VIP Supplier Access', desc:'Unlock exclusive products and 10% better cost on all items.', cost:60, effect:'vip' },
+  { id:'returns_protect', icon:'🛡️', name:'Return Shield', desc:'Reduce customer return rate by 60%. Protect your margins.', cost:35, effect:'returns-.6' },
+  { id:'email_list', icon:'📧', name:'Email Marketing List', desc:'+30% repeat purchase demand every day. Loyal customer base.', cost:40, effect:'repeat+.3' },
 ];
 
-const ACHIEVEMENTS=[
-  {id:'first', name:'Premiere Recolte',  icon:'🌱',desc:'Clique le champignon une fois.',    req:()=>G.totalClicks>=1},
-  {id:'tap100',name:'Inlassable',        icon:'👆',desc:'Clique 100 fois.',                  req:()=>G.totalClicks>=100},
-  {id:'tap1k', name:'Obsessionnel',      icon:'🤯',desc:'Clique 1 000 fois.',                req:()=>G.totalClicks>=1000},
-  {id:'s1k',   name:'Accumulateur',      icon:'✨',desc:'Collecte 1 000 spores.',            req:()=>G.lifetime>=1000},
-  {id:'s100k', name:'Baron Fongique',    icon:'🍄',desc:'Collecte 100 000 spores.',          req:()=>G.lifetime>=100000},
-  {id:'s1m',   name:'Myco-Millionnaire',icon:'💰',desc:'Collecte 1 Million de spores.',     req:()=>G.lifetime>=1e6},
-  {id:'s1b',   name:'Milliardaire Spore',icon:'🤑',desc:'Collecte 1 Milliard de spores.',   req:()=>G.lifetime>=1e9},
-  {id:'s1t',   name:'Titan Fongique',    icon:'🌍',desc:'Collecte 1 Trillion de spores.',   req:()=>G.lifetime>=1e12},
-  {id:'b10',   name:'Cultivateur',       icon:'🌿',desc:'Possede 10 colonies.',              req:()=>totalBlds()>=10},
-  {id:'b50',   name:'Mycologue',         icon:'🔬',desc:'Possede 50 colonies.',              req:()=>totalBlds()>=50},
-  {id:'b100',  name:'Empire Fongique',   icon:'👑',desc:'Possede 100 colonies.',             req:()=>totalBlds()>=100},
-  {id:'b200',  name:'L Overmind',        icon:'🌀',desc:'Possede 200 colonies.',             req:()=>totalBlds()>=200},
-  {id:'allbld',name:'Ecosysteme Complet',icon:'🌲',desc:'Possede 1 de chaque type.',         req:()=>BUILDINGS.every(b=>bldN(b.id)>=1)},
-  {id:'asc1',  name:'Spore Renee',       icon:'🔄',desc:'Ascende pour la premiere fois.',    req:()=>G.ascendCount>=1},
-  {id:'asc3',  name:'Fungi Eternel',     icon:'♾️',desc:'Ascende 3 fois.',                  req:()=>G.ascendCount>=3},
+const EVENTS = [
+  { icon:'🔥', headline:'Viral TikTok moment', detail:'A micro-influencer featured your niche. Demand spikes 60% across trending categories.', impact:'high', type:'good', effect:'demand+.6' },
+  { icon:'🚢', headline:'Shipping carrier delays', detail:'Port congestion adds 4 days to all incoming shipments. Plan your restocks.', impact:'high', type:'bad', effect:'ship+4' },
+  { icon:'📉', headline:'Market price war', detail:'Mass undercutting drives average sell prices down 18% across all categories.', impact:'high', type:'bad', effect:'price-.18' },
+  { icon:'⭐', headline:'Review bombing incident', detail:'Competitor left 1-star reviews on your listings. Reputation −15.', impact:'med', type:'bad', effect:'rep-15' },
+  { icon:'🎄', headline:'Holiday shopping surge', detail:'Seasonal demand lifts all categories by 70%. Best time to stock up.', impact:'high', type:'good', effect:'demand+.7' },
+  { icon:'💸', headline:'PayPal account hold', detail:'$30 frozen for 5 business days. Payment processor review in progress.', impact:'high', type:'bad', effect:'hold30' },
+  { icon:'🌐', headline:'Algorithm update', detail:'Platform organic reach dropped 40%. Paid traffic becomes more critical.', impact:'med', type:'bad', effect:'reach-.4' },
+  { icon:'📦', headline:'Supplier cost increase', detail:'Raw material costs up. All product sourcing prices rise 20% this week.', impact:'med', type:'bad', effect:'cost+.2' },
+  { icon:'📰', headline:'Press feature', detail:'Your store was mentioned in a trade blog. +18 reputation.', impact:'low', type:'good', effect:'rep+18' },
+  { icon:'↩️', headline:'Return wave', detail:'15% of recent sales are being returned. Quality complaints from customers.', impact:'high', type:'bad', effect:'returns.15' },
+  { icon:'🏷️', headline:'Flash sale trend', detail:'Customers expecting deals. Slightly lower price sensitivity today.', impact:'low', type:'good', effect:'demand+.2' },
+  { icon:'🚨', headline:'Competitor bankruptcy', detail:'CheapDropz99 burned through cash. Their threat level drops significantly.', impact:'med', type:'good', effect:'comp-rep' },
 ];
 
-const STAGES=[
-  {at:0,      name:'🌱 Spore Solitaire',   desc:'Une seule spore sur le sol de la foret.'},
-  {at:200,    name:'🍄 Germination',        desc:'De petits champignons emergent du sol.'},
-  {at:2000,   name:'🌿 Reseau Mycelien',    desc:'Des filaments souterrains connectent ton empire.'},
-  {at:20000,  name:'🌲 Gardien de Foret',   desc:'Les arbres chuchotent a ton mycelium.'},
-  {at:200000, name:'🦋 Bosquet Enchante',   desc:'La magie s imprègne dans ton reseau.'},
-  {at:2e6,    name:'🌍 Mycelium Planetaire',desc:'Tes racines couvrent des continents.'},
-  {at:2e9,    name:'🌌 Spore Dimensionnel', desc:'Tes spores voyagent entre les mondes.'},
-  {at:2e12,   name:'👑 Divinite Fongique',  desc:'Tu es la foret. Tu es tout.'},
-];
+/* ═══════════════════════════════════════════════════════════
+   GAME STATE
+═══════════════════════════════════════════════════════════ */
+let G = {};
+let currentFilter = 'all';
+let currentTab = 'catalog';
+let modalState = { productId: null, qty: 1, restock: false, invIdx: -1 };
 
-const TICKERS=[
-  '🍄 Un fermier signale des champignons couvrant son champ entier du jour au lendemain.',
-  '🌿 Des botanistes perplexes face aux reseaux de mycelium sous les rues de la ville.',
-  '✨ Un anneau de fees atteint 3 km de diametre — les touristes affluent en masse.',
-  '🦠 Scientists: La foret pense. Nous ne pouvons pas l expliquer.',
-  '🌰 Le marche mondial des truffes s effondre — l offre devient inepuisable.',
-  '🕸️ Un reseau mycelien communique via des signaux chimiques entre continents entiers.',
-  '🌀 Des rapports d une dimension de spores apparaissant dans l ocean Pacifique.',
-  '💰 Les futures de spores atteignent un sommet historique sur l echange interplanetaire.',
-  '🧠 Des biologistes confirment: le reseau mycelien a atteint une conscience collective.',
-];
-
-const EVENTS=[
-  {id:'spore_rain',    icon:'🌧️',title:'Pluie de Spores!',          desc:'Une tempete de spores balaie la foret. +3 minutes de production!',             type:'bonus',weight:12,apply:()=>{const b=getSPS()*180;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
-  {id:'giant_shroom',  icon:'🌲',title:'Champignon Geant!',          desc:'Un champignon colossal surgit. +5 minutes de production!',                     type:'bonus',weight:8, apply:()=>{const b=getSPS()*300;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
-  {id:'ancient_ritual',icon:'🔮',title:'Rituel Ancien!',             desc:'Un rituel ancestral. +10 min du meilleur batiment!',                           type:'bonus',weight:5, apply:()=>{let best=0;BUILDINGS.forEach(b=>{const s=b.cps*bldN(b.id)*bldMult(b.id)*globalMult();if(s>best)best=s;});const b=best*600;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
-  {id:'spore_bounty',  icon:'🎁',title:'Bounty de Spores!',          desc:'Un chasseur offre une recompense. +2 minutes de production!',                  type:'bonus',weight:10,apply:()=>{const b=getSPS()*120;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
-  {id:'myco_frenzy',   icon:'🍄',title:'Frenesie Mycelium!',          desc:'Le reseau vibre. Production x3 / 30s!',                                        type:'boost',weight:10,apply:()=>{addBoost('myco_frenzy','🍄 Frenesie x3',3,30);return 'x3 / 30s';}},
-  {id:'spore_wind',    icon:'🌀',title:'Vent de Spores!',             desc:'Un vent porte tes spores. Tap x5 / 45s!',                                      type:'boost',weight:9, apply:()=>{addBoost('spore_wind','🌀 Tap x5',5,45,'click');return 'Tap x5 / 45s';}},
-  {id:'fairy_blessing',icon:'💫',title:'Benediction des Fees!',       desc:'Les fees te benissent. Production x2 / 60s!',                                  type:'boost',weight:8, apply:()=>{addBoost('fairy_blessing','💫 Benediction x2',2,60);return 'x2 / 60s';}},
-  {id:'truffle_rush',  icon:'🌰',title:'Ruee aux Truffes!',           desc:'Truffes rares. +50% clic / 60s!',                                              type:'boost',weight:9, apply:()=>{addBoost('truffle_rush','🌰 Clic +50%',1.5,60,'click');return '+50% clic / 60s';}},
-  {id:'spore_storm',   icon:'⚡',title:'Tempete de Spores!',          desc:'Ionisation. Production x5 / 20s!',                                             type:'boost',weight:6, apply:()=>{addBoost('spore_storm','⚡ Tempete x5',5,20);return 'x5 / 20s';}},
-  {id:'mycoburst',     icon:'🌟',title:'Explosion Mycelienne!',       desc:'Explosion d energie. Production x4 / 45s!',                                    type:'boost',weight:7, apply:()=>{addBoost('mycoburst','🌟 Burst x4',4,45);return 'x4 / 45s';}},
-  {id:'drought',       icon:'☀️',title:'Secheresse!',                 desc:'Sol desseche. Production -50% / 45s.',                                         type:'malus',weight:8, apply:()=>{addBoost('drought','☀️ Secheresse -50%',0.5,45);return '-50% / 45s';}},
-  {id:'rot',           icon:'🦠',title:'Pourriture Mycelienne!',      desc:'Maladie. -10% de spores actuels.',                                             type:'malus',weight:6, apply:()=>{const l=Math.floor(G.spores*0.1);G.spores=Math.max(0,G.spores-l);return '-'+fmt(l)+' spores';}},
-  {id:'spore_thieves', icon:'🐛',title:'Voleurs de Spores!',          desc:'Insectes envahisseurs. Production -70% / 30s.',                                type:'malus',weight:5, apply:()=>{addBoost('spore_thieves','🐛 Invasion -70%',0.3,30);return '-70% / 30s';}},
-  {id:'cold_snap',     icon:'❄️',title:'Vague de Froid!',             desc:'Gel. Production -40% / 60s.',                                                  type:'malus',weight:7, apply:()=>{addBoost('cold_snap','❄️ Gel -40%',0.6,60);return '-40% / 60s';}},
-  {id:'fungal_blight', icon:'🌑',title:'Fletrissure Fongique!',       desc:'Fletrissure noire. Production -60% / 40s.',                                    type:'malus',weight:5, apply:()=>{addBoost('fungal_blight','🌑 Fletrissure -60%',0.4,40);return '-60% / 40s';}},
-  {id:'root_damage',   icon:'⚠️',title:'Racines Endommagees!',        desc:'Tunneliers. Production -30% / 90s.',                                           type:'malus',weight:6, apply:()=>{addBoost('root_damage','⚠️ Racines -30%',0.7,90);return '-30% / 90s';}},
-  {id:'spore_collapse',icon:'💀',title:'Effondrement!',               desc:'Catastrophe rare. -25% de spores.',                                            type:'malus',weight:2, apply:()=>{const l=Math.floor(G.spores*0.25);G.spores=Math.max(0,G.spores-l);return '-'+fmt(l)+' spores';}},
-  {id:'mega_drought',  icon:'🔥',title:'Grande Secheresse!',          desc:'Megasecheresse. Production -80% / 60s!',                                       type:'malus',weight:2, apply:()=>{addBoost('mega_drought','🔥 Megasecheresse -80%',0.2,60);return '-80% / 60s';}},
-  {id:'parasite',      icon:'🕷️',title:'Parasite Mycelien!',          desc:'Parasite. -50% prod ET -50% tap / 45s!',                                      type:'malus',weight:3, apply:()=>{addBoost('parasite_prod','🕷️ Parasite -50%',0.5,45);addBoost('parasite_click','🕷️ Tap -50%',0.5,45,'click');return '-50% tout / 45s';}},
-];
-
-const SHOP_ITEMS_POOL=[
-  {id:'s_click2',   rarity:'common',   icon:'🖐️',name:'Dose de Spores',    desc:'Tap power x2 / 2 minutes.',          cost:()=>Math.max(100,getSPS()*20),   apply:()=>addBoost('s_click2','🖐️ Tap x2',2,120,'click')},
-  {id:'s_prod15',   rarity:'common',   icon:'🌿',name:'Fertilisant Leger',  desc:'Production +50% / 2 minutes.',       cost:()=>Math.max(150,getSPS()*25),   apply:()=>addBoost('s_prod15','🌿 Prod +50%',1.5,120)},
-  {id:'s_instant',  rarity:'common',   icon:'✨',name:'Recolte Rapide',     desc:'Recolte 1 minute de production.',    cost:()=>Math.max(80,getSPS()*15),    apply:()=>{const b=getSPS()*60;G.spores+=b;G.lifetime+=b;}},
-  {id:'s_click3',   rarity:'rare',     icon:'⚡',name:'Gants Myceliens',    desc:'Tap power x3 / 3 minutes.',          cost:()=>Math.max(500,getSPS()*60),   apply:()=>addBoost('s_click3','⚡ Tap x3',3,180,'click')},
-  {id:'s_prod2',    rarity:'rare',     icon:'🍄',name:'Champignon Booste',  desc:'Production x2 / 3 minutes.',         cost:()=>Math.max(600,getSPS()*70),   apply:()=>addBoost('s_prod2','🍄 Prod x2',2,180)},
-  {id:'s_instant5', rarity:'rare',     icon:'🌧️',name:'Pluie de Spores',   desc:'Recolte 5 minutes de production.',   cost:()=>Math.max(400,getSPS()*80),   apply:()=>{const b=getSPS()*300;G.spores+=b;G.lifetime+=b;}},
-  {id:'s_antidote', rarity:'rare',     icon:'🛡️',name:'Antidote Fongique',  desc:'Annule tous les malus actifs!',      cost:()=>Math.max(800,getSPS()*100),  apply:()=>{Object.keys(activeBoosts).forEach(id=>{if(activeBoosts[id].isMalus)delete activeBoosts[id];});renderBoosts();}},
-  {id:'s_prod3',    rarity:'epic',     icon:'🔮',name:'Rituel Ancien',      desc:'Production x3 / 5 minutes.',         cost:()=>Math.max(2000,getSPS()*150), apply:()=>addBoost('s_prod3','🔮 Prod x3',3,300)},
-  {id:'s_click5',   rarity:'epic',     icon:'🌀',name:'Vortex de Spores',   desc:'Tap power x5 / 3 minutes.',          cost:()=>Math.max(1800,getSPS()*140), apply:()=>addBoost('s_click5','🌀 Tap x5',5,180,'click')},
-  {id:'s_instant15',rarity:'epic',     icon:'🌲',name:'Foret Enchantee',    desc:'Recolte 15 minutes de production.',  cost:()=>Math.max(1500,getSPS()*200), apply:()=>{const b=getSPS()*900;G.spores+=b;G.lifetime+=b;}},
-  {id:'s_shield',   rarity:'epic',     icon:'🧿',name:'Bouclier Mycelien',  desc:'Bloque le prochain evenement negatif!',cost:()=>Math.max(3000,getSPS()*250),apply:()=>{G.shielded=true;addLog('🧿 Bouclier actif — prochain malus ignore!');}},
-  {id:'s_megaprod', rarity:'legendary',icon:'👑',name:'Couronne Fongique',  desc:'Production x5 / 10 minutes!',        cost:()=>Math.max(8000,getSPS()*400), apply:()=>addBoost('s_megaprod','👑 x5 LEGENDAIRE',5,600)},
-  {id:'s_megaclick',rarity:'legendary',icon:'🌟',name:'Mains des Dieux',    desc:'Tap power x10 / 5 minutes!',         cost:()=>Math.max(7000,getSPS()*350), apply:()=>addBoost('s_megaclick','🌟 Tap x10',10,300,'click')},
-  {id:'s_godboost', rarity:'legendary',icon:'∞', name:'Eveil Mycelien',     desc:'Tout x8 / 2 minutes!',               cost:()=>Math.max(15000,getSPS()*600),apply:()=>addBoost('s_godboost','∞ Eveil x8',8,120)},
-];
-
-const RARITY_WEIGHTS={common:55,rare:30,epic:12,legendary:3};
-let shopItems=[],shopCdTimer=300,shopSold={};
-let eventTimer=60+Math.random()*20;
-let activeBoosts={};
-
-function bldN(id){return G.bld[id]||0;}
-function totalBlds(){return Object.values(G.bld).reduce((a,b)=>a+b,0);}
-function bldCost(b){return Math.floor(b.base*Math.pow(1.16,bldN(b.id)));}
-function clickMult(){let m=1;UPGRADES.forEach(u=>{if(u.type==='click'&&G.upg[u.id])m*=u.mult;});return m;}
-function globalMult(){let m=1;UPGRADES.forEach(u=>{if(u.type==='global'&&G.upg[u.id])m*=u.mult;});return m*G.ascendMult;}
-function bldMult(id){let m=1;UPGRADES.forEach(u=>{if(u.type==='bld'&&u.bld===id&&G.upg[u.id])m*=u.mult;});return m;}
-function getEventBoostMult(){let m=1;Object.values(activeBoosts).forEach(b=>{if(b.type==='global')m*=b.mult;});return m;}
-function getEventClickMult(){let m=1;Object.values(activeBoosts).forEach(b=>{if(b.type==='click')m*=b.mult;});return m;}
-function getSPS(){let s=0;BUILDINGS.forEach(b=>{const n=bldN(b.id);if(n>0)s+=b.cps*n*bldMult(b.id);});return s*globalMult()*getEventBoostMult();}
-function getClickPow(){return Math.ceil(Math.max(1,getSPS()*0.004+1)*clickMult()*G.ascendMult*getEventClickMult());}
-
-const logLines=[];
-function addLog(msg){
-  const d=new Date(),ts=d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
-  logLines.unshift('<span style="color:var(--text2)">['+ts+']</span> '+msg);
-  if(logLines.length>40)logLines.pop();
-  document.getElementById('logDiv').innerHTML=logLines.join('<br>');
-}
-function notif(msg){
-  const el=document.createElement('div');el.className='notif';el.innerHTML=msg;
-  document.body.appendChild(el);setTimeout(()=>el.remove(),3500);
-}
-
-function addBoost(id,label,mult,duration,type='global'){
-  activeBoosts[id]={label,mult,timeLeft:duration,type,isMalus:mult<1};
-  renderBoosts();
-}
-function renderBoosts(){
-  const bar=document.getElementById('boostsBar');
-  bar.querySelectorAll('.boost-chip').forEach(c=>c.remove());
-  const keys=Object.keys(activeBoosts);
-  document.getElementById('noBoosts').style.display=keys.length?'none':'';
-  keys.forEach(id=>{
-    const b=activeBoosts[id];
-    const chip=document.createElement('div');chip.id='chip_'+id;chip.className='boost-chip';
-    if(b.isMalus)chip.style.cssText='background:rgba(255,68,68,0.1);border-color:#ff4444;color:#ff6666;';
-    chip.innerHTML=b.label+' <span class="boost-chip-timer" id="chiptimer_'+id+'">'+Math.ceil(b.timeLeft)+'s</span>';
-    bar.appendChild(chip);
+function initGame() {
+  G = {
+    cash: 10, day: 1, rep: 50,
+    totalRevenue: 0, totalExpenses: 0, totalOrders: 0, totalReturns: 0,
+    unitsSold: 0, bestDayRevenue: 0,
+    inventory: [],          // {productId, qty, pendingQty, pendingDays, costPer, sellPrice, salesHistory[]}
+    trends: {},             // productId → multiplier
+    upgrades: new Set(),
+    adBoostDays: 0,
+    adBoostMult: 1,
+    holdCash: 0, holdDays: 0,
+    reachMult: 1,           // algo hit
+    reachDaysLeft: 0,
+    shipDelay: 0,           // extra days added globally
+    shipDelayDays: 0,
+    costSpike: 1, costSpikeDays: 0,
+    revHistory: [],         // last 14 days
+    newsLog: [],
+    competitor: { cash: 120, rep: 65, priceFactor: 0.88 },
+  };
+  PRODUCTS.forEach(p => {
+    G.trends[p.id] = 0.75 + Math.random() * 0.5;
   });
-}
-function tickBoosts(dt){
-  let changed=false;
-  Object.keys(activeBoosts).forEach(id=>{
-    activeBoosts[id].timeLeft-=dt;
-    const tel=document.getElementById('chiptimer_'+id);
-    if(tel)tel.textContent=Math.max(0,Math.ceil(activeBoosts[id].timeLeft))+'s';
-    if(activeBoosts[id].timeLeft<=0){delete activeBoosts[id];const chip=document.getElementById('chip_'+id);if(chip)chip.remove();changed=true;}
-  });
-  if(changed)renderBoosts();
+  renderAll();
+  addFeed('🚀', 'DropForge launched. You have $10.00. Make it count.', 'system');
+  updateTicker();
 }
 
-// EVENTS — auto-appliques, banniere qui disparait seule
-function triggerEvent(){
-  if(getSPS()<=0&&G.lifetime<100)return;
-  const totalW=EVENTS.reduce((s,e)=>s+(e.weight||1),0);
-  let r=Math.random()*totalW,cum=0,ev=EVENTS[0];
-  for(const e of EVENTS){cum+=(e.weight||1);if(r<=cum){ev=e;break;}}
-  if(ev.type==='malus'&&G.shielded){
-    G.shielded=false;
-    addLog('🧿 <strong style="color:var(--glow)">Bouclier!</strong> Malus bloque: '+ev.title);
-    notif('🧿 <strong>Bouclier!</strong><br>'+ev.title+' bloque!');
+/* ═══════════════════════════════════════════════════════════
+   SCREEN ROUTING
+═══════════════════════════════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+}
+function startGame() { showScreen('screen-game'); initGame(); }
+function resetGame() { showScreen('screen-intro'); }
+
+/* ═══════════════════════════════════════════════════════════
+   TAB SWITCHING
+═══════════════════════════════════════════════════════════ */
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('content-' + tab).classList.add('active');
+  document.getElementById('nav-' + tab).classList.add('active');
+  if (tab === 'news') document.getElementById('news-badge').style.display = 'none';
+  renderTab(tab);
+}
+function renderTab(tab) {
+  if (tab === 'catalog') renderCatalog();
+  else if (tab === 'store') renderStore();
+  else if (tab === 'analytics') renderAnalytics();
+  else if (tab === 'upgrades') renderUpgrades();
+  else if (tab === 'news') renderNews();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RENDER ALL
+═══════════════════════════════════════════════════════════ */
+function renderAll() {
+  renderHUD();
+  renderLeftPanel();
+  renderTab(currentTab);
+  renderRightPanel();
+}
+
+/* ─── HUD ─── */
+function renderHUD() {
+  const profit = G.totalRevenue - G.totalExpenses;
+  document.getElementById('hud-cash').textContent = '$' + G.cash.toFixed(2);
+  document.getElementById('hud-profit').textContent = (profit >= 0 ? '+' : '') + '$' + profit.toFixed(2);
+  document.getElementById('hud-rep').textContent = Math.round(G.rep);
+  document.getElementById('hud-day').textContent = 'Day ' + G.day;
+  const pct = Math.min(100, G.day);
+  document.getElementById('day-bar').style.width = pct + '%';
+  document.getElementById('day-pct').textContent = pct + '%';
+  document.getElementById('hud-profit').style.color = profit >= 0 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('hud-cash').style.color = G.cash < 5 ? 'var(--red)' : G.cash < 30 ? 'var(--yellow)' : 'var(--green)';
+}
+
+/* ─── LEFT PANEL ─── */
+function renderLeftPanel() {
+  const goalPct = Math.min(100, (G.cash / 10000) * 100);
+  document.getElementById('bc-rev').textContent = '$' + G.totalRevenue.toFixed(2);
+  document.getElementById('bc-exp').textContent = '$' + G.totalExpenses.toFixed(2);
+  document.getElementById('bc-orders').textContent = G.totalOrders;
+  document.getElementById('bc-returns').textContent = G.totalReturns;
+  document.getElementById('goal-bar').style.width = goalPct.toFixed(1) + '%';
+  document.getElementById('goal-pct').textContent = 'Goal: $10,000 — ' + goalPct.toFixed(1) + '%';
+  document.getElementById('m-listings').textContent = G.inventory.length;
+  document.getElementById('m-stock').textContent = G.inventory.reduce((s, i) => s + i.qty, 0);
+  document.getElementById('m-sales').textContent = G.unitsSold;
+  const todayRev = G.revHistory.length ? G.revHistory[G.revHistory.length - 1] : 0;
+  document.getElementById('m-daily').textContent = '$' + todayRev.toFixed(0);
+  const hasLowStock = G.inventory.some(i => i.qty < 3 && i.qty >= 0);
+  document.getElementById('store-badge').style.display = hasLowStock ? 'inline' : 'none';
+
+  // Competitor
+  const c = G.competitor;
+  const threat = c.rep > G.rep ? 'HIGH ⚠' : 'LOW ✓';
+  const threatColor = c.rep > G.rep ? 'var(--red)' : 'var(--green)';
+  document.getElementById('competitor-panel').innerHTML = `
+    <div class="cw-row"><span class="cl">Name</span><span class="cv">CheapDropz99</span></div>
+    <div class="cw-row"><span class="cl">Cash</span><span class="cv" style="color:var(--yellow)">$${c.cash.toFixed(0)}</span></div>
+    <div class="cw-row"><span class="cl">Reputation</span><span class="cv" style="color:var(--blue)">${Math.round(c.rep)}</span></div>
+    <div class="cw-row"><span class="cl">Price War</span><span class="cv">${(c.priceFactor * 100).toFixed(0)}% of yours</span></div>
+    <div class="cw-row"><span class="cl">Threat</span><span class="cv" style="color:${threatColor}">${threat}</span></div>
+  `;
+}
+
+/* ─── CATALOG ─── */
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('filter-' + f);
+  if (btn) btn.classList.add('active');
+  renderCatalog();
+}
+
+function renderCatalog() {
+  const q = (document.getElementById('search-input')?.value || '').toLowerCase();
+  const grid = document.getElementById('catalog-grid');
+  let products = PRODUCTS;
+  if (currentFilter !== 'all') products = products.filter(p => p.cat === currentFilter);
+  if (q) products = products.filter(p => p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q));
+
+  const vipUnlocked = G.upgrades.has('vip_supplier');
+  if (!vipUnlocked) products = products.slice(0, 9);
+
+  grid.innerHTML = products.map(p => {
+    const trend = G.trends[p.id] || 1;
+    const trendPct = ((trend - 1) * 100).toFixed(0);
+    const trendUp = trend >= 1;
+    const cost = getProductCost(p);
+    const canAfford = G.cash >= cost;
+    const demand = Math.round(p.demandBase * trend);
+    const margin = (((p.msrp - cost) / p.msrp) * 100).toFixed(0);
+
+    const tagBadge = p.tags[0];
+    const badgeMap = { hot:'hot', trending:'trending', cold:'cold', risky:'risky', new:'new', saturated:'saturated', stable:'trending', health:'new', pet:'new', fashion:'hot', tech:'new', home:'new' };
+    const badgeClass = badgeMap[tagBadge] || 'new';
+
+    return `<div class="product-card ${canAfford ? '' : 'unaffordable'}" onclick="${canAfford ? `openModal('${p.id}')` : ''}">
+      <div class="pc-top">
+        <span class="pc-emoji">${p.emoji}</span>
+        <div class="pc-badges">
+          <span class="badge ${badgeClass}">${tagBadge}</span>
+          ${trend > 1.35 ? '<span class="badge hot">🔥 HOT</span>' : trend < 0.7 ? '<span class="badge cold">❄ COLD</span>' : ''}
+        </div>
+      </div>
+      <div class="pc-name">${p.name}</div>
+      <div class="pc-cat">${p.cat} · ${p.shipDays}d ship</div>
+      <div class="pc-desc">${p.desc}</div>
+      <div class="pc-grid">
+        <div class="pc-stat"><span class="ps-val" style="color:var(--red)">$${cost.toFixed(2)}</span><span class="ps-lbl">Source Cost</span></div>
+        <div class="pc-stat"><span class="ps-val" style="color:var(--green)">$${p.msrp.toFixed(2)}</span><span class="ps-lbl">Suggested</span></div>
+        <div class="pc-stat"><span class="ps-val" style="color:var(--blue)">~${demand}/d</span><span class="ps-lbl">Demand</span></div>
+        <div class="pc-stat"><span class="ps-val" style="color:${margin > 50 ? 'var(--green)' : margin > 30 ? 'var(--yellow)' : 'var(--red)'}">${margin}%</span><span class="ps-lbl">Max Margin</span></div>
+      </div>
+      <div class="pc-trend">
+        <div style="display:flex;justify-content:space-between;font-size:10px;">
+          <span style="color:var(--text3)">Market Trend</span>
+          <span style="font-family:var(--mono);font-weight:700;color:${trendUp ? 'var(--green)' : 'var(--red)'}">${trendUp ? '▲' : '▼'} ${Math.abs(trendPct)}%</span>
+        </div>
+        <div class="pc-trend-bar"><div class="pc-trend-fill" style="width:${Math.min(100, trend * 55)}%;background:${trendUp ? 'var(--green)' : 'var(--red)'}"></div></div>
+      </div>
+    </div>`;
+  }).join('') || '<div style="color:var(--text3);padding:20px;font-size:12px;">No products match your search.</div>';
+}
+
+/* ─── STORE ─── */
+function renderStore() {
+  const wrap = document.getElementById('store-grid-wrap');
+  if (G.inventory.length === 0) {
+    wrap.innerHTML = `<div class="store-empty"><span class="se-icon">📭</span><span class="se-text">No active listings.<br>Head to the catalog to source your first product!</span></div>`;
     return;
   }
-  const result=ev.apply();
-  const borderCol=ev.type==='malus'?'#ff4444':ev.type==='boost'?'#00ffaa':'#ffaa22';
-  const titleCol=ev.type==='malus'?'#ff6666':ev.type==='boost'?'#00ffaa':'#ffaa22';
-  const typeLabel=ev.type==='malus'?'⚠️ Evenement negatif':ev.type==='boost'?'✨ Bonus temporaire':'🎁 Recompense';
-  const logColor=ev.type==='malus'?'#ff6666':ev.type==='boost'?'#00ffaa':'#ffaa22';
-  addLog(ev.icon+' <strong style="color:'+logColor+'">'+ev.title+'</strong> — '+result);
-  // Banniere auto
-  const old=document.getElementById('eventBanner');if(old)old.remove();
-  const banner=document.createElement('div');
-  banner.id='eventBanner';
-  banner.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:900;width:380px;max-width:92vw;background:linear-gradient(135deg,#1a0a00,#0d0800);border:2px solid '+borderCol+';border-radius:12px;padding:14px 20px;box-shadow:0 0 40px rgba(0,0,0,0.6);animation:eventSlide 0.4s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;';
-  banner.innerHTML='<div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#9a7a44;margin-bottom:2px">'+typeLabel+'</div><div style="font-family:Cinzel,serif;font-size:16px;font-weight:900;color:'+titleCol+';margin-bottom:4px">'+ev.icon+' '+ev.title+'</div><div style="font-size:12px;color:#e8d5a0;font-style:italic;margin-bottom:6px">'+ev.desc+'</div><div style="font-family:Cinzel,serif;font-size:13px;color:'+titleCol+';font-weight:700">'+result+'</div>';
-  document.body.appendChild(banner);
-  setTimeout(()=>{banner.style.transition='opacity 0.5s';banner.style.opacity='0';setTimeout(()=>banner.remove(),500);},4000);
-  refresh();
+  wrap.innerHTML = `<div class="store-grid">${G.inventory.map((item, idx) => {
+    const p = PRODUCTS.find(x => x.id === item.productId);
+    if (!p) return '';
+    const profit = item.sellPrice - item.costPer;
+    const margin = item.sellPrice > 0 ? ((profit / item.sellPrice) * 100).toFixed(0) : 0;
+    const profitClass = profit > 0 ? 'pos' : 'neg';
+    const cardClass = item.pendingDays > 0 && item.qty === 0 ? 'has-pending' : item.qty === 0 ? 'out-of-stock' : 'healthy';
+    const avgSales = item.salesHistory.length ? (item.salesHistory.reduce((a,b)=>a+b,0)/item.salesHistory.length).toFixed(1) : '—';
+    const maxSale = Math.max(...item.salesHistory, 1);
+    const sparkBars = item.salesHistory.slice(-10).map(v => {
+      const h = Math.max(4, Math.round((v / maxSale) * 100));
+      return `<div class="mc-bar" style="height:${h}%"></div>`;
+    }).join('');
+
+    return `<div class="listing-card ${cardClass}">
+      <div class="lc-header">
+        <div>
+          <div class="lc-name">${p.emoji} ${p.name} <span class="profit-pill ${profitClass}">${profit > 0 ? '+' : ''}$${profit.toFixed(2)}</span></div>
+          ${item.pendingDays > 0 ? `<div style="font-size:10px;color:var(--yellow);margin-top:3px">⏳ ${item.pendingQty} units arriving in ${item.pendingDays}d</div>` : ''}
+        </div>
+        <div>
+          <div class="lc-stock" style="color:${item.qty > 0 ? 'var(--green)' : 'var(--red)'}">${item.qty}</div>
+          <div class="lc-stock-lbl">in stock</div>
+        </div>
+      </div>
+      <div class="lc-stats">
+        <div class="lc-stat"><span class="lsv" style="color:var(--red)">$${item.costPer.toFixed(2)}</span><span class="lsl">Cost</span></div>
+        <div class="lc-stat"><span class="lsv" style="color:${margin > 40 ? 'var(--green)' : margin > 20 ? 'var(--yellow)' : 'var(--red)'}">${margin}%</span><span class="lsl">Margin</span></div>
+        <div class="lc-stat"><span class="lsv">${avgSales}/d</span><span class="lsl">Avg Sales</span></div>
+      </div>
+      ${sparkBars ? `<div class="mini-chart">${sparkBars}</div>` : ''}
+      <div class="price-row">
+        <label>Sell Price $</label>
+        <input class="price-input" type="number" value="${item.sellPrice.toFixed(2)}" min="0.01" step="0.50"
+          onchange="updatePrice(${idx},this.value)" oninput="updatePricePreview(${idx},this.value,this)">
+        <span class="price-margin" id="pm-${idx}" style="color:${margin > 40 ? 'var(--green)' : margin > 20 ? 'var(--yellow)' : 'var(--red)'}">${margin}%</span>
+      </div>
+      <div class="lc-actions">
+        <button class="btn-sm success" onclick="openModal('${p.id}',true,${idx})">+ Restock</button>
+        <button class="btn-sm" onclick="discardListing(${idx})">Remove</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
 }
 
-function generateShop(){
-  shopItems=[];shopSold={};
-  const pool=[...SHOP_ITEMS_POOL],picked=new Set();
-  while(shopItems.length<4&&pool.length>0){
-    const totalW=pool.reduce((s,item)=>s+RARITY_WEIGHTS[item.rarity],0);
-    let r=Math.random()*totalW,cum=0,chosen=null;
-    for(const item of pool){cum+=RARITY_WEIGHTS[item.rarity];if(r<=cum){chosen=item;break;}}
-    if(!chosen)chosen=pool[0];
-    if(!picked.has(chosen.id)){shopItems.push(chosen);picked.add(chosen.id);}
-    pool.splice(pool.indexOf(chosen),1);
+function updatePrice(idx, val) {
+  const price = parseFloat(val);
+  if (!isNaN(price) && price > 0 && G.inventory[idx]) G.inventory[idx].sellPrice = price;
+}
+function updatePricePreview(idx, val, input) {
+  const price = parseFloat(val);
+  if (!isNaN(price) && price > 0 && G.inventory[idx]) {
+    G.inventory[idx].sellPrice = price;
+    const margin = ((price - G.inventory[idx].costPer) / price * 100).toFixed(0);
+    const el = document.getElementById('pm-' + idx);
+    if (el) { el.textContent = margin + '%'; el.style.color = margin > 40 ? 'var(--green)' : margin > 20 ? 'var(--yellow)' : 'var(--red)'; }
   }
 }
-function openShop(){generateShopUI();document.getElementById('shopOverlay').style.display='flex';}
-function closeShop(){document.getElementById('shopOverlay').style.display='none';}
-function generateShopUI(){
-  const grid=document.getElementById('shopGrid');grid.innerHTML='';
-  const rarityColors={common:'#aaa',rare:'#44aaff',epic:'#cc44ff',legendary:'#ffaa22'};
-  shopItems.forEach(item=>{
-    const sold=shopSold[item.id],cost=item.cost(),canAfford=G.spores>=cost;
-    const div=document.createElement('div');
-    div.className='shop-item'+(sold?' sold':'');
-    div.innerHTML='<div class="shop-item-rarity" style="color:'+rarityColors[item.rarity]+'">'+item.rarity.toUpperCase()+'</div><div class="shop-item-icon">'+item.icon+'</div><div class="shop-item-name">'+item.name+'</div><div class="shop-item-desc">'+item.desc+'</div><div class="shop-item-cost" style="color:'+(canAfford?'var(--amber)':'var(--red)')+'">'+fmt(cost)+' ✨</div>';
-    if(!sold)div.onclick=()=>buyShopItem(item.id);
-    grid.appendChild(div);
-  });
+function discardListing(idx) {
+  const item = G.inventory[idx];
+  const p = PRODUCTS.find(x => x.id === item.productId);
+  G.inventory.splice(idx, 1);
+  addFeed('🗑️', `Removed listing: ${p ? p.name : 'item'}`, 'warn');
+  renderAll();
 }
-function buyShopItem(id){
-  const item=shopItems.find(x=>x.id===id);
-  if(!item||shopSold[id])return;
-  const cost=item.cost();
-  if(G.spores<cost){notif('Pas assez de spores!');return;}
-  G.spores-=cost;shopSold[id]=true;item.apply();
-  addLog('🏪 Achete: <strong style="color:var(--amber)">'+item.name+'</strong> — '+fmt(cost)+' spores');
-  notif('✅ <strong>'+item.name+'</strong> active!');
-  generateShopUI();refresh();
+
+/* ─── ANALYTICS ─── */
+function renderAnalytics() {
+  const profit = G.totalRevenue - G.totalExpenses;
+  const avgDaily = G.revHistory.length ? (G.revHistory.reduce((a,b)=>a+b,0)/G.revHistory.length) : 0;
+  const maxRev = Math.max(...G.revHistory, 1);
+  const revBars = G.revHistory.slice(-14).map((v, i) => {
+    const h = Math.max(2, Math.round((v / maxRev) * 80));
+    return `<div class="rev-bar" style="height:${h}px"><div class="rev-tooltip">Day ${G.day - G.revHistory.length + i + 1}: $${v.toFixed(2)}</div></div>`;
+  }).join('');
+
+  // Product breakdown
+  const productRevs = G.inventory.map(item => {
+    const p = PRODUCTS.find(x => x.id === item.productId);
+    const total = item.salesHistory.reduce((a,b)=>a+b,0) * item.sellPrice;
+    return { name: p ? p.name : 'Unknown', total };
+  }).sort((a,b) => b.total - a.total);
+  const maxPRev = Math.max(...productRevs.map(x => x.total), 1);
+  const breakdownHtml = productRevs.slice(0, 6).map(pr => `
+    <div class="bl-row">
+      <span class="bl-name">${pr.name}</span>
+      <div class="bl-bar-wrap"><div class="bl-bar-fill" style="width:${(pr.total/maxPRev*100).toFixed(0)}%"></div></div>
+      <span class="bl-val">$${pr.total.toFixed(0)}</span>
+    </div>`).join('') || '<div style="color:var(--text3);font-size:11px;padding:8px 0">No sales data yet</div>';
+
+  document.getElementById('analytics-grid').innerHTML = `
+    <div class="analytics-card">
+      <div class="ac-title">Total Revenue</div>
+      <span class="ac-big">$${G.totalRevenue.toFixed(2)}</span>
+      <span class="ac-sub">${G.totalOrders} orders · ${G.unitsSold} units sold</span>
+      <div class="rev-chart">${revBars || '<span style="color:var(--text3);font-size:11px">No data yet</span>'}</div>
+    </div>
+    <div class="analytics-card">
+      <div class="ac-title">Net Profit</div>
+      <span class="ac-big" style="color:${profit >= 0 ? 'var(--green)' : 'var(--red)'}">${profit >= 0 ? '+' : ''}$${profit.toFixed(2)}</span>
+      <span class="ac-sub">Expenses: $${G.totalExpenses.toFixed(2)} · Returns: ${G.totalReturns}</span>
+    </div>
+    <div class="analytics-card" style="grid-column:1/-1">
+      <div class="ac-title">Revenue by Product</div>
+      <div class="breakdown-list">${breakdownHtml}</div>
+    </div>
+    <div class="analytics-card">
+      <div class="ac-title">Best Day</div>
+      <span class="ac-big">$${G.bestDayRevenue.toFixed(2)}</span>
+      <span class="ac-sub">Avg daily: $${avgDaily.toFixed(2)}</span>
+    </div>
+    <div class="analytics-card">
+      <div class="ac-title">Reputation Score</div>
+      <span class="ac-big" style="color:var(--blue)">${Math.round(G.rep)}</span>
+      <span class="ac-sub">Affects conversion rate. Target: 80+</span>
+    </div>
+  `;
 }
-function tickShop(dt){
-  shopCdTimer-=dt;eventTimer-=dt;
-  if(eventTimer<=0){eventTimer=50+Math.random()*30;triggerEvent();}
-  if(shopCdTimer<=0){
-    shopCdTimer=300;generateShop();
-    addLog('🏪 <strong style="color:var(--amber)">Marche renouvele!</strong>');
-    notif('🏪 <strong>Marche renouvele!</strong><br>Nouveaux boosts disponibles!');
+
+/* ─── UPGRADES ─── */
+function renderUpgrades() {
+  document.getElementById('upgrades-grid').innerHTML = UPGRADES.map((u, i) => {
+    const owned = G.upgrades.has(u.id);
+    const cantAfford = !owned && G.cash < u.cost;
+    return `<div class="upgrade-card ${owned ? 'owned' : cantAfford ? 'cant-afford' : ''}" onclick="${owned ? '' : `buyUpgrade('${u.id}')`}">
+      <span class="uc-icon">${u.icon}</span>
+      <div class="uc-name">${u.name} ${owned ? '<span class="uc-owned-badge">✓ INSTALLED</span>' : ''}</div>
+      <div class="uc-desc">${u.desc}</div>
+      <div class="uc-cost">${owned ? 'Active' : '$' + u.cost.toFixed(2)}</div>
+    </div>`;
+  }).join('');
+}
+
+function buyUpgrade(id) {
+  const u = UPGRADES.find(x => x.id === id);
+  if (!u || G.upgrades.has(id)) return;
+  if (G.cash < u.cost) { toast('💸 Not enough cash for this upgrade.', 'bad'); return; }
+  G.cash -= u.cost;
+  G.totalExpenses += u.cost;
+  G.upgrades.add(id);
+  applyUpgradeEffect(u.effect, u);
+  toast(`✅ ${u.name} installed!`, 'good');
+  addFeed('⚡', `Upgrade purchased: ${u.name}`, 'system');
+  renderAll();
+}
+
+function applyUpgradeEffect(effect, u) {
+  if (effect === 'ads14') { G.adBoostDays = 14; G.adBoostMult = 1.5; }
+  if (effect === 'rep+25') { G.rep = Math.min(100, G.rep + 25); }
+}
+
+/* ─── NEWS ─── */
+function renderNews() {
+  const nl = document.getElementById('news-list');
+  if (G.newsLog.length === 0) {
+    nl.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:20px 0">No market events yet. Advance days to see market news.</div>';
+    return;
   }
-  const sm=Math.floor(shopCdTimer/60),ss=Math.floor(shopCdTimer%60);
-  const txt='Nouveau dans '+sm+':'+(ss<10?'0':'')+ss;
-  const el1=document.getElementById('shopCdTxt');if(el1)el1.textContent=txt;
-  const el2=document.getElementById('shopTimerTxt');if(el2)el2.textContent='Se renouvelle dans '+sm+':'+(ss<10?'0':'')+ss;
+  nl.innerHTML = G.newsLog.slice().reverse().map(n => `
+    <div class="news-item impact-${n.impact}">
+      <span class="news-icon">${n.icon}</span>
+      <div class="news-body">
+        <div class="news-headline">${n.headline}</div>
+        <div class="news-detail">${n.detail}</div>
+      </div>
+      <div class="news-day">Day ${n.day}</div>
+    </div>`).join('');
 }
 
-function quickRefresh(){
-  const sps=getSPS(),cp=getClickPow();
-  document.getElementById('sporeCount').textContent=fmt(G.spores);
-  document.getElementById('spsDisplay').textContent=fmt(sps);
-  document.getElementById('spcDisplay').textContent=fmt(cp);
-  document.getElementById('tSpores').textContent=fmt(G.spores);
-  document.getElementById('tSPS').textContent=fmt(sps);
-  document.getElementById('tLife').textContent=fmt(G.lifetime);
-  document.querySelectorAll('.bld-card').forEach((el,i)=>{
-    const b=BUILDINGS[i];if(!b)return;
-    const cost=bldCost(b),locked=G.lifetime<b.unlock,afford=!locked&&G.spores>=cost;
-    el.classList.toggle('affordable',afford);
-    const ce=el.querySelector('.bld-count');if(ce)ce.textContent=bldN(b.id);
-    const cps=el.querySelector('.bld-cps'),n=bldN(b.id);
-    if(cps)cps.textContent=n>0?fmt(b.cps*n*bldMult(b.id)*globalMult())+' /s':'';
-  });
-}
-function refresh(){
-  const sps=getSPS(),cp=getClickPow();
-  document.getElementById('sporeCount').textContent=fmt(G.spores);
-  document.getElementById('spsDisplay').textContent=fmt(sps);
-  document.getElementById('spcDisplay').textContent=fmt(cp);
-  document.getElementById('tSpores').textContent=fmt(G.spores);
-  document.getElementById('tSPS').textContent=fmt(sps);
-  document.getElementById('tMult').textContent=G.ascendMult.toFixed(2);
-  document.getElementById('tLife').textContent=fmt(G.lifetime);
-  document.getElementById('ascMultPrev').textContent='x'+(1+(G.ascendCount+1)*0.6).toFixed(2);
-  const ab=document.getElementById('ascBtn');
-  ab.disabled=G.lifetime<1e15;
-  ab.textContent=G.lifetime>=1e15?'🌀 Ascend #'+(G.ascendCount+1):'🌀 Ascend (need '+fmt(1e15)+')';
-  const{stage,pct,nextAt}=getStage();
-  document.getElementById('stageName').textContent=stage.name;
-  document.getElementById('stageBar').style.width=pct+'%';
-  document.getElementById('stageDesc').textContent=nextAt===Infinity?stage.desc:stage.desc+' — Prochain: '+fmt(nextAt)+' spores';
-  renderBlds();renderUpgs();
-}
-function renderBlds(){
-  const el=document.getElementById('bldList');el.innerHTML='';
-  BUILDINGS.forEach(b=>{
-    const n=bldN(b.id),cost=bldCost(b),locked=G.lifetime<b.unlock,afford=!locked&&G.spores>=cost;
-    const sps=b.cps*Math.max(1,n)*bldMult(b.id)*globalMult();
-    const mp=[1,5,10,25,50,100,200,300],prevM=mp.filter(m=>n>=m).pop()||0,nextM=mp.find(m=>n<m)||999;
-    const prog=nextM<999?((n-prevM)/(nextM-prevM)*100):100;
-    const div=document.createElement('div');
-    div.className='bld-card'+(locked?' locked':'')+(afford?' affordable':'');
-    div.innerHTML='<div class="bld-top"><div class="bld-icon">'+b.icon+'</div><div class="bld-info"><div class="bld-name">'+b.name+'</div><div class="bld-desc">'+(locked?'Debloque a '+fmt(b.unlock)+' spores':b.desc)+'</div></div><div class="bld-count">'+n+'</div></div><div class="bld-bottom"><div class="bld-cps">'+(n>0?fmt(sps)+' /s':'')+'</div><div class="bld-cost">'+fmt(cost)+' ✨</div></div><div class="bld-prog"><div class="bld-prog-fill" style="width:'+prog+'%"></div></div>';
-    if(!locked)div.onclick=()=>buyBld(b.id);
-    el.appendChild(div);
-  });
-}
-function renderUpgs(){
-  const el=document.getElementById('upgList');el.innerHTML='';
-  UPGRADES.forEach(u=>{
-    const bought=G.upg[u.id];if(!bought&&!u.req())return;
-    const afford=!bought&&G.spores>=u.cost;
-    const div=document.createElement('div');
-    div.className='upg-card'+(bought?' bought':'')+(afford?' affordable':'');
-    div.innerHTML='<span class="upg-icon">'+u.icon+'</span><div class="upg-name">'+u.name+'</div><div class="upg-desc">'+u.eff+'</div><div class="upg-cost">'+(bought?'✓ Recherche':fmt(u.cost)+' ✨')+'</div>';
-    if(!bought)div.onclick=()=>buyUpg(u.id);
-    el.appendChild(div);
-  });
-}
-function renderAch(){
-  const el=document.getElementById('achList');el.innerHTML='';
-  ACHIEVEMENTS.forEach(a=>{
-    const u=G.ach[a.id],div=document.createElement('div');
-    div.className='ach-card '+(u?'unlocked':'locked');
-    div.innerHTML='<div class="ach-icon">'+a.icon+'</div><div><div class="ach-name">'+a.name+'</div><div class="ach-desc">'+(u?a.desc:'???')+'</div></div>';
-    el.appendChild(div);
-  });
-}
-function getStage(){
-  let s=STAGES[0];
-  for(let i=STAGES.length-1;i>=0;i--){if(G.lifetime>=STAGES[i].at){s=STAGES[i];break;}}
-  const idx=STAGES.indexOf(s),next=STAGES[idx+1];
-  if(!next)return{stage:s,pct:100,nextAt:Infinity};
-  return{stage:s,pct:Math.min(100,((G.lifetime-s.at)/(next.at-s.at))*100),nextAt:next.at};
+/* ─── RIGHT PANEL ─── */
+function renderRightPanel() {
+  // Trends
+  const trendHtml = PRODUCTS.slice(0, 10).map(p => {
+    const t = G.trends[p.id] || 1;
+    const chg = ((t - 1) * 100).toFixed(1);
+    return `<div class="trend-item">
+      <span class="ti-name">${p.emoji} ${p.name.split(' ')[0]}</span>
+      <span class="ti-change ${t >= 1 ? 'up' : 'down'}">${t >= 1 ? '▲' : '▼'} ${Math.abs(chg)}%</span>
+    </div>`;
+  }).join('');
+  document.getElementById('market-trends-list').innerHTML = trendHtml;
+
+  // Sparkline
+  const rev7 = G.revHistory.slice(-7);
+  const maxR = Math.max(...rev7, 1);
+  const sparkHtml = rev7.map(v => {
+    const h = Math.max(2, Math.round((v / maxR) * 100));
+    return `<div class="spark" style="height:${h}%"></div>`;
+  }).join('');
+  document.getElementById('revenue-sparkline').innerHTML = sparkHtml || '<span style="color:var(--text3);font-size:10px">No data</span>';
+  const avg = rev7.length ? rev7.reduce((a,b)=>a+b,0)/rev7.length : 0;
+  document.getElementById('avg-daily').textContent = `Avg: $${avg.toFixed(2)}/day`;
 }
 
-const _cap=document.getElementById('shroomCap');
-let _ct=null;
-function onClickShroom(e){
-  const pow=getClickPow();
-  G.spores+=pow;G.lifetime+=pow;G.totalClicks++;
-  const fl=document.createElement('div');
-  fl.style.cssText='position:fixed;pointer-events:none;z-index:999;font-family:Cinzel,serif;font-weight:700;font-size:15px;color:#c8ff00;text-shadow:0 0 12px rgba(200,255,0,0.8);animation:floatUp 0.9s ease-out forwards;left:'+(e.clientX-20)+'px;top:'+(e.clientY-30)+'px';
-  fl.textContent='+'+fmt(pow);
-  document.body.appendChild(fl);setTimeout(()=>fl.remove(),900);
-  _cap.style.transform='scale(0.93) translateX(-50%)';
-  if(_ct)clearTimeout(_ct);
-  _ct=setTimeout(()=>{_cap.style.transform='translateX(-50%)';},80);
-  quickRefresh();checkAch();
+/* ═══════════════════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════════════════ */
+function openModal(productId, restock = false, invIdx = -1) {
+  const p = PRODUCTS.find(x => x.id === productId);
+  if (!p) return;
+  modalState = { productId, qty: 1, restock, invIdx };
+
+  document.getElementById('modal-title').textContent = restock ? `Restock: ${p.name}` : `Source: ${p.name}`;
+  document.getElementById('modal-sub').textContent = restock ? `Add more units to your existing listing.` : `Review details before placing order with supplier.`;
+
+  const cost = getProductCost(p);
+  document.getElementById('modal-preview').innerHTML = `
+    <span style="font-size:36px">${p.emoji}</span>
+    <div><div class="mpp-name">${p.name}</div><div class="mpp-cat">${p.cat} · Ships in ${getShipDays(p)} days</div></div>
+    <div class="mpp-cost">$${cost.toFixed(2)}<br><span style="font-size:10px;color:var(--text3)">per unit</span></div>`;
+
+  document.getElementById('modal-details').innerHTML = `
+    <div class="modal-row"><span class="mr-l">Suggested Sell Price</span><span class="mr-r" style="color:var(--yellow)">$${p.msrp.toFixed(2)}</span></div>
+    <div class="modal-row"><span class="mr-l">Potential Margin</span><span class="mr-r" style="color:var(--green)">${(((p.msrp - cost)/p.msrp)*100).toFixed(0)}%</span></div>
+    <div class="modal-row"><span class="mr-l">Estimated Demand</span><span class="mr-r">~${Math.round(p.demandBase * (G.trends[p.id]||1))}/day</span></div>
+    <div class="modal-row"><span class="mr-l">Return Rate</span><span class="mr-r" style="color:var(--red)">${(getReturnRate(p)*100).toFixed(0)}%</span></div>`;
+
+  updateModalCalc();
+  document.getElementById('buy-modal').classList.add('open');
 }
-function buyBld(id){
-  const b=BUILDINGS.find(x=>x.id===id),cost=bldCost(b);
-  if(G.spores<cost)return;
-  G.spores-=cost;G.bld[id]=(G.bld[id]||0)+1;
-  addLog('Construit '+b.icon+' <strong style="color:var(--glow)">'+b.name+'</strong> #'+bldN(id)+' — '+fmt(cost)+' spores');
-  refresh();checkAch();
+
+function closeModal() {
+  document.getElementById('buy-modal').classList.remove('open');
 }
-function buyUpg(id){
-  if(G.upg[id])return;
-  const u=UPGRADES.find(x=>x.id===id);
-  if(!u||G.spores<u.cost)return;
-  G.spores-=u.cost;G.upg[id]=true;
-  addLog('Recherche '+u.icon+' <strong style="color:var(--amber)">'+u.name+'</strong>');
-  notif('🔬 <strong>'+u.name+'</strong><br><em>'+u.eff+'</em>');
-  refresh();
+
+function qtyChange(delta) {
+  if (!modalState.productId) return;
+  const p = PRODUCTS.find(x => x.id === modalState.productId);
+  const max = Math.floor(G.cash / getProductCost(p));
+  modalState.qty = Math.max(1, Math.min(max, modalState.qty + delta));
+  document.getElementById('modal-qty').textContent = modalState.qty;
+  updateModalCalc();
 }
-function checkAch(){
-  ACHIEVEMENTS.forEach(a=>{
-    if(!G.ach[a.id]&&a.req()){
-      G.ach[a.id]=true;
-      addLog('🏅 <strong style="color:var(--amber)">'+a.name+'</strong> debloque!');
-      notif('🏅 <strong>'+a.name+'</strong><br><em>'+a.desc+'</em>');
-      renderAch();
+
+function updateModalCalc() {
+  const p = PRODUCTS.find(x => x.id === modalState.productId);
+  if (!p) return;
+  const cost = getProductCost(p);
+  const total = cost * modalState.qty;
+  const remain = G.cash - total;
+  const sellEst = p.msrp;
+  const profitPer = sellEst - cost;
+  document.getElementById('modal-total').textContent = '$' + total.toFixed(2);
+  document.getElementById('modal-remain').textContent = '$' + remain.toFixed(2);
+  document.getElementById('modal-remain').style.color = remain < 0 ? 'var(--red)' : remain < 5 ? 'var(--yellow)' : 'var(--text)';
+  document.getElementById('modal-sellprice').textContent = '$' + sellEst.toFixed(2);
+  document.getElementById('modal-profit').textContent = (profitPer >= 0 ? '+' : '') + '$' + profitPer.toFixed(2) + '/unit';
+  document.getElementById('modal-profit').style.color = profitPer >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('modal-confirm').disabled = remain < 0 || modalState.qty < 1;
+}
+
+function confirmOrder() {
+  const p = PRODUCTS.find(x => x.id === modalState.productId);
+  if (!p) return;
+  const cost = getProductCost(p);
+  const total = cost * modalState.qty;
+  if (total > G.cash) { toast('Not enough cash.', 'bad'); return; }
+
+  G.cash -= total;
+  G.totalExpenses += total;
+  G.totalOrders++;
+
+  const shipDays = getShipDays(p);
+  const suggestedPrice = parseFloat((p.msrp * (0.88 + Math.random() * 0.24)).toFixed(2));
+
+  if (modalState.restock && modalState.invIdx >= 0) {
+    const item = G.inventory[modalState.invIdx];
+    item.pendingQty = (item.pendingQty || 0) + modalState.qty;
+    item.pendingDays = Math.max(item.pendingDays || 0, shipDays);
+    addFeed('📦', `Restocked ${modalState.qty}× ${p.name}. Arrives in ${shipDays}d.`, 'system');
+  } else {
+    const existing = G.inventory.findIndex(x => x.productId === p.id);
+    if (existing >= 0) {
+      G.inventory[existing].pendingQty = (G.inventory[existing].pendingQty || 0) + modalState.qty;
+      G.inventory[existing].pendingDays = Math.max(G.inventory[existing].pendingDays || 0, shipDays);
+      addFeed('📦', `Added ${modalState.qty}× ${p.name} to existing listing.`, 'system');
+    } else {
+      G.inventory.push({ productId: p.id, qty: 0, pendingQty: modalState.qty, pendingDays: shipDays, costPer: cost, sellPrice: suggestedPrice, salesHistory: [] });
+      addFeed('🛍️', `New listing: ${p.emoji} ${p.name} — arriving in ${shipDays}d`, 'good');
+    }
+  }
+
+  toast(`✅ Ordered ${modalState.qty}× ${p.name} for $${total.toFixed(2)}`, 'good');
+  closeModal();
+  renderAll();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DAY ADVANCEMENT — Core Game Loop
+═══════════════════════════════════════════════════════════ */
+function advanceDay() {
+  if (G.day >= 100) return;
+
+  let dayRevenue = 0;
+  G.day++;
+
+  /* 1. RECEIVE PENDING SHIPMENTS */
+  G.inventory.forEach(item => {
+    if ((item.pendingQty || 0) > 0 && item.pendingDays > 0) {
+      item.pendingDays--;
+      if (item.pendingDays === 0) {
+        item.qty += item.pendingQty;
+        const p = PRODUCTS.find(x => x.id === item.productId);
+        addFeed('📬', `${p?.emoji || '📦'} ${p?.name || 'Order'} arrived! ${item.pendingQty} units in stock.`, 'good');
+        toast(`📬 ${p?.name} delivery arrived!`, 'info');
+        item.pendingQty = 0;
+      }
     }
   });
-}
-function doAscend(){
-  if(G.lifetime<1e15)return;
-  G.ascendCount++;
-  const m=1+G.ascendCount*0.6;G.ascendMult=m;
-  G.spores=0;G.lifetime=0;G.totalClicks=0;G.bld={};G.upg={};
-  addLog('🌀 <strong style="color:#cc44ff">ASCENSION #'+G.ascendCount+'</strong> — Multiplicateur x'+m.toFixed(2));
-  notif('🌀 <strong>Ascension #'+G.ascendCount+'!</strong><br>x'+m.toFixed(2)+' permanent!');
-  refresh();renderAch();
-}
-let goldActive=false;
-function spawnGold(){
-  if(goldActive)return;goldActive=true;
-  const el=document.createElement('div');el.className='gold-shroom';
-  el.textContent='🌟';el.title='Champignon Dore! Clique vite!';
-  el.style.left=(80+Math.random()*(window.innerWidth-180))+'px';
-  el.style.top=(80+Math.random()*(window.innerHeight-180))+'px';
-  el.onclick=()=>{
-    const bonus=Math.floor(getSPS()*25+getClickPow()*80);
-    G.spores+=bonus;G.lifetime+=bonus;
-    addLog('🌟 <strong style="color:var(--amber)">Champignon Dore!</strong> +'+fmt(bonus)+' spores!');
-    notif('🌟 <strong>Champignon Dore!</strong><br>+'+fmt(bonus)+' Spores!');
-    el.remove();goldActive=false;refresh();
-  };
-  document.body.appendChild(el);
-  setTimeout(()=>{el.remove();goldActive=false;},14000);
+
+  /* 2. DECAY TEMPORARY EFFECTS */
+  if (G.adBoostDays > 0) { G.adBoostDays--; if (G.adBoostDays === 0) { G.adBoostMult = 1; addFeed('📣', 'Ad campaign ended. Organic traffic resumes.', 'warn'); } }
+  if (G.holdDays > 0) { G.holdDays--; if (G.holdDays === 0) { G.cash += G.holdCash; addFeed('💳', `$${G.holdCash.toFixed(2)} released from payment hold.`, 'good'); G.holdCash = 0; } }
+  if (G.reachDaysLeft > 0) { G.reachDaysLeft--; if (G.reachDaysLeft === 0) G.reachMult = 1; }
+  if (G.shipDelayDays > 0) { G.shipDelayDays--; if (G.shipDelayDays === 0) G.shipDelay = 0; }
+  if (G.costSpikeDays > 0) { G.costSpikeDays--; if (G.costSpikeDays === 0) G.costSpike = 1; }
+
+  /* 3. MARKET TREND UPDATE */
+  PRODUCTS.forEach(p => {
+    const drift = (Math.random() - 0.5) * p.volatility * 0.28;
+    G.trends[p.id] = Math.max(0.25, Math.min(2.8, (G.trends[p.id] || 1) + drift));
+  });
+
+  /* 4. RANDOM MARKET EVENT (18% chance) */
+  if (Math.random() < 0.18) {
+    const ev = EVENTS[Math.floor(Math.random() * EVENTS.length)];
+    applyMarketEvent(ev);
+    G.newsLog.push({ ...ev, day: G.day });
+    addFeed(ev.icon, ev.headline + ': ' + ev.detail, ev.type === 'good' ? 'good' : 'bad');
+    toast(ev.icon + ' ' + ev.headline, ev.type === 'good' ? 'good' : 'bad');
+    document.getElementById('news-badge').style.display = 'inline';
+  }
+
+  /* 5. COMPETITOR AI */
+  tickCompetitor();
+
+  /* 6. SALES SIMULATION */
+  G.inventory.forEach(item => {
+    if (item.qty <= 0) { item.salesHistory.push(0); if (item.salesHistory.length > 14) item.salesHistory.shift(); return; }
+    const p = PRODUCTS.find(x => x.id === item.productId);
+    if (!p) return;
+
+    const trend = G.trends[item.productId] || 1;
+    const repFactor = 0.4 + (G.rep / 100) * 0.8;
+    const priceFactor = calcPriceDemand(item.sellPrice, p.msrp);
+    const adFactor = G.adBoostMult;
+    const reachFactor = G.reachMult;
+    const emailBonus = G.upgrades.has('email_list') ? 1.3 : 1;
+
+    // Competitor steals share if undercutting
+    let compStealth = 1;
+    if (G.competitor.rep > 20 && G.competitor.cash > 10) {
+      const compPrice = item.sellPrice * G.competitor.priceFactor;
+      if (compPrice < item.sellPrice && G.competitor.rep > G.rep * 0.75) {
+        compStealth = 0.55 + Math.random() * 0.25;
+      }
+    }
+
+    const rawDemand = p.demandBase * trend * repFactor * priceFactor * adFactor * reachFactor * emailBonus * compStealth;
+    const salesQty = Math.min(item.qty, Math.max(0, Math.round(rawDemand * (0.5 + Math.random() * 1.0))));
+
+    if (salesQty > 0) {
+      const revenue = salesQty * item.sellPrice;
+      // Returns
+      const returnRate = getReturnRate(p);
+      const returns = Math.floor(salesQty * returnRate);
+      const netSales = salesQty - returns;
+      const netRevenue = netSales * item.sellPrice;
+      const refundCost = returns * item.sellPrice;
+
+      item.qty -= salesQty;
+      item.qty += returns; // returned stock goes back
+      dayRevenue += netRevenue;
+      G.totalRevenue += netRevenue;
+      G.unitsSold += netSales;
+      G.totalReturns += returns;
+
+      if (returns > 0) {
+        addFeed('↩️', `${returns} return(s) on ${p.name}. -$${refundCost.toFixed(2)} refunded.`, 'bad');
+        G.rep = Math.max(10, G.rep - returns * 0.5);
+      }
+      // Reputation from sales
+      G.rep = Math.min(100, G.rep + netSales * 0.08);
+    }
+
+    item.salesHistory.push(salesQty);
+    if (item.salesHistory.length > 14) item.salesHistory.shift();
+  });
+
+  /* 7. APPLY DAY REVENUE */
+  G.cash += dayRevenue;
+  if (dayRevenue > G.bestDayRevenue) G.bestDayRevenue = dayRevenue;
+  G.revHistory.push(dayRevenue);
+  if (G.revHistory.length > 30) G.revHistory.shift();
+
+  if (dayRevenue > 0) addFeed('💰', `Day ${G.day - 1} revenue: $${dayRevenue.toFixed(2)}`, 'good');
+  else if (G.inventory.some(i => i.qty > 0)) addFeed('📉', `Day ${G.day - 1}: Zero sales. Check your pricing and stock.`, 'bad');
+
+  /* 8. REPUTATION NATURAL DECAY */
+  G.rep = Math.max(10, G.rep - 0.15);
+
+  /* 9. CHECK WIN / LOSE */
+  if (G.cash <= 0 && G.inventory.every(i => i.qty === 0 && (i.pendingQty || 0) === 0)) {
+    endGame(false, 'You ran out of cash with no inventory left. The market ate you alive.');
+    return;
+  }
+  if (G.cash >= 10000) { endGame(true); return; }
+  if (G.day >= 100) {
+    if (G.cash >= 5000) endGame(true);
+    else endGame(false, `Time's up. You finished with $${G.cash.toFixed(2)}. The goal was $10,000.`);
+    return;
+  }
+
+  updateTicker();
+  renderAll();
 }
 
-let loggedMs=-1;
-const MS=[
-  {v:100,   t:'Spore Pod debloque!'},
-  {v:500,   t:'Mycelium Thread disponible!'},
-  {v:2500,  t:'Fairy Ring decouvert!'},
-  {v:12000, t:'Truffle Network revele!'},
-  {v:60000, t:'Plan Giant Shroom trouve!'},
-  {v:300000,t:'Cave Colony prete!'},
-  {v:1.5e6, t:'Fungal Spire construit!'},
-  {v:9e6,   t:'Enchanted Forest conquise!'},
-  {v:4e7,   t:'World Root eveille!'},
-  {v:2e8,   t:'La Dimension Spore s ouvre...'},
-  {v:1e15,  t:'ASCENSION DISPONIBLE!'},
-];
-
-generateShop();
-
-let lastT=Date.now(),goldCdTimer=100,tickerIdx=0,tickerTimer=0,renderTimer=0;
-function tick(){
-  const now=Date.now(),dt=Math.min((now-lastT)/1000,1);lastT=now;
-  G.time+=dt;
-  const sps=getSPS(),earned=sps*dt;
-  G.spores+=earned;G.lifetime+=earned;
-  goldCdTimer-=dt;
-  if(goldCdTimer<=0){goldCdTimer=80+Math.random()*40;if(sps>0)spawnGold();}
-  MS.forEach((m,i)=>{if(G.lifetime>=m.v&&loggedMs<i){loggedMs=i;addLog('📍 <strong style="color:var(--glow)">'+m.t+'</strong>');}});
-  tickerTimer+=dt;
-  if(tickerTimer>35){tickerTimer=0;tickerIdx=(tickerIdx+1)%TICKERS.length;document.getElementById('tickerText').textContent=TICKERS[tickerIdx];}
-  tickBoosts(dt);
-  tickShop(dt);
-  quickRefresh();
-  renderTimer+=dt;if(renderTimer>=0.5){renderTimer=0;refresh();}
-  checkAch();
+function calcPriceDemand(price, msrp) {
+  const r = price / msrp;
+  if (r < 0.6) return 1.6;
+  if (r < 0.85) return 1.25;
+  if (r < 1.05) return 1.0;
+  if (r < 1.3) return 0.72;
+  if (r < 1.6) return 0.45;
+  return 0.22;
 }
 
-try{const sv=localStorage.getItem('myceliumEmpire');if(sv){G={...G,...JSON.parse(sv)};addLog('🍄 Spores memorisees. L empire se reveille.');}}catch(e){}
-renderAch();refresh();generateShopUI();
-addLog('🌱 Clique le champignon pour commencer ton empire!');
-addLog('💡 Achete des Colonies a droite pour automatiser la production.');
-addLog('💡 Ouvre le 🏪 Marche pour des boosts et le 🧿 Bouclier contre les malus!');
-addLog('💡 Les evenements arrivent automatiquement toutes les ~1 minute!');
-setInterval(tick,50);
-setInterval(()=>{try{localStorage.setItem('myceliumEmpire',JSON.stringify(G));}catch(e){}},8000);
+function tickCompetitor() {
+  const c = G.competitor;
+  c.cash += 8 + Math.random() * 18;
+  if (Math.random() < 0.14) { c.priceFactor = Math.max(0.55, c.priceFactor - 0.04); addFeed('⚔️', 'CheapDropz99 dropped prices again. Customers may defect.', 'warn'); }
+  if (Math.random() < 0.07) c.priceFactor = Math.min(0.96, c.priceFactor + 0.06);
+  c.rep += (Math.random() - 0.45) * 2.5;
+  c.rep = Math.max(10, Math.min(95, c.rep));
+}
+
+function applyMarketEvent(ev) {
+  switch (ev.effect) {
+    case 'demand+.6': PRODUCTS.forEach(p => { G.trends[p.id] = Math.min(2.8, G.trends[p.id] * 1.6); }); break;
+    case 'demand+.7': PRODUCTS.forEach(p => { G.trends[p.id] = Math.min(2.8, G.trends[p.id] * 1.7); }); break;
+    case 'demand+.2': PRODUCTS.forEach(p => { G.trends[p.id] = Math.min(2.8, G.trends[p.id] * 1.2); }); break;
+    case 'ship+4':    G.shipDelay = 4; G.shipDelayDays = 10; G.inventory.forEach(i => { if (i.pendingDays > 0) i.pendingDays += 4; }); break;
+    case 'price-.18': G.inventory.forEach(i => { i.sellPrice = Math.max(i.costPer * 1.05, i.sellPrice * 0.82); }); break;
+    case 'rep-15':    G.rep = Math.max(10, G.rep - 15); break;
+    case 'hold30':    G.holdCash = Math.min(30, G.cash * 0.4); G.cash -= G.holdCash; G.holdDays = 5; break;
+    case 'reach-.4':  G.reachMult = 0.6; G.reachDaysLeft = 7; break;
+    case 'cost+.2':   G.costSpike = 1.2; G.costSpikeDays = 7; break;
+    case 'rep+18':    G.rep = Math.min(100, G.rep + 18); break;
+    case 'returns.15':
+      G.inventory.forEach(i => {
+        const ret = Math.floor(i.qty * 0.15);
+        if (ret > 0) { const cost = ret * i.sellPrice; G.cash = Math.max(0, G.cash - cost); G.totalReturns += ret; i.qty += ret; G.totalRevenue -= cost; }
+      }); break;
+    case 'comp-rep':  G.competitor.rep = Math.max(10, G.competitor.rep - 30); G.competitor.cash = Math.max(0, G.competitor.cash - 80); break;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════════ */
+function getProductCost(p) {
+  let c = p.cost * G.costSpike;
+  if (G.upgrades.has('bulk_sourcing')) c *= 0.78;
+  if (G.upgrades.has('vip_supplier')) c *= 0.90;
+  return parseFloat(c.toFixed(2));
+}
+function getShipDays(p) {
+  let d = p.shipDays + G.shipDelay;
+  if (G.upgrades.has('express_ship')) d = Math.max(1, d - 3);
+  return d;
+}
+function getReturnRate(p) {
+  let r = p.returnRate;
+  if (G.upgrades.has('returns_protect')) r *= 0.4;
+  return r;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   UI HELPERS
+═══════════════════════════════════════════════════════════ */
+function addFeed(icon, text, type = 'neutral') {
+  const feed = document.getElementById('live-feed');
+  if (!feed) return;
+  const el = document.createElement('div');
+  el.className = `feed-item ${type}`;
+  el.innerHTML = `<span class="fi-icon">${icon}</span><span class="fi-text">${text}</span><span class="fi-time">D${G.day}</span>`;
+  feed.insertBefore(el, feed.firstChild);
+  while (feed.children.length > 60) feed.removeChild(feed.lastChild);
+}
+
+function toast(msg, type = 'good') {
+  const root = document.getElementById('toast-root');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icons = { good:'✅', bad:'❌', warn:'⚠️', info:'ℹ️' };
+  el.innerHTML = `<span class="toast-icon">${icons[type] || '●'}</span><span class="toast-text">${msg}</span>`;
+  root.appendChild(el);
+  setTimeout(() => { el.style.transition = 'opacity .3s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 350); }, 3000);
+}
+
+function updateTicker() {
+  const messages = [
+    `Day ${G.day}/100 · Cash: $${G.cash.toFixed(2)} · Reputation: ${Math.round(G.rep)}`,
+    `CheapDropz99 pricing at ${(G.competitor.priceFactor * 100).toFixed(0)}% of your price`,
+    `${G.inventory.filter(i => i.qty > 0).length} active listings · ${G.unitsSold} total units sold`,
+    `Goal: $10,000 — currently ${((G.cash/10000)*100).toFixed(1)}% there`,
+    PRODUCTS.slice(0,3).map(p => `${p.emoji} ${p.name.split(' ')[0]}: ${((G.trends[p.id]-1)*100).toFixed(0)}%`).join(' · '),
+  ];
+  const msg = messages[G.day % messages.length];
+  const ticker = document.getElementById('ticker-text');
+  if (ticker) ticker.textContent = '  ·  ' + messages.join('  ·  ');
+}
+
+function endGame(win, msg = '') {
+  const statsHtml = `
+    <div class="end-stat"><span class="esv">$${G.cash.toFixed(0)}</span><span class="esl">Final Cash</span></div>
+    <div class="end-stat"><span class="esv">${G.day}</span><span class="esl">Days</span></div>
+    <div class="end-stat"><span class="esv">${G.unitsSold}</span><span class="esl">Units Sold</span></div>
+    <div class="end-stat"><span class="esv">$${G.bestDayRevenue.toFixed(0)}</span><span class="esl">Best Day</span></div>
+    <div class="end-stat"><span class="esv">${Math.round(G.rep)}</span><span class="esl">Reputation</span></div>`;
+  if (win) {
+    document.getElementById('win-msg').textContent = G.cash >= 10000 ? `You hit $${G.cash.toFixed(2)} on Day ${G.day}. Starting with $10, you built an empire.` : `Day 100. You ended with $${G.cash.toFixed(2)} — solid run.`;
+    document.getElementById('win-stats').innerHTML = statsHtml;
+    showScreen('screen-win');
+  } else {
+    document.getElementById('gameover-msg').textContent = msg;
+    document.getElementById('gameover-stats').innerHTML = statsHtml;
+    showScreen('screen-gameover');
+  }
+}
 </script>
 </body>
 </html>
