@@ -104,7 +104,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 /* ════════════════════════════════
    MAIN GAME
 ════════════════════════════════ */
-#s-game{flex-direction:column;height:100vh;overflow:hidden}
+#s-game{flex-direction:column;height:100vh;overflow:hidden;display:flex!important}
 
 /* TOPBAR */
 #topbar{
@@ -163,7 +163,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .btn-logout:hover{border-color:var(--r);color:var(--r)}
 
 /* GAME BODY */
-#game-body{display:grid;grid-template-columns:220px 1fr 260px;flex:1;min-height:0;overflow:hidden}
+#game-body{display:grid;grid-template-columns:220px 1fr 260px;flex:1;min-height:0;overflow:hidden;height:calc(100vh - 46px)}
 
 /* LEFT PANEL */
 #lpanel{
@@ -211,19 +211,19 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 
 .tabbar{
   display:flex;align-items:center;border-bottom:1px solid var(--border);
-  background:var(--bg1);padding:0 14px;flex-shrink:0;gap:0;
+  background:var(--bg1);padding:0 6px;flex-shrink:0;gap:0;overflow-x:auto;
 }
 .tbtn{
-  padding:11px 14px;border:none;background:none;color:var(--text3);
+  padding:9px 10px;border:none;background:none;color:var(--text3);
   font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;
   border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .12s;white-space:nowrap;
 }
 .tbtn:hover{color:var(--text)}.tbtn.active{color:var(--g);border-bottom-color:var(--g)}
 
-.tcontent{display:none;flex:1;overflow-y:auto;padding:14px;min-height:0}
+.tcontent{display:none;overflow-y:auto;padding:14px;min-height:0;flex:1}
 .tcontent::-webkit-scrollbar{width:4px}
 .tcontent::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
-.tcontent.active{display:flex;flex-direction:column;overflow-y:auto;height:100%}
+.tcontent.active{display:block;overflow-y:auto;height:100%;padding:14px}
 
 /* RIGHT PANEL */
 #rpanel{background:var(--bg1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
@@ -559,8 +559,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .coin-usd{font-family:var(--mono);font-size:16px;font-weight:700;color:#fff}
 .coin-chg{font-family:var(--mono);font-size:11px;font-weight:700;margin-top:2px}
 .coin-chg.up{color:var(--g)}.coin-chg.dn{color:var(--r)}
-.coin-chart{height:54px;display:flex;align-items:flex-end;gap:2px;margin-bottom:10px}
-.cc-bar{flex:1;border-radius:1px 1px 0 0;min-height:2px;transition:height .3s}
+.coin-chart{height:70px;margin-bottom:10px;position:relative}
+.coin-chart svg{width:100%;height:100%;display:block}
 .coin-actions{display:flex;gap:7px}
 .coin-inp{
   flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;
@@ -931,11 +931,13 @@ function loadGame() {
     g.upgrades = new Set(Array.isArray(g.upgrades) ? g.upgrades : []);
     if (!g.lastOrdered) g.lastOrdered = {};
     if (!g.shops) g.shops = [];
+    if (!g.seoBonus) g.seoBonus = 1;
+    if (!g.loyaltyBonus) g.loyaltyBonus = 1;
     if (!g.shopRevHistory) g.shopRevHistory = [];
     if (!g.crypto) g.crypto = {};
     if (!g.coinPrices) g.coinPrices = {};
     if (!g.coinHistory) g.coinHistory = {};
-    // Ensure all coins are initialised
+    // Ensure all coins are initialised (including newly added ones)
     COINS.forEach(c => {
       if (!g.coinPrices[c.id]) g.coinPrices[c.id] = c.basePrice;
       if (!g.coinHistory[c.id]) g.coinHistory[c.id] = [g.coinPrices[c.id]];
@@ -1096,6 +1098,13 @@ const UPGRADES = [
   {id:'email_list',icon:'📧',name:'Email Marketing Engine',desc:'+25% repeat demand daily. Loyal customer base = predictable revenue.',cost:80,effect:'email+.25'},
   {id:'multi_channel',icon:'🌐',name:'Multi-Channel Listing',desc:'+35% total demand. Expensive, but demand is the hardest problem to solve.',cost:100,effect:'channel+.35'},
   {id:'warehouse',icon:'🏬',name:'Mini Warehouse',desc:'Remove stock caps. Without this, your growth will be physically throttled.',cost:150,effect:'warehouse'},
+  {id:'auto_restock',icon:'🔄',name:'Auto-Restock System',desc:'Automatically reorders any product that hits zero stock. Set it and forget it.',cost:200,effect:'auto_restock'},
+  {id:'flash_sale',icon:'⚡',name:'Flash Sale Engine',desc:'Trigger automated 24hr flash sales every 7 days. Demand spikes +80% during events.',cost:130,effect:'flash_sale'},
+  {id:'loyalty_prog',icon:'💎',name:'Loyalty Program',desc:'Customers earn points and come back. +40% repeat purchase rate permanently.',cost:175,effect:'loyalty+.40'},
+  {id:'seo_boost',icon:'🔍',name:'SEO & Content Machine',desc:'Organic search traffic. +20% passive daily demand, no ad spend needed.',cost:90,effect:'seo+.20'},
+  {id:'influencer',icon:'🎥',name:'Influencer Network',desc:'Micro-influencers post your products weekly. Reputation +30 and +50% demand spike for 5 days.',cost:160,effect:'influencer'},
+  {id:'analytics_pro',icon:'📊',name:'Pro Analytics Suite',desc:'Reveals which products are trending before markets react. +15% pre-trend bonus.',cost:110,effect:'analytics_pro'},
+  {id:'crypto_terminal',icon:'₿',name:'Crypto Trading Terminal',desc:'Unlocks advanced crypto features: stop-loss, limit orders, and 3 exclusive coins.',cost:250,effect:'crypto_terminal'},
 ];
 
 /* ══════════════════════════════════════════════
@@ -1168,8 +1177,28 @@ const COINS = [
    color:'#c2a633'},
   {id:'pepe',name:'PEPE',sym:'PEPE',emoji:'🐸',
    basePrice:0.0000082, volatility:0.28, trend:-0.002,
-   desc:'Meme coin. Can 10× or go to zero. No fundamentals. Gamble only.',
+   desc:'Meme coin. Can 10x or go to zero. No fundamentals. Gamble only.',
    color:'#48b04a'},
+  {id:'bnb',name:'BNB',sym:'BNB',emoji:'🔶',
+   basePrice:380, volatility:0.07, trend:0.001,
+   desc:'Exchange token. Tied to Binance health. Burns reduce supply — deflationary pressure.',
+   color:'#f3ba2f'},
+  {id:'avax',name:'Avalanche',sym:'AVAX',emoji:'🔺',
+   basePrice:38, volatility:0.11, trend:0.0008,
+   desc:'Fast L1 chain. Institutional interest growing. Higher vol than BTC/ETH.',
+   color:'#e84142'},
+  {id:'link',name:'Chainlink',sym:'LINK',emoji:'🔗',
+   basePrice:14, volatility:0.10, trend:0.0012,
+   desc:'Oracle network. Real utility, real usage. Less meme-driven, more fundamental.',
+   color:'#2a5ada'},
+  {id:'wif',name:'dogwifhat',sym:'WIF',emoji:'🎩',
+   basePrice:2.8, volatility:0.35, trend:-0.003,
+   desc:'Pure meme. No product. Solana-based. Can 5x or lose 90% in 48h.',
+   color:'#e67e22'},
+  {id:'xrp',name:'XRP',sym:'XRP',emoji:'💧',
+   basePrice:0.52, volatility:0.08, trend:0.0005,
+   desc:'Cross-border payments. Legal battles create volatility. Large retail base.',
+   color:'#00aae4'},
 ];
 
 const EVENTS = [
@@ -1224,6 +1253,7 @@ function initGame() {
     newsLog:[],
     comp:{cash:300, rep:75, pf:0.82},
     lastOrdered:{},
+    seoBonus:1, loyaltyBonus:1,
     shops:[],       // owned shop ids
     shopRevHistory:[],
     crypto:{},      // {coinId: {units, avgBuy}}
@@ -1367,8 +1397,36 @@ function advanceDay() {
   // 8. Rep decay
   G.rep = Math.max(5, G.rep-.20); // HARD: faster rep decay
 
+  // 9a2. Auto-restock
+  if (G.upgrades && G.upgrades.has('auto_restock')) {
+    G.inventory.forEach(function(item) {
+      const p = PRODUCTS.find(function(x){return x.id===item.pid;});
+      if (!p) return;
+      if (item.qty === 0 && item.pendingQty === 0) {
+        const cost = p.cost * (G.upgrades.has('bulk_deal') ? 0.78 : 1) * (G.costMult||1) * (G.upgrades.has('vip_supplier') ? 0.90 : 1);
+        const maxOrd = Math.min(Math.floor(G.cash / cost), 20);
+        if (maxOrd >= 1 && G.cash >= cost) {
+          const qty = maxOrd;
+          const total = qty * cost;
+          G.cash -= total; G.totalExp += total;
+          item.pendingQty += qty;
+          item.pendingDays = (p.ship || 5) + (G.upgrades.has('express_ship') ? -3 : 0) + (G.shipDelay||0);
+          item.pendingDays = Math.max(1, item.pendingDays);
+          addFeed('🔄', 'Auto-restocked ' + qty + 'x ' + p.name + ' ($' + total.toFixed(2) + ')', 'sys');
+        }
+      }
+    });
+  }
+
   // 9b. Shop income tick
   tickShops();
+
+  // 9b2. Flash sale engine
+  if (G.upgrades && G.upgrades.has('flash_sale') && G.day % 7 === 0) {
+    G.adDays = Math.max(G.adDays, 1);
+    G.adMult = Math.max(G.adMult, 1.8);
+    addFeed('⚡', 'Flash Sale triggered! Demand +80% for 24hrs.', 'good');
+  }
 
   // 9c. Crypto price tick
   tickCrypto();
@@ -1659,105 +1717,166 @@ function fmtUnits(u) {
   return u.toFixed(8);
 }
 
+function makeSvgChart(hist, color, w, h) {
+  if (!hist || hist.length < 2) return '<svg><text x="50%" y="50%" fill="#404d6a" text-anchor="middle" font-size="10">No data yet</text></svg>';
+  const pts = hist.slice(-60);
+  const maxV = Math.max(...pts), minV = Math.min(...pts);
+  const range = maxV - minV || maxV * 0.01 || 0.0001;
+  const padY = 4, padX = 2;
+  const W = w || 300, H = h || 70;
+  const xs = pts.map((_, i) => padX + (i / (pts.length - 1)) * (W - padX * 2));
+  const ys = pts.map(v => H - padY - ((v - minV) / range) * (H - padY * 2));
+  // Line path
+  const linePath = xs.map((x, i) => (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + ys[i].toFixed(1)).join(' ');
+  // Fill path (closed below)
+  const fillPath = linePath + ' L' + xs[xs.length-1].toFixed(1) + ',' + H + ' L' + xs[0].toFixed(1) + ',' + H + ' Z';
+  const isUp = pts[pts.length-1] >= pts[0];
+  const lineCol = isUp ? color : '#ff4466';
+  const gradId = 'g' + Math.random().toString(36).slice(2,7);
+  // Grid lines
+  let gridLines = '';
+  for (let i = 1; i < 4; i++) {
+    const y = (i / 4 * (H - padY * 2) + padY).toFixed(0);
+    gridLines += '<line x1="0" y1="' + y + '" x2="' + W + '" y2="' + y + '" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>';
+  }
+  // Price labels
+  const topLabel = fmtPrice(maxV).replace('$','');
+  const botLabel = fmtPrice(minV).replace('$','');
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">'
+    + '<defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1">'
+    + '<stop offset="0%" stop-color="' + lineCol + '" stop-opacity="0.18"/>'
+    + '<stop offset="100%" stop-color="' + lineCol + '" stop-opacity="0.01"/>'
+    + '</linearGradient></defs>'
+    + gridLines
+    + '<path d="' + fillPath + '" fill="url(#' + gradId + ')"/>'
+    + '<path d="' + linePath + '" fill="none" stroke="' + lineCol + '" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>'
+    + '<circle cx="' + xs[xs.length-1].toFixed(1) + '" cy="' + ys[ys.length-1].toFixed(1) + '" r="3" fill="' + lineCol + '" stroke="#07090e" stroke-width="1.5"/>'
+    + '<text x="' + (W-3) + '" y="10" fill="rgba(255,255,255,0.3)" font-size="8" text-anchor="end" font-family="monospace">' + topLabel + '</text>'
+    + '<text x="' + (W-3) + '" y="' + (H-3) + '" fill="rgba(255,255,255,0.3)" font-size="8" text-anchor="end" font-family="monospace">' + botLabel + '</text>'
+    + '</svg>';
+}
+
 function renderCrypto() {
   const wrap = document.getElementById('crypto-wrap');
   if (!wrap) return;
+  const hasTerminal = G.upgrades && G.upgrades.has('crypto_terminal');
+  const visibleCoins = hasTerminal ? COINS : COINS.slice(0, 5);
 
-  // Total portfolio value
+  // Total portfolio
   let totalInvested = 0, totalValue = 0;
-  COINS.forEach(c => {
-    const pos = G.crypto[c.id];
+  COINS.forEach(function(coin) {
+    const pos = G.crypto[coin.id];
     if (pos && pos.units > 0) {
       totalInvested += pos.units * pos.avgBuy;
-      totalValue += pos.units * G.coinPrices[c.id];
+      totalValue += pos.units * G.coinPrices[coin.id];
     }
   });
   const totalPnl = totalValue - totalInvested;
 
-  // Build portfolio rows
+  // Portfolio rows
   let portRows = '';
-  COINS.forEach(c => {
-    const pos = G.crypto[c.id];
+  COINS.forEach(function(coin) {
+    const pos = G.crypto[coin.id];
     if (!pos || pos.units < 0.0000001) return;
-    const val = pos.units * G.coinPrices[c.id];
+    const val = pos.units * G.coinPrices[coin.id];
     const pnl = val - (pos.units * pos.avgBuy);
-    portRows += `<div class="port-row">
-      <div><div class="pr-name">${c.emoji} ${c.sym}</div><div class="pr-sub">${fmtUnits(pos.units)} units</div></div>
-      <div class="pr-val">
-        <div class="pr-usd">${fmtPrice(val)}</div>
-        <div class="pr-pnl ${pnl>=0?'up':'dn'}">${pnl>=0?'+':''}$${pnl.toFixed(2)}</div>
-      </div>
-    </div>`;
+    const pnlPct = ((pnl / (pos.units * pos.avgBuy)) * 100).toFixed(1);
+    portRows += '<div class="port-row">'
+      + '<div><div class="pr-name">' + coin.emoji + ' ' + coin.sym + '</div>'
+      + '<div class="pr-sub">' + fmtUnits(pos.units) + ' @ ' + fmtPrice(pos.avgBuy) + '</div></div>'
+      + '<div class="pr-val">'
+      + '<div class="pr-usd">' + fmtPrice(val) + '</div>'
+      + '<div class="pr-pnl ' + (pnl>=0?'up':'dn') + '">' + (pnl>=0?'+':'') + '$' + pnl.toFixed(2) + ' (' + (pnl>=0?'+':'') + pnlPct + '%)</div>'
+      + '</div></div>';
   });
 
-  // Build coin cards
-  let coinsHtml = COINS.map(c => {
-    const hist = G.coinHistory[c.id] || [G.coinPrices[c.id]];
-    const maxH = Math.max(...hist), minH = Math.min(...hist);
-    const range = maxH - minH || 1;
-    const bars = hist.slice(-20).map(v => {
-      const h = Math.max(4, ((v - minH) / range * 50 + 4).toFixed(0));
-      const isUp = v >= (hist[hist.indexOf(v)-1] || v);
-      return `<div class="cc-bar" style="height:${h}px;background:${isUp?c.color:'#ff4466'};opacity:.7"></div>`;
-    }).join('');
+  // Coin cards
+  let coinsHtml = visibleCoins.map(function(coin) {
+    const hist = G.coinHistory[coin.id] || [G.coinPrices[coin.id]];
     const prev = hist.length >= 2 ? hist[hist.length-2] : hist[0];
-    const chgPct = ((G.coinPrices[c.id] - prev) / prev * 100).toFixed(2);
-    const pos = G.crypto[c.id];
-    const holding = pos && pos.units > 0;
-    return `<div class="coin-card">
-      <div class="coin-hdr">
-        <span class="coin-icon">${c.emoji}</span>
-        <div><div class="coin-name">${c.name}</div><div class="coin-sym">${c.sym}</div></div>
-        <div class="coin-price">
-          <div class="coin-usd">${fmtPrice(G.coinPrices[c.id])}</div>
-          <div class="coin-chg ${+chgPct>=0?'up':'dn'}">${+chgPct>=0?'▲':'▼'} ${Math.abs(chgPct)}%</div>
-        </div>
-      </div>
-      <div class="coin-chart">${bars}</div>
-      <div style="font-size:10.5px;color:var(--text3);margin-bottom:10px;line-height:1.5;">${c.desc}</div>
-      ${holding ? `<div style="font-size:10px;color:var(--text2);background:var(--bg3);border-radius:5px;padding:5px 9px;margin-bottom:8px;">
-        Holding: <span style="color:#fff;font-family:var(--mono);font-weight:700;">${fmtUnits(pos.units)} ${c.sym}</span>
-        · Avg: ${fmtPrice(pos.avgBuy)}
-        · PnL: <span style="${(pos.units*(G.coinPrices[c.id]-pos.avgBuy))>=0?'color:var(--g)':'color:var(--r)'}; font-family:var(--mono);font-weight:700;">${(pos.units*(G.coinPrices[c.id]-pos.avgBuy))>=0?'+':''}$${(pos.units*(G.coinPrices[c.id]-pos.avgBuy)).toFixed(2)}</span>
-      </div>` : ''}
-      <div class="coin-actions">
-        <input class="coin-inp" id="ci-${c.id}" type="number" placeholder="USD amount" min="1" step="1">
-        <button class="cbtn buy" onclick="cryptoBuy('${c.id}')">BUY</button>
-        <button class="cbtn sell" onclick="cryptoSell('${c.id}')" ${(!holding)?'disabled':''}>SELL</button>
-      </div>
-    </div>`;
+    const chgPct = ((G.coinPrices[coin.id] - prev) / prev * 100).toFixed(2);
+    const chg24 = hist.length >= 24 ? ((G.coinPrices[coin.id] - hist[hist.length-24]) / hist[hist.length-24] * 100).toFixed(1) : chgPct;
+    const pos = G.crypto[coin.id];
+    const holding = pos && pos.units > 0.0000001;
+    const svgChart = makeSvgChart(hist, coin.color, 400, 70);
+
+    let holdingRow = '';
+    if (holding) {
+      const curVal = pos.units * G.coinPrices[coin.id];
+      const posPnl = curVal - (pos.units * pos.avgBuy);
+      const posPct = ((posPnl / (pos.units * pos.avgBuy)) * 100).toFixed(1);
+      holdingRow = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:9px;">'
+        + '<div style="background:var(--bg3);border-radius:5px;padding:5px 7px;">'
+        + '<div style="font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;">' + fmtUnits(pos.units) + '</div>'
+        + '<div style="font-size:9px;color:var(--text3);">HOLDING</div></div>'
+        + '<div style="background:var(--bg3);border-radius:5px;padding:5px 7px;">'
+        + '<div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--y);">' + fmtPrice(curVal) + '</div>'
+        + '<div style="font-size:9px;color:var(--text3);">VALUE</div></div>'
+        + '<div style="background:var(--bg3);border-radius:5px;padding:5px 7px;">'
+        + '<div style="font-family:var(--mono);font-size:11px;font-weight:700;color:' + (posPnl>=0?'var(--g)':'var(--r)') + ';">' + (posPnl>=0?'+':'') + '$' + posPnl.toFixed(2) + '</div>'
+        + '<div style="font-size:9px;color:var(--text3);">' + (posPnl>=0?'+':'') + posPct + '% PnL</div></div>'
+        + '</div>';
+    }
+
+    return '<div class="coin-card">'
+      + '<div class="coin-hdr">'
+      + '<span class="coin-icon">' + coin.emoji + '</span>'
+      + '<div><div class="coin-name">' + coin.name + '</div><div class="coin-sym">' + coin.sym + '</div></div>'
+      + '<div class="coin-price">'
+      + '<div class="coin-usd">' + fmtPrice(G.coinPrices[coin.id]) + '</div>'
+      + '<div style="display:flex;gap:8px;margin-top:2px;">'
+      + '<div class="coin-chg ' + (+chgPct>=0?'up':'dn') + '">' + (+chgPct>=0?'▲':'▼') + ' ' + Math.abs(chgPct) + '%</div>'
+      + '<div style="font-size:9px;color:var(--text3);">24h: <span style="color:' + (+chg24>=0?'var(--g)':'var(--r)') + '">' + (+chg24>=0?'+':'') + chg24 + '%</span></div>'
+      + '</div>'
+      + '</div></div>'
+      + '<div class="coin-chart">' + svgChart + '</div>'
+      + '<div style="font-size:10.5px;color:var(--text3);margin-bottom:10px;line-height:1.5;">' + coin.desc + '</div>'
+      + holdingRow
+      + '<div class="coin-actions">'
+      + '<input class="coin-inp" id="ci-' + coin.id + '" type="number" placeholder="USD amount" min="1" step="1">'
+      + '<button class="cbtn buy" onclick="cryptoBuy(\' + coin.id + \')">BUY</button>'
+      + '<button class="cbtn sell" onclick="cryptoSell(\' + coin.id + \')" ' + (!holding?'disabled':'') + '>SELL ALL</button>'
+      + '</div>'
+      + '</div>';
   }).join('');
 
-  wrap.innerHTML = `<div class="crypto-layout">
-    <div class="crypto-main">
-      <div class="crypto-warn">⚠️ <strong>Crypto is extremely high risk.</strong> Prices are volatile — you can lose your entire investment. Never invest money you cannot afford to lose. This is harder than the dropshipping side.</div>
-      ${coinsHtml}
-    </div>
-    <div class="crypto-sidebar">
-      <div class="crypto-total">
-        <span class="ct-lbl">Portfolio Value</span>
-        <span class="ct-big">${fmtPrice(totalValue)}</span>
-        <span class="ct-pnl" style="color:${totalPnl>=0?'var(--g)':'var(--r)'}">
-          ${totalPnl>=0?'▲ +':'▼ '}$${Math.abs(totalPnl).toFixed(2)} unrealized PnL
-        </span>
-        <div style="font-size:10px;color:var(--text3);margin-top:6px;">Invested: $${totalInvested.toFixed(2)}</div>
-      </div>
-      <div class="portfolio-card">
-        <div class="port-title">Your Positions</div>
-        ${portRows || '<div style="color:var(--text3);font-size:11px;padding:4px 0">No open positions. Buy a coin to start.</div>'}
-      </div>
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px;">
-        <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Tips</div>
-        <div style="font-size:11px;color:var(--text2);line-height:1.7;">
-          💡 Start small — this is <em>real</em> volatility.<br>
-          📉 Markets can crash 50% in days.<br>
-          🐸 PEPE & DOGE are pure gambling.<br>
-          ⏳ BTC/ETH reward patience.<br>
-          💸 Only invest dropship profits, never your core cash.
-        </div>
-      </div>
-    </div>
-  </div>`;
+  // Locked coins notice
+  let lockedHtml = '';
+  if (!hasTerminal && COINS.length > 5) {
+    lockedHtml = '<div style="background:rgba(155,109,255,.07);border:1px dashed rgba(155,109,255,.25);border-radius:9px;padding:13px;text-align:center;margin-top:4px;">'
+      + '<div style="font-size:20px;margin-bottom:6px;">🔒</div>'
+      + '<div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:4px;">' + (COINS.length-5) + ' More Coins Locked</div>'
+      + '<div style="font-size:11px;color:var(--text2);">Buy the <strong>Crypto Trading Terminal</strong> upgrade ($250) to unlock BNB, AVAX, LINK, WIF and XRP.</div>'
+      + '</div>';
+  }
+
+  wrap.innerHTML = '<div class="crypto-layout">'
+    + '<div class="crypto-main">'
+    + '<div class="crypto-warn">&#9888;&#65039; <strong>Crypto is extremely high risk.</strong> You can lose everything. Prices move like real markets — crash 50% in hours, pump 300% overnight. This is much harder than dropshipping.</div>'
+    + coinsHtml
+    + lockedHtml
+    + '</div>'
+    + '<div class="crypto-sidebar">'
+    + '<div class="crypto-total">'
+    + '<span class="ct-lbl">Portfolio Value</span>'
+    + '<span class="ct-big">' + fmtPrice(totalValue) + '</span>'
+    + '<span class="ct-pnl" style="color:' + (totalPnl>=0?'var(--g)':'var(--r)') + '">' + (totalPnl>=0?'▲ +':'▼ ') + '$' + Math.abs(totalPnl).toFixed(2) + ' unrealized</span>'
+    + '<div style="font-size:10px;color:var(--text3);margin-top:5px;">Invested: $' + totalInvested.toFixed(2) + '</div>'
+    + '</div>'
+    + '<div class="portfolio-card"><div class="port-title">Open Positions</div>'
+    + (portRows || '<div style="color:var(--text3);font-size:11px;padding:4px 0">No positions. Buy a coin to start.</div>')
+    + '</div>'
+    + '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px;">'
+    + '<div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Survival Guide</div>'
+    + '<div style="font-size:11px;color:var(--text2);line-height:1.8;">'
+    + '&#128161; Never invest more than 20% of your cash.<br>'
+    + '&#128197; BTC/ETH are long holds. Memes are gambles.<br>'
+    + '&#128200; Buy dips, but know when it is a crash.<br>'
+    + '&#127918; WIF/PEPE/DOGE: pure luck. Could 10x or die.<br>'
+    + '&#128276; Watch the 24h change more than the last tick.'
+    + '</div></div>'
+    + '</div>'
+    + '</div>';
 }
 
 /* ══════════════════════════════════════════════
