@@ -1834,8 +1834,8 @@ function renderCrypto() {
       + holdingRow
       + '<div class="coin-actions">'
       + '<input class="coin-inp" id="ci-' + coin.id + '" type="number" placeholder="USD amount" min="1" step="1">'
-      + '<button class="cbtn buy" onclick="cryptoBuy(\' + coin.id + \')">BUY</button>'
-      + '<button class="cbtn sell" onclick="cryptoSell(\' + coin.id + \')" ' + (!holding?'disabled':'') + '>SELL ALL</button>'
+      + '<button class="cbtn buy" onclick="cryptoBuy(&#39;" + coin.id + "&#39;)">BUY</button>'
+      + '<button class="cbtn sell" onclick="cryptoSell(&#39;" + coin.id + "&#39;)" ' + (!holding?'disabled':'') + '>SELL ALL</button>'
       + '</div>'
       + '</div>';
   }).join('');
