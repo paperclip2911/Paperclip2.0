@@ -1129,7 +1129,7 @@ function spawnEntities(){
       let bx=(z.x+z.w/2)|0,by=(z.y+z.h/2)|0;
       entities.push({...boss,id:boss.id,t:'boss',
         x:bx*TS,y:by*TS,hp:boss.hp,maxHp:boss.hp,
-        state:'idle',atkCd:0,facing:{x:1,y:0},anim:0,aT:0,dead:false});
+        state:'patrol',ptimer:0,atkCd:0,facing:{x:1,y:0},anim:0,aT:0,dead:false,zone:z.id});
     }
   });
 }
@@ -1487,12 +1487,21 @@ function updEntities(dt){
     const dx=P.x-e.x,dy=P.y-e.y,dist=Math.sqrt(dx*dx+dy*dy);
     const ar=80+e.w,ad=e.w/2+10;
 
-    if(e.t==='boss'&&dist>300&&e.state==='chase'){e.state='patrol';activeBoss=null;document.getElementById('bossBar').classList.remove('on');}
+    if(e.t==='boss'&&dist>320&&e.state==='chase'){
+      e.state='patrol';activeBoss=null;
+      document.getElementById('bossBar').classList.remove('on');
+    }
     if(e.t==='boss'&&dist<160){
-      e.state='chase';activeBoss=e;
-      document.getElementById('bossBar').classList.add('on');
-      document.getElementById('bossN').textContent=e.n.toUpperCase();
-      document.getElementById('bossH').style.width=(e.hp/e.maxHp*100)+'%';
+      // Only aggro if player is in the same zone as the boss
+      const pZone=getZoneAt(Math.floor(P.x/TS),Math.floor(P.y/TS));
+      if(pZone&&pZone.id===e.zone){
+        e.state='chase';activeBoss=e;
+        document.getElementById('bossBar').classList.add('on');
+        document.getElementById('bossN').textContent=e.n.toUpperCase();
+        document.getElementById('bossH').style.width=(e.hp/e.maxHp*100)+'%';
+      } else {
+        e.state='patrol'; // boss stays put if player is in different zone
+      }
     }
     // Only enemies, bounty targets fight player
     if(e.t==='enemy'||e.t==='bounty'){
@@ -1505,9 +1514,14 @@ function updEntities(dt){
     }
 
     if(e.state==='patrol'){
-      e.ptimer-=dt;
-      if(e.ptimer<=0){e.ptimer=60+Math.random()*120;
-        e.tx=e.homeX+(Math.random()-.5)*80;e.ty=e.homeY+(Math.random()-.5)*80;}
+      e.ptimer=(e.ptimer||0)-dt;
+      if(e.ptimer<=0){
+        e.ptimer=80+Math.random()*120;
+        // Bosses patrol ONLY within their zone — max 3 tiles from home
+        const wander=e.t==='boss'?3*TS:5*TS;
+        e.tx=e.homeX+(Math.random()-.5)*wander*2;
+        e.ty=e.homeY+(Math.random()-.5)*wander*2;
+      }
       const tdx=e.tx-e.x,tdy=e.ty-e.y,tl=Math.sqrt(tdx*tdx+tdy*tdy)||1;
       const mspd=e.spd*TS*0.08;
       e.x+=tdx/tl*mspd*dt;e.y+=tdy/tl*mspd*dt;
