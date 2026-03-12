@@ -7,141 +7,168 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--gold:#ffd700;--gold2:#b8860b;--red:#cc2222;--green:#22aa44;--blue:#2244cc;--purple:#8822cc}
-html,body{width:100%;height:100%;overflow:hidden;background:#050510;font-family:'Press Start 2P',monospace,sans-serif;touch-action:none}
+:root{--gold:#ffd27a;--gold2:#c8982a;--red:#dd3333;--green:#44bb66;--blue:#3366cc;--pur:#8833cc;--wood:#c8a060;--woodDark:#8a6030;--woodLight:#e8c888}
+html,body{width:100%;height:100%;overflow:hidden;background:#1a1008;font-family:'Press Start 2P',monospace,sans-serif;touch-action:none}
 canvas{display:block;position:fixed;top:0;left:0;image-rendering:pixelated;image-rendering:crisp-edges}
 
-/* SCREENS */
+/* ── SCREENS ── */
 .screen{display:none;position:fixed;inset:0;z-index:100;flex-direction:column;align-items:center;justify-content:center}
 .screen.on{display:flex}
 
-/* TITLE */
-#sTitle{background:radial-gradient(ellipse at 50% 30%,#1a0a2e,#050510)}
-.tLogo{text-align:center;margin-bottom:32px;animation:float 3s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.tTitle{font-size:clamp(18px,5vw,42px);color:var(--gold);text-shadow:0 0 30px rgba(255,215,0,.6);letter-spacing:2px}
-.tSub{font-size:clamp(7px,1.5vw,11px);color:rgba(200,160,50,.6);letter-spacing:6px;margin-top:8px}
-.tMenu{display:flex;flex-direction:column;gap:10px;width:min(300px,90vw)}
-.tBtn{background:transparent;border:1px solid var(--gold2);color:var(--gold);font-family:inherit;font-size:clamp(8px,2vw,11px);padding:12px 18px;cursor:pointer;text-align:left;letter-spacing:1px;transition:all .15s}
-.tBtn:hover,.tBtn:active{border-color:var(--gold);background:rgba(255,215,0,.08);box-shadow:0 0 20px rgba(255,215,0,.2)}
+/* ── TITLE ── */
+#sTitle{background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><rect width="4" height="4" fill="%23140c04"/><rect x="0" y="0" width="1" height="1" fill="%231e1408" opacity=".5"/></svg>') repeat,radial-gradient(ellipse at 50% 30%,#2a1808 0%,#0a0804 100%)}
+.tLogo{text-align:center;margin-bottom:28px;animation:float 3.5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.tKing{font-size:clamp(8px,1.4vw,13px);color:#a07830;letter-spacing:10px;margin-bottom:4px}
+.tTitle1{font-size:clamp(22px,5.5vw,48px);color:var(--gold);text-shadow:0 0 24px rgba(255,210,120,.5),2px 2px 0 #4a2a00;letter-spacing:2px}
+.tTitle2{font-size:clamp(22px,5.5vw,48px);color:#fff;text-shadow:0 0 20px rgba(255,255,255,.25),2px 2px 0 #2a1800;letter-spacing:2px}
+.tSub{font-size:clamp(6px,1.2vw,9px);color:#8a6030;letter-spacing:5px;margin-top:8px}
+.tLine{width:min(280px,80vw);height:1px;background:linear-gradient(90deg,transparent,#c8982a,transparent);margin:14px auto}
+.tMenu{display:flex;flex-direction:column;gap:8px;width:min(280px,88vw)}
+.tBtn{background:rgba(30,18,8,.85);border:2px solid var(--woodDark);color:var(--gold);font-family:inherit;font-size:clamp(7px,1.8vw,10px);padding:11px 16px;cursor:pointer;text-align:left;letter-spacing:1px;transition:all .12s;position:relative;overflow:hidden}
+.tBtn::before{content:'▶';position:absolute;left:-20px;top:50%;transform:translateY(-50%);color:var(--gold2);transition:left .12s}
+.tBtn:hover,.tBtn:active{border-color:var(--gold);background:rgba(60,35,10,.9);padding-left:26px}
+.tBtn:hover::before,.tBtn:active::before{left:8px}
+.tHint{position:absolute;bottom:10px;font-size:5px;color:#6a4820;letter-spacing:1px;text-align:center;padding:0 10px}
 
-/* RACE SELECT */
-#sRace{background:radial-gradient(ellipse at 50% 20%,#120820,#050510);overflow-y:auto;padding:16px;gap:14px}
-.secTitle{color:var(--gold);font-size:clamp(10px,2.5vw,18px);text-align:center;letter-spacing:4px}
-.raceGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;max-width:900px;width:100%}
-.raceCard{background:rgba(15,10,30,.8);border:1px solid rgba(100,60,160,.3);padding:14px;cursor:pointer;transition:all .15s;text-align:center;border-radius:3px}
-.raceCard.sel,.raceCard:active{border-color:var(--gold);background:rgba(255,215,0,.07);box-shadow:0 0 16px rgba(255,215,0,.2)}
-.raceEmoji{font-size:32px;margin-bottom:8px}
-.raceName{color:var(--gold);font-size:8px;margin-bottom:6px}
-.raceStat{display:flex;align-items:center;gap:4px;margin-top:3px}
-.rsBg{flex:1;height:3px;background:rgba(255,255,255,.1);border-radius:1px}
-.rsFill{height:3px;background:var(--gold);border-radius:1px}
-.raceAbil{color:rgba(200,160,50,.8);font-size:6px;margin-top:6px}
+/* ── PANEL WINDOW (Stardew-style wooden frame) ── */
+.win{background:rgba(20,12,4,.96);border:3px solid var(--woodDark);outline:2px solid rgba(200,160,80,.15);max-width:720px;width:96%;max-height:92vh;overflow-y:auto;padding:18px;position:relative}
+.win::before{content:'';position:absolute;inset:3px;border:1px solid rgba(200,150,60,.12);pointer-events:none}
+.winTitle{color:var(--gold);font-size:clamp(9px,2vw,14px);letter-spacing:3px;text-align:center;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid rgba(200,150,60,.2);position:relative}
+.winTitle::after{content:'';display:block;width:40px;height:2px;background:var(--gold2);margin:8px auto 0}
+.winClose{position:absolute;top:10px;right:10px;background:rgba(60,20,10,.8);border:2px solid var(--woodDark);color:var(--wood);font-family:inherit;font-size:8px;padding:4px 8px;cursor:pointer;line-height:1}
+.winClose:active{border-color:var(--gold);color:var(--gold)}
 
-/* CLAN SELECT */
-#sClan{background:radial-gradient(ellipse at 50% 20%,#0a1520,#050510);padding:16px;gap:14px;overflow-y:auto}
-.clanGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:600px;width:100%}
-.clanCard{border:2px solid;padding:16px;cursor:pointer;transition:all .15s;text-align:center;border-radius:3px}
-.clanCard:active{transform:scale(0.97)}
-.clanName{font-size:10px;margin-bottom:6px;letter-spacing:2px}
-.clanDesc{font-size:6px;color:rgba(200,200,200,.6);line-height:1.9;margin-bottom:6px}
-.clanBonus{font-size:7px}
+/* ── QUESTS SCREEN ── */
+#sQuest{background:radial-gradient(ellipse at 50% 20%,#1e1004,#080604);overflow-y:auto;padding:16px;gap:12px}
+.questList{display:flex;flex-direction:column;gap:8px;max-width:680px;width:100%}
+.questCard{background:rgba(20,12,4,.9);border:2px solid var(--woodDark);padding:12px 14px;cursor:pointer;transition:all .12s;border-radius:2px;position:relative}
+.questCard:hover,.questCard:active{border-color:var(--gold);background:rgba(50,28,8,.9)}
+.questCard.done{border-color:#44aa44;opacity:.7;cursor:default}
+.questCard.locked{border-color:#444;opacity:.5;cursor:not-allowed}
+.qHeader{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.qIcon{font-size:18px;width:26px;text-align:center}
+.qName{color:var(--gold);font-size:8px;flex:1}
+.qStatus{font-size:6px;padding:2px 6px;border:1px solid;border-radius:1px}
+.qStatus.active{color:#44cc66;border-color:#44cc66}
+.qStatus.done{color:#888;border-color:#555}
+.qStatus.locked{color:#555;border-color:#333}
+.qDesc{font-size:6px;color:#9a7848;line-height:1.9;margin-bottom:4px}
+.qReward{font-size:6px;color:#c8a848;margin-top:4px}
+.qProg{height:4px;background:rgba(255,255,255,.08);margin-top:6px;border-radius:1px}
+.qProgFill{height:100%;background:linear-gradient(90deg,#446622,#66aa33);border-radius:1px;transition:width .4s}
 
-/* HUD */
+/* ── HUD ── */
 #hud{display:none;position:fixed;inset:0;pointer-events:none;z-index:50}
-.hudBars{position:absolute;top:8px;left:8px;display:flex;flex-direction:column;gap:3px}
+/* Bars — stardew wood panel */
+.hudBars{position:absolute;top:8px;left:8px;background:rgba(18,10,4,.9);border:2px solid var(--woodDark);border-radius:2px;padding:7px 10px;display:flex;flex-direction:column;gap:4px}
 .barRow{display:flex;align-items:center;gap:5px}
-.barLbl{font-size:5px;color:rgba(255,255,255,.4);width:10px;text-align:right}
-.barOut{width:90px;height:7px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.12)}
-.barIn{height:100%;transition:width .2s}
-.barVal{font-size:5px;color:rgba(255,255,255,.4);width:36px}
-.hudCenter{position:absolute;top:8px;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none}
-.hudZone{font-size:6px;color:rgba(200,160,50,.7);letter-spacing:2px}
-.hudDay{font-size:5px;color:rgba(150,150,200,.5);margin-top:2px}
-.hudMinimap{position:absolute;top:8px;right:8px;width:100px;height:100px;border:1px solid rgba(200,160,50,.25);background:rgba(0,0,0,.7);overflow:hidden}
-.hudMinimap canvas{width:100px;height:100px;image-rendering:pixelated}
-.hudHotbar{position:absolute;bottom:env(safe-area-inset-bottom,8px);bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:4px;pointer-events:all}
-.hotslot{width:40px;height:40px;background:rgba(0,0,0,.7);border:1px solid rgba(200,160,50,.2);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;position:relative;user-select:none}
-.hotslot:active{border-color:var(--gold);background:rgba(255,215,0,.1)}
-.hotN{position:absolute;bottom:1px;right:2px;font-size:4px;color:rgba(255,255,255,.35)}
-.hudBL{position:absolute;bottom:60px;left:8px;display:flex;flex-direction:column;gap:3px;pointer-events:all}
-.hudBR{position:absolute;bottom:60px;right:8px;display:flex;flex-direction:column;gap:3px;align-items:flex-end;pointer-events:all}
-.pill{background:rgba(0,0,0,.7);border:1px solid rgba(200,160,50,.2);padding:3px 7px;font-size:5px;color:rgba(200,180,150,.7);cursor:pointer}
-.pill:active{border-color:var(--gold)}
-.bossBar{position:absolute;top:45px;left:50%;transform:translateX(-50%);width:min(380px,75vw);display:none}
+.barLbl{font-size:5px;color:#c09050;width:11px;text-align:right}
+.barOut{width:88px;height:8px;background:rgba(0,0,0,.7);border:1px solid rgba(150,100,40,.4);border-radius:1px}
+.barIn{height:100%;border-radius:1px;transition:width .18s}
+.barVal{font-size:5px;color:#a07838;width:38px}
+/* Zone info */
+.hudInfo{position:absolute;top:8px;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none}
+.hudZone{font-size:6px;color:rgba(220,180,100,.8);letter-spacing:2px;background:rgba(18,10,4,.8);border:1px solid rgba(150,100,40,.3);padding:3px 10px}
+.hudDay{font-size:5px;color:rgba(160,120,70,.55);margin-top:2px}
+/* Minimap */
+.hudMM{position:absolute;top:8px;right:8px;background:rgba(18,10,4,.9);border:2px solid var(--woodDark);padding:2px}
+/* Hotbar */
+.hudHB{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);left:50%;transform:translateX(-50%);display:flex;gap:3px;pointer-events:all;background:rgba(18,10,4,.9);border:2px solid var(--woodDark);border-radius:2px;padding:4px}
+.hs{width:42px;height:42px;background:rgba(60,35,10,.7);border:2px solid rgba(100,65,20,.6);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:19px;cursor:pointer;position:relative;user-select:none}
+.hs:active{border-color:var(--gold);background:rgba(180,120,30,.2)}
+.hsN{position:absolute;bottom:1px;right:2px;font-size:4px;color:rgba(200,160,80,.4)}
+/* Pills */
+.hudBL{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 62px);left:8px;display:flex;flex-direction:column;gap:3px;pointer-events:all}
+.hudBR{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 62px);right:8px;display:flex;flex-direction:column;gap:3px;align-items:flex-end;pointer-events:all}
+.pill{background:rgba(18,10,4,.9);border:2px solid var(--woodDark);padding:3px 8px;font-size:5px;color:var(--wood);cursor:pointer;border-radius:2px;letter-spacing:.5px}
+.pill:active{border-color:var(--gold);color:var(--gold)}
+/* Boss bar */
+.bossBar{position:absolute;top:42px;left:50%;transform:translateX(-50%);width:min(380px,76vw);display:none}
 .bossBar.on{display:block}
-.bossName{font-size:6px;color:#ff4444;text-align:center;margin-bottom:3px;letter-spacing:2px}
-.bossOut{height:11px;background:rgba(0,0,0,.7);border:1px solid rgba(200,50,50,.3)}
-.bossIn{height:100%;background:linear-gradient(90deg,#880000,#cc2222,#ff4444);transition:width .3s}
+.bossLbl{font-size:6px;color:#ff5555;text-align:center;margin-bottom:3px;letter-spacing:2px}
+.bossOut{height:12px;background:rgba(0,0,0,.8);border:2px solid rgba(180,40,40,.4)}
+.bossIn{height:100%;background:linear-gradient(90deg,#660000,#bb2222,#ff4444);transition:width .25s}
+/* Quest tracker */
+.hudQ{position:absolute;top:8px;left:50%;transform:translateX(-50%) translateY(36px);text-align:center;pointer-events:none;max-width:260px}
+.hudQT{font-size:5px;color:rgba(200,160,80,.6);background:rgba(18,10,4,.7);border:1px solid rgba(150,100,40,.25);padding:2px 8px;line-height:1.8}
 
-/* PANELS */
-.panel{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:200}
+/* ── PANELS ── */
+.panel{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:200}
 .panel.on{display:flex}
-.pBox{background:rgba(8,6,18,.97);border:1px solid var(--gold2);max-width:680px;width:95%;max-height:90vh;overflow-y:auto;padding:16px;position:relative}
-.pTitle{color:var(--gold);font-size:10px;letter-spacing:3px;border-bottom:1px solid rgba(200,160,50,.25);padding-bottom:8px;margin-bottom:12px}
-.pClose{position:absolute;top:10px;right:10px;background:none;border:1px solid rgba(200,160,50,.3);color:var(--gold2);font-family:inherit;font-size:8px;padding:4px 7px;cursor:pointer}
-.pClose:active{border-color:var(--gold);color:var(--gold)}
+/* Inventory grid */
 .eqSlots{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:10px}
-.eqSlot{background:rgba(255,255,255,.02);border:1px solid rgba(200,160,50,.15);padding:6px;text-align:center}
-.eqLbl{font-size:5px;color:rgba(200,160,50,.4);margin-bottom:3px}
-.eqItem{font-size:20px;min-height:24px;display:flex;align-items:center;justify-content:center}
-.invGrid{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;margin-bottom:10px}
-.invSlot{aspect-ratio:1;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;position:relative;transition:all .1s}
-.invSlot:active{border-color:rgba(200,160,50,.5);background:rgba(255,215,0,.06)}
-.invSlot.eq{border-color:var(--gold);background:rgba(255,215,0,.08)}
-.iQty{position:absolute;bottom:1px;right:2px;font-size:4px;color:rgba(255,255,255,.5)}
-.iDesc{font-size:6px;color:rgba(200,180,150,.7);min-height:28px;line-height:1.9;margin-top:6px}
-.sep{height:1px;background:rgba(200,160,50,.12);margin:8px 0}
+.eqSlot{background:rgba(40,24,8,.8);border:2px solid rgba(100,65,20,.5);padding:6px;text-align:center;border-radius:1px}
+.eqLbl{font-size:5px;color:rgba(180,130,60,.5);margin-bottom:3px}
+.eqIt{font-size:22px;min-height:26px;display:flex;align-items:center;justify-content:center}
+.invG{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;margin-bottom:10px}
+.iSl{aspect-ratio:1;background:rgba(40,24,8,.7);border:2px solid rgba(80,50,16,.5);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;position:relative;border-radius:1px;transition:border-color .1s}
+.iSl:active,.iSl.eq{border-color:var(--gold)}
+.iQty{position:absolute;bottom:1px;right:2px;font-size:4px;color:rgba(200,160,80,.6)}
+.iDesc{font-size:6px;color:#9a7040;min-height:28px;line-height:2;margin-top:6px}
+.sep{height:1px;background:rgba(180,130,60,.15);margin:8px 0}
 
-/* DIALOG */
-#dialog{position:fixed;bottom:56px;left:50%;transform:translateX(-50%);width:min(580px,92vw);background:rgba(8,6,18,.97);border:1px solid var(--gold2);padding:12px 16px;display:none;z-index:300}
-#dialog.on{display:block}
-.dlgName{color:var(--gold);font-size:7px;margin-bottom:7px}
-.dlgText{color:rgba(220,210,200,.85);font-size:6px;line-height:2.1}
-.dlgOpts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-.dlgOpt{background:none;border:1px solid rgba(200,160,50,.3);color:var(--gold2);font-family:inherit;font-size:5px;padding:5px 9px;cursor:pointer}
-.dlgOpt:active{border-color:var(--gold);color:var(--gold)}
+/* ── DIALOG ── */
+#dlg{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 54px);left:50%;transform:translateX(-50%);width:min(600px,93vw);background:rgba(18,10,4,.97);border:2px solid var(--woodDark);padding:12px 16px;display:none;z-index:300}
+#dlg::before{content:'';position:absolute;inset:3px;border:1px solid rgba(180,130,60,.1);pointer-events:none}
+#dlg.on{display:block}
+.dlgN{color:var(--gold);font-size:7px;margin-bottom:7px;letter-spacing:1px}
+.dlgT{color:rgba(230,200,160,.85);font-size:6px;line-height:2.1}
+.dlgOs{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.dlgO{background:rgba(40,24,8,.8);border:2px solid var(--woodDark);color:var(--wood);font-family:inherit;font-size:5px;padding:5px 10px;cursor:pointer;border-radius:1px}
+.dlgO:active{border-color:var(--gold);color:var(--gold)}
 
-/* NOTIFS */
-#notifs{position:fixed;top:50px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:3px;align-items:center;z-index:400;pointer-events:none}
-.notif{background:rgba(0,0,0,.88);border:1px solid;padding:5px 12px;font-size:6px;letter-spacing:1px;animation:nIn .25s ease,nOut .4s 2s ease forwards;white-space:nowrap}
-.notif.good{border-color:var(--green);color:#4dff88}
-.notif.bad{border-color:var(--red);color:#ff6666}
-.notif.info{border-color:var(--gold2);color:var(--gold)}
-.notif.rare{border-color:var(--purple);color:#cc88ff}
+/* ── NOTIFS ── */
+#notifs{position:fixed;top:48px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:3px;align-items:center;z-index:400;pointer-events:none}
+.notif{background:rgba(18,10,4,.95);border:2px solid;padding:4px 12px;font-size:6px;letter-spacing:1px;animation:nIn .2s ease,nOut .35s 2.1s ease forwards;white-space:nowrap;border-radius:1px}
+.notif.good{border-color:#44bb55;color:#66ee88}
+.notif.bad{border-color:#aa2222;color:#ff6666}
+.notif.info{border-color:var(--woodDark);color:var(--gold)}
+.notif.rare{border-color:#aa44dd;color:#dd99ff}
 @keyframes nIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes nOut{to{opacity:0;transform:translateY(-8px)}}
 
-/* DEATH */
-#sDeath{background:rgba(0,0,0,.95);gap:16px}
-.deathTitle{font-size:clamp(16px,5vw,36px);color:var(--red);text-shadow:0 0 30px rgba(200,0,0,.5);animation:dp 1.5s ease infinite}
-@keyframes dp{0%,100%{text-shadow:0 0 20px rgba(200,0,0,.4)}50%{text-shadow:0 0 50px rgba(200,0,0,.8)}}
-.deathSub{font-size:8px;color:rgba(200,100,100,.6)}
+/* ── DEATH ── */
+#sDeath{background:rgba(0,0,0,.95);gap:14px}
+.deathT{font-size:clamp(18px,5.5vw,40px);color:#cc2222;text-shadow:0 0 30px rgba(200,0,0,.5);animation:dp 1.6s ease infinite}
+@keyframes dp{0%,100%{text-shadow:0 0 16px rgba(180,0,0,.4)}50%{text-shadow:0 0 50px rgba(255,40,40,.8)}}
+.deathS{font-size:7px;color:rgba(180,80,80,.7)}
 
-/* MOBILE CONTROLS */
-#mCtrl{position:fixed;bottom:0;left:0;right:0;height:170px;display:none;z-index:60;pointer-events:none}
-.jWrap{position:absolute;bottom:16px;left:16px;width:110px;height:110px;pointer-events:all}
-.jBg{width:100%;height:100%;border-radius:50%;background:rgba(255,255,255,.04);border:2px solid rgba(255,255,255,.12)}
-.jKnob{position:absolute;width:44px;height:44px;border-radius:50%;background:rgba(255,215,0,.2);border:2px solid rgba(255,215,0,.45);top:50%;left:50%;transform:translate(-50%,-50%)}
+/* ── MOBILE ── */
+#mCtrl{position:fixed;bottom:0;left:0;right:0;height:175px;display:none;z-index:60;pointer-events:none}
+.jWrap{position:absolute;bottom:16px;left:16px;width:112px;height:112px;pointer-events:all}
+.jBg{width:100%;height:100%;border-radius:50%;background:rgba(255,255,255,.04);border:2px solid rgba(200,150,60,.2)}
+.jKnob{position:absolute;width:46px;height:46px;border-radius:50%;background:rgba(220,170,60,.18);border:2px solid rgba(220,160,60,.4);top:50%;left:50%;transform:translate(-50%,-50%)}
 .aBtns{position:absolute;bottom:16px;right:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;pointer-events:all}
-.aBtn{width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,.65);border:2px solid rgba(200,160,50,.35);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;pointer-events:all;user-select:none}
-.aBtn:active{background:rgba(255,215,0,.1);border-color:var(--gold)}
+.aBtn{width:54px;height:54px;border-radius:50%;background:rgba(18,10,4,.75);border:2px solid rgba(150,100,40,.45);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;pointer-events:all;user-select:none}
+.aBtn:active{background:rgba(180,120,30,.15);border-color:var(--gold)}
 
-/* UTILS */
-.bGold{background:none;border:1px solid var(--gold2);color:var(--gold);font-family:inherit;padding:10px 18px;font-size:clamp(7px,2vw,9px);cursor:pointer;letter-spacing:1px;transition:all .15s}
-.bGold:hover,.bGold:active{border-color:var(--gold);background:rgba(255,215,0,.07);box-shadow:0 0 14px rgba(255,215,0,.2)}
-.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 
-/* Stars */
-.star{position:absolute;background:#fff;border-radius:50%;animation:tw var(--d,2s) ease-in-out infinite}
-@keyframes tw{0%,100%{opacity:.1}50%{opacity:.8}}
+/* ── TUTORIAL BOX ── */
+#tutorialBox{position:fixed;inset:0;background:rgba(0,0,0,.78);display:none;align-items:center;justify-content:center;z-index:600;padding:16px}
+.tutWin{background:rgba(14,8,2,.98);border:3px solid #c8a050;max-width:520px;width:100%;padding:24px;position:relative;font-family:'Press Start 2P',monospace}
+.tutWin::before{content:'';position:absolute;inset:4px;border:1px solid rgba(200,160,60,.15);pointer-events:none}
+.tutElderRow{display:flex;align-items:flex-start;gap:16px;margin-bottom:14px}
+.tutElderSprite{width:48px;height:72px;flex-shrink:0;image-rendering:pixelated;background:rgba(0,0,0,.3);border:1px solid rgba(200,150,60,.2)}
+.tutTitleEl{color:#ffd27a;font-size:clamp(8px,2vw,12px);letter-spacing:2px;margin-bottom:8px}
+.tutTextEl{color:rgba(230,200,160,.85);font-size:clamp(5px,1.2vw,7px);line-height:2.2;white-space:pre-line}
+.tutBtns{display:flex;gap:8px;margin-top:14px;justify-content:flex-end}
+.tutBtn{background:rgba(30,18,8,.9);border:2px solid #8a6030;color:#ffd27a;font-family:inherit;font-size:clamp(6px,1.5vw,8px);padding:8px 14px;cursor:pointer}
+.tutBtn:hover{border-color:#ffd27a;background:rgba(60,35,10,.9)}
+.tutBtn.prim{border-color:#ffd27a}
+.tutProg{position:absolute;top:10px;right:14px;font-size:5px;color:rgba(180,130,50,.5)}
 
-/* HOW TO PLAY */
-#sHelp{background:rgba(5,3,16,.97);padding:20px;overflow-y:auto;gap:10px}
-.helpGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;max-width:800px;width:100%}
-.helpCard{background:rgba(15,10,30,.8);border:1px solid rgba(100,60,160,.3);padding:12px;border-radius:3px}
-.helpCard h3{color:var(--gold);font-size:7px;margin-bottom:8px;letter-spacing:1px}
-.helpCard p{color:rgba(200,180,150,.7);font-size:6px;line-height:2}
+/* ── SWIMMING ── */
+.swimBadge{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:8px;color:rgba(100,200,255,.8);pointer-events:none;display:none}
+
+/* ── UTILS ── */
+.bGold{background:rgba(20,12,4,.85);border:2px solid var(--woodDark);color:var(--gold);font-family:inherit;padding:10px 18px;font-size:clamp(7px,1.8vw,9px);cursor:pointer;letter-spacing:1px;transition:all .12s;border-radius:2px}
+.bGold:hover,.bGold:active{border-color:var(--gold);background:rgba(50,28,8,.9)}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.secT{color:var(--gold);font-size:clamp(10px,2.5vw,16px);text-align:center;letter-spacing:4px;margin-bottom:6px}
+.secS{font-size:6px;color:#8a6030;text-align:center;margin-bottom:14px}
+.starDot{position:absolute;background:#fff;border-radius:50%;animation:tw var(--d,2s) ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.08}50%{opacity:.8}}
 </style>
 </head>
 <body>
@@ -150,54 +177,51 @@ canvas{display:block;position:fixed;top:0;left:0;image-rendering:pixelated;image
 <div id="sTitle" class="screen on">
   <div id="titleStars"></div>
   <div class="tLogo">
-    <div style="font-size:clamp(8px,2vw,14px);color:rgba(200,160,50,.4);letter-spacing:10px;margin-bottom:6px">⚔ ⚔ ⚔</div>
-    <div class="tTitle">Kingdom of</div>
-    <div class="tTitle" style="color:#fff;text-shadow:0 0 30px rgba(255,255,255,.3)">Realms</div>
-    <div class="tSub">A world of war, magic &amp; legend</div>
+    <div class="tKing">✦ ✦ ✦ ✦ ✦</div>
+    <div class="tTitle1">Kingdom of</div>
+    <div class="tTitle2">Realms</div>
+    <div class="tSub">war · magic · legend</div>
   </div>
+  <div class="tLine"></div>
   <div class="tMenu">
-    <button class="tBtn" onclick="startNew()">⚔ &nbsp;New Adventure</button>
-    <button class="tBtn" onclick="loadGame()">📜 &nbsp;Continue</button>
+    <button class="tBtn" onclick="startNew()">⚔ &nbsp;Begin Your Journey</button>
+    <button class="tBtn" onclick="loadGame()">📜 &nbsp;Continue Adventure</button>
     <button class="tBtn" onclick="SS('sHelp')">❓ &nbsp;How to Play</button>
   </div>
-  <div style="position:absolute;bottom:12px;font-size:5px;color:rgba(200,160,50,.3);letter-spacing:1px;text-align:center;padding:0 10px">
-    WASD/⬆⬇⬅➡ MOVE · CLICK/TAP ATTACK · F ABILITY · SPACE DODGE · E TALK · I INV · M MAP
-  </div>
+  <div class="tHint">WASD · CLICK/TAP · F=ABILITY · SPACE=DODGE · E=TALK · I=INV · M=MAP</div>
 </div>
 
 <!-- ═══ HOW TO PLAY ═══ -->
-<div id="sHelp" class="screen">
-  <div class="secTitle" style="margin-bottom:4px">❓ HOW TO PLAY</div>
-  <div class="helpGrid">
-    <div class="helpCard"><h3>🎮 Controls</h3><p>WASD / Arrow keys to move<br>Click or tap to attack<br>F key = special ability<br>Space = dodge roll<br>E = talk to NPCs<br>I = inventory, M = map<br>1-5 = use hotbar items</p></div>
-    <div class="helpCard"><h3>⚔ Combat</h3><p>Approach enemies to fight<br>Dodge to avoid damage<br>Use potions to heal<br>Kill enemies for XP + Gold<br>Level up to get stronger<br>Watch your stamina bar</p></div>
-    <div class="helpCard"><h3>🗺 World</h3><p>Start at Heartwood Village<br>Explore 8 territories<br>Each zone has unique enemies<br>Bosses guard each region<br>Hell &amp; Abyss = endgame zones<br>Day/night cycle active</p></div>
-    <div class="helpCard"><h3>🌟 Magic Man</h3><p>A mysterious figure hides<br>somewhere far from the village.<br>Very very hard to find.<br>He grants permanent power<br>for 50 gold. Most adventurers<br>never find him...</p></div>
-    <div class="helpCard"><h3>⚜ Clans</h3><p>Join one of 4 clans<br>Each gives unique bonuses<br>Iron = ATK + DEF<br>Arcane = Magic power<br>Shadow = Speed + Crit<br>Flame = Fire damage</p></div>
-    <div class="helpCard"><h3>🧪 Potions</h3><p>HP Potion = restore health<br>MP Potion = restore mana<br>Strength = attack boost<br>Speed = movement boost<br>Magic Surge = spell power<br>Invincibility = rare &amp; powerful</p></div>
+<div id="sHelp" class="screen" style="background:rgba(8,4,2,.97);overflow-y:auto;padding:16px;gap:10px">
+  <div class="secT">❓ HOW TO PLAY</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;max-width:820px;width:100%">
+    <div style="background:rgba(20,12,4,.9);border:2px solid var(--woodDark);padding:12px">
+      <div style="color:var(--gold);font-size:7px;margin-bottom:8px">🎮 CONTROLS</div>
+      <div style="font-size:6px;color:#9a7040;line-height:2">WASD / Arrows = Move<br>Click / Tap = Attack<br>F = Special Ability<br>Space = Dodge Roll<br>E = Talk to NPCs<br>I = Inventory &nbsp; M = Map<br>1-5 = Use Hotbar</div>
+    </div>
+    <div style="background:rgba(20,12,4,.9);border:2px solid var(--woodDark);padding:12px">
+      <div style="color:var(--gold);font-size:7px;margin-bottom:8px">⚔ YOUR RACE & CLAN</div>
+      <div style="font-size:6px;color:#9a7040;line-height:2">You start as a basic warrior.<br>Talk to NPCs in the village<br>to unlock quests. Complete<br>quests to EARN your race<br>and clan. Each quest reveals<br>a deeper power within you.</div>
+    </div>
+    <div style="background:rgba(20,12,4,.9);border:2px solid var(--woodDark);padding:12px">
+      <div style="color:var(--gold);font-size:7px;margin-bottom:8px">🌟 THE MAGIC MAN</div>
+      <div style="font-size:6px;color:#9a7040;line-height:2">Hidden far from the village.<br>Very very hard to find.<br>He grants permanent power<br>for 50 gold. Most heroes<br>never find him in their<br>lifetime of adventuring...</div>
+    </div>
+    <div style="background:rgba(20,12,4,.9);border:2px solid var(--woodDark);padding:12px">
+      <div style="color:var(--gold);font-size:7px;margin-bottom:8px">🗺 THE WORLD</div>
+      <div style="font-size:6px;color:#9a7040;line-height:2">8 territories to explore.<br>Trees block your path.<br>Lava deals fire damage.<br>Bosses guard each region.<br>Day/night cycle active.<br>Night = harder enemies.</div>
+    </div>
   </div>
-  <button class="bGold" style="margin-top:10px" onclick="SS('sTitle')">← Back</button>
+  <button class="bGold" onclick="SS('sTitle')">← Back</button>
 </div>
 
-<!-- ═══ RACE SELECT ═══ -->
-<div id="sRace" class="screen">
-  <div class="secTitle">⚔ CHOOSE YOUR RACE</div>
-  <div style="font-size:6px;color:rgba(200,180,150,.4);text-align:center">Your race defines your destiny</div>
-  <div class="raceGrid" id="raceGrid"></div>
-  <div class="row" style="margin-top:10px">
-    <button class="bGold" onclick="confirmRace()">Enter the Realm ⚔</button>
-    <button class="bGold" onclick="SS('sTitle')">← Back</button>
-  </div>
-</div>
-
-<!-- ═══ CLAN SELECT ═══ -->
-<div id="sClan" class="screen">
-  <div class="secTitle">⚜ JOIN A CLAN</div>
-  <div style="font-size:6px;color:rgba(200,180,150,.4);text-align:center">Clans fight for territory. Choose wisely.</div>
-  <div class="clanGrid" id="clanGrid"></div>
-  <div class="row" style="margin-top:12px">
-    <button class="bGold" onclick="confirmClan()">Pledge Loyalty ⚜</button>
-    <button class="bGold" onclick="SS('sRace')">← Back</button>
+<!-- ═══ QUESTS ═══ -->
+<div id="sQuest" class="screen">
+  <div class="secT">📜 QUEST BOARD</div>
+  <div class="secS">Talk to villagers to unlock quests. Complete them to discover your true power.</div>
+  <div class="questList" id="questList"></div>
+  <div class="row">
+    <button class="bGold" onclick="enterWorld()">⚔ Enter World</button>
   </div>
 </div>
 
@@ -207,75 +231,108 @@ canvas{display:block;position:fixed;top:0;left:0;image-rendering:pixelated;image
 <!-- ═══ HUD ═══ -->
 <div id="hud">
   <div class="hudBars">
-    <div class="barRow"><span class="barLbl">HP</span><div class="barOut"><div class="barIn" id="bHp" style="background:#cc2222;width:100%"></div></div><span class="barVal" id="vHp">100/100</span></div>
-    <div class="barRow"><span class="barLbl">MP</span><div class="barOut"><div class="barIn" id="bMp" style="background:#2244cc;width:100%"></div></div><span class="barVal" id="vMp">100/100</span></div>
-    <div class="barRow"><span class="barLbl">XP</span><div class="barOut"><div class="barIn" id="bXp" style="background:#228822;width:0%"></div></div><span class="barVal" id="vLv">Lv1</span></div>
-    <div class="barRow"><span class="barLbl">ST</span><div class="barOut"><div class="barIn" id="bSt" style="background:#cc8800;width:100%"></div></div><span class="barVal" id="vSt">100</span></div>
+    <div class="barRow"><span class="barLbl">HP</span><div class="barOut"><div class="barIn" id="bHp" style="background:linear-gradient(90deg,#881111,#dd2222,#ff4444);width:100%"></div></div><span class="barVal" id="vHp">100</span></div>
+    <div class="barRow"><span class="barLbl">MP</span><div class="barOut"><div class="barIn" id="bMp" style="background:linear-gradient(90deg,#112288,#2244cc,#4466ff);width:100%"></div></div><span class="barVal" id="vMp">80</span></div>
+    <div class="barRow"><span class="barLbl">XP</span><div class="barOut"><div class="barIn" id="bXp" style="background:linear-gradient(90deg,#224411,#336622,#55aa33);width:0%"></div></div><span class="barVal" id="vLv">Lv1</span></div>
+    <div class="barRow"><span class="barLbl">ST</span><div class="barOut"><div class="barIn" id="bSt" style="background:linear-gradient(90deg,#664400,#aa7700,#ddaa00);width:100%"></div></div><span class="barVal" id="vSt">100</span></div>
   </div>
-  <div class="hudCenter">
+  <div class="hudInfo">
     <div class="hudZone" id="hZone">Heartwood Village</div>
     <div class="hudDay" id="hDay">Day 1 · Dawn</div>
   </div>
-  <div class="hudMinimap"><canvas id="mmCv" width="100" height="100"></canvas></div>
-  <div class="hudHotbar" id="hotbar">
-    <div class="hotslot" id="hs0" onclick="useHS(0)"><span class="hotN">1</span></div>
-    <div class="hotslot" id="hs1" onclick="useHS(1)"><span class="hotN">2</span></div>
-    <div class="hotslot" id="hs2" onclick="useHS(2)"><span class="hotN">3</span></div>
-    <div class="hotslot" id="hs3" onclick="useHS(3)"><span class="hotN">4</span></div>
-    <div class="hotslot" id="hs4" onclick="useHS(4)"><span class="hotN">5</span></div>
+  <div class="hudMM"><canvas id="mmCv" width="100" height="100" style="display:block;image-rendering:pixelated"></canvas></div>
+  <div class="hudQ"><div class="hudQT" id="hudQT"></div></div>
+  <div class="hudHB" id="hotbar">
+    <div class="hs" id="hs0" onclick="useHS(0)"><span class="hsN">1</span></div>
+    <div class="hs" id="hs1" onclick="useHS(1)"><span class="hsN">2</span></div>
+    <div class="hs" id="hs2" onclick="useHS(2)"><span class="hsN">3</span></div>
+    <div class="hs" id="hs3" onclick="useHS(3)"><span class="hsN">4</span></div>
+    <div class="hs" id="hs4" onclick="useHS(4)"><span class="hsN">5</span></div>
   </div>
   <div class="hudBL">
-    <div class="pill" id="pClan">Clan: —</div>
+    <div class="pill" id="pClan">⚜ No Clan</div>
     <div class="pill" id="pGold">🪙 0g</div>
+    <div class="pill" id="pRace">👤 Warrior</div>
   </div>
   <div class="hudBR">
-    <div class="pill" onclick="toggleP('pInv')" style="pointer-events:all">⚔ INV</div>
-    <div class="pill" onclick="toggleP('pMap')" style="pointer-events:all">🗺 MAP</div>
-    <div class="pill" onclick="useAbility()" style="pointer-events:all;color:#cc88ff">⚡ [F]</div>
+    <div class="pill" onclick="toggleP('pInv')" style="pointer-events:all">⚔ INV [I]</div>
+    <div class="pill" onclick="toggleP('pMap')" style="pointer-events:all">🗺 MAP [M]</div>
+    <div class="pill" onclick="toggleP('pQP')" style="pointer-events:all">📜 QUESTS</div>
+    <div class="pill" onclick="useAbility()" style="pointer-events:all;color:#cc88ff">⚡ SKILL [F]</div>
+    <div class="pill" id="goalPill" style="color:#ffd27a">🏆 0/6 Bosses</div>
   </div>
-  <div class="bossBar" id="bossBar">
-    <div class="bossName" id="bossName">BOSS</div>
-    <div class="bossOut"><div class="bossIn" id="bossHp" style="width:100%"></div></div>
+  <div id="swimBar" style="display:none;position:absolute;top:60px;left:50%;transform:translateX(-50%);font-size:6px;color:#60d0ff;background:rgba(0,30,80,.8);border:1px solid rgba(100,200,255,.4);padding:3px 10px;border-radius:2px">🏊 Swimming — slower movement</div>
+<div class="bossBar" id="bossBar">
+    <div class="bossLbl" id="bossN">BOSS</div>
+    <div class="bossOut"><div class="bossIn" id="bossH" style="width:100%"></div></div>
   </div>
 </div>
 
-<!-- ═══ INVENTORY PANEL ═══ -->
+<!-- ═══ INVENTORY ═══ -->
 <div class="panel" id="pInv">
-  <div class="pBox">
-    <div class="pTitle">⚔ INVENTORY</div>
-    <button class="pClose" onclick="toggleP('pInv')">✕</button>
-    <div style="font-size:6px;color:rgba(200,180,150,.4);margin-bottom:6px">Equipment</div>
+  <div class="win" style="max-width:680px">
+    <div class="winTitle">⚔ INVENTORY</div>
+    <button class="winClose" onclick="toggleP('pInv')">✕</button>
+    <div style="font-size:6px;color:rgba(180,130,60,.5);margin-bottom:7px">Equipped Gear</div>
     <div class="eqSlots">
-      <div class="eqSlot"><div class="eqLbl">HEAD</div><div class="eqItem" id="eqH">—</div></div>
-      <div class="eqSlot"><div class="eqLbl">CHEST</div><div class="eqItem" id="eqC">—</div></div>
-      <div class="eqSlot"><div class="eqLbl">LEGS</div><div class="eqItem" id="eqL">—</div></div>
-      <div class="eqSlot"><div class="eqLbl">FEET</div><div class="eqItem" id="eqF">—</div></div>
-      <div class="eqSlot"><div class="eqLbl">WEAPON</div><div class="eqItem" id="eqW">🗡️</div></div>
+      <div class="eqSlot"><div class="eqLbl">HEAD</div><div class="eqIt" id="eqH">—</div></div>
+      <div class="eqSlot"><div class="eqLbl">CHEST</div><div class="eqIt" id="eqC">—</div></div>
+      <div class="eqSlot"><div class="eqLbl">LEGS</div><div class="eqIt" id="eqL">—</div></div>
+      <div class="eqSlot"><div class="eqLbl">FEET</div><div class="eqIt" id="eqF">—</div></div>
+      <div class="eqSlot"><div class="eqLbl">WEAPON</div><div class="eqIt" id="eqW">🗡️</div></div>
     </div>
     <div class="sep"></div>
-    <div style="font-size:6px;color:rgba(200,180,150,.4);margin-bottom:6px">Bag — tap to equip/use</div>
-    <div class="invGrid" id="invGrid"></div>
+    <div style="font-size:6px;color:rgba(180,130,60,.5);margin-bottom:7px">Bag (tap to equip/use)</div>
+    <div class="invG" id="invG"></div>
     <div class="sep"></div>
     <div class="iDesc" id="iDesc">Select an item to see details</div>
   </div>
 </div>
 
-<!-- ═══ MAP PANEL ═══ -->
+<!-- ═══ MAP ═══ -->
 <div class="panel" id="pMap">
-  <div class="pBox" style="max-width:760px">
-    <div class="pTitle">🗺 WORLD MAP</div>
-    <button class="pClose" onclick="toggleP('pMap')">✕</button>
-    <canvas id="wmCv" style="width:100%;height:min(380px,50vw);image-rendering:pixelated;border:1px solid rgba(200,160,50,.2);display:block"></canvas>
-    <div style="font-size:5px;color:rgba(200,160,50,.4);margin-top:8px">⚠ The Magic Man is hidden far from the village. Very few have found him.</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:5px;margin-top:8px" id="zoneLeg"></div>
+  <div class="win" style="max-width:780px">
+    <div class="winTitle">🗺 WORLD MAP — Kingdom of Realms</div>
+    <button class="winClose" onclick="toggleP('pMap')">✕</button>
+    <canvas id="wmCv" style="width:100%;height:min(380px,50vh);image-rendering:pixelated;border:2px solid rgba(150,100,40,.3);display:block"></canvas>
+    <div style="font-size:5px;color:rgba(160,100,40,.5);margin-top:8px">⚠ The Magic Man is hidden in the far reaches of the world. Very few have found him.</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:5px;margin-top:9px" id="zoneLeg"></div>
+  </div>
+</div>
+
+<!-- ═══ QUEST PANEL (in-game) ═══ -->
+<div class="panel" id="pQP">
+  <div class="win">
+    <div class="winTitle">📜 QUESTS</div>
+    <button class="winClose" onclick="toggleP('pQP')">✕</button>
+    <div class="questList" id="questListIG"></div>
+  </div>
+</div>
+
+
+<!-- ═══ TUTORIAL ═══ -->
+<div id="tutorialBox">
+  <div class="tutWin">
+    <div class="tutProg" id="tutProg">1/5</div>
+    <div class="tutElderRow">
+      <canvas class="tutElderSprite" id="tutElderCanvas" width="48" height="72"></canvas>
+      <div>
+        <div class="tutTitleEl" id="tutTitle">Welcome!</div>
+        <div class="tutTextEl" id="tutText"></div>
+      </div>
+    </div>
+    <div class="tutBtns">
+      <button class="tutBtn" onclick="tutSkip()">Skip Tutorial</button>
+      <button class="tutBtn prim" onclick="tutNext()">Next ▶</button>
+    </div>
   </div>
 </div>
 
 <!-- ═══ DIALOG ═══ -->
-<div id="dialog">
-  <div class="dlgName" id="dlgName">???</div>
-  <div class="dlgText" id="dlgText"></div>
-  <div class="dlgOpts" id="dlgOpts"></div>
+<div id="dlg">
+  <div class="dlgN" id="dlgN">???</div>
+  <div class="dlgT" id="dlgT"></div>
+  <div class="dlgOs" id="dlgOs"></div>
 </div>
 
 <!-- ═══ NOTIFS ═══ -->
@@ -283,9 +340,9 @@ canvas{display:block;position:fixed;top:0;left:0;image-rendering:pixelated;image
 
 <!-- ═══ DEATH ═══ -->
 <div id="sDeath" class="screen">
-  <div class="deathTitle">YOU DIED</div>
-  <div class="deathSub" id="deathMsg">Slain by the darkness...</div>
-  <div class="row" style="margin-top:10px">
+  <div class="deathT">YOU DIED</div>
+  <div class="deathS" id="deathMsg"></div>
+  <div class="row">
     <button class="bGold" onclick="respawn()">⚔ Respawn at Village</button>
     <button class="bGold" onclick="SS('sTitle')">⚰ Main Menu</button>
   </div>
@@ -293,10 +350,7 @@ canvas{display:block;position:fixed;top:0;left:0;image-rendering:pixelated;image
 
 <!-- ═══ MOBILE CONTROLS ═══ -->
 <div id="mCtrl">
-  <div class="jWrap" id="jWrap">
-    <div class="jBg"></div>
-    <div class="jKnob" id="jKnob"></div>
-  </div>
+  <div class="jWrap" id="jWrap"><div class="jBg"></div><div class="jKnob" id="jKnob"></div></div>
   <div class="aBtns">
     <div class="aBtn" id="btnAtk">⚔</div>
     <div class="aBtn" id="btnDodge">💨</div>
@@ -306,126 +360,170 @@ canvas{display:block;position:fixed;top:0;left:0;image-rendering:pixelated;image
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// KINGDOM OF REALMS — v2 (Cloudflare + Mobile ready)
-// ═══════════════════════════════════════════════════════
-const gc = document.getElementById('gc');
-const gctx = gc.getContext('2d');
-const mmCv = document.getElementById('mmCv');
-const mmctx = mmCv.getContext('2d');
+'use strict';
+// ═══════════════════════════════════════════════════════════
+//  KINGDOM OF REALMS v3 — Quest Races, Tree Collision, HD Tiles
+// ═══════════════════════════════════════════════════════════
+const gc=document.getElementById('gc');
+const gctx=gc.getContext('2d');
+const mmCv=document.getElementById('mmCv');
+const mmctx=mmCv.getContext('2d');
+const TS=16, WW=256, WH=256;
+let SCALE=3;
 
-// ── CONSTANTS ──
-const TS = 16, WW = 256, WH = 256;
-let SCALE = 3;
-
-// ── DATA ──
-const ZONES = [
-  {id:'village', name:'Heartwood Village',color:'#1a2e1a',x:100,y:100,w:40,h:40,safe:true, danger:0,desc:'Peaceful spawn village with many NPCs.'},
-  {id:'forest',  name:'Darkwood Forest',  color:'#0d1f0d',x:60, y:80, w:60,h:60,safe:false,danger:2,desc:'Twisted trees, lurking beasts.'},
-  {id:'hell',    name:'Hell Territories', color:'#2e0a00',x:160,y:160,w:50,h:50,safe:false,danger:5,desc:'Scorched hellscape of demons.'},
-  {id:'jungle',  name:'Jungle Wilds',     color:'#0a2210',x:30, y:150,w:55,h:50,safe:false,danger:3,desc:'Dense jungle with deadly traps.'},
-  {id:'frozen',  name:'Frozen Wastes',    color:'#0d1e2e',x:140,y:20, w:60,h:55,safe:false,danger:4,desc:'Blizzards and undead hordes.'},
-  {id:'sky',     name:'Sky Realm',        color:'#1a1535',x:70, y:20, w:55,h:45,safe:false,danger:4,desc:'Floating islands. Celestial danger.'},
-  {id:'abyss',   name:'The Abyss',        color:'#080010',x:180,y:90, w:40,h:45,safe:false,danger:5,desc:'Deepest dungeon. Strongest survive.'},
-  {id:'plains',  name:'Golden Plains',    color:'#1e1a08',x:85, y:145,w:55,h:45,safe:false,danger:1,desc:'Rolling plains with roaming bandits.'},
+// ── ZONES ──
+const ZONES=[
+  {id:'village',n:'Heartwood Village',col:'#1a2e1a',x:100,y:100,w:40,h:40,safe:true, danger:0,desc:'Peaceful starting village.'},
+  {id:'forest', n:'Darkwood Forest',  col:'#0d1f0d',x:60, y:80, w:60,h:60,safe:false,danger:2,desc:'Twisted trees, lurking beasts.'},
+  {id:'hell',   n:'Hell Territories', col:'#2e0a00',x:160,y:160,w:50,h:50,safe:false,danger:5,desc:'Scorched hellscape of demons.'},
+  {id:'jungle', n:'Jungle Wilds',     col:'#0a2210',x:30, y:150,w:55,h:50,safe:false,danger:3,desc:'Dense jungle with deadly traps.'},
+  {id:'frozen', n:'Frozen Wastes',    col:'#0d1e2e',x:140,y:20, w:60,h:55,safe:false,danger:4,desc:'Blizzards and undead hordes.'},
+  {id:'sky',    n:'Sky Realm',        col:'#1a1535',x:70, y:20, w:55,h:45,safe:false,danger:4,desc:'Floating islands. Celestial danger.'},
+  {id:'abyss',  n:'The Abyss',        col:'#080010',x:180,y:90, w:40,h:45,safe:false,danger:5,desc:'Deepest dungeon.'},
+  {id:'plains', n:'Golden Plains',    col:'#1e1a08',x:85, y:145,w:55,h:45,safe:false,danger:1,desc:'Rolling plains with bandits.'},
 ];
 
-const RACES = [
-  {id:'human',  name:'Human',      emoji:'🧑',hp:100,mp:80, spd:2.4,atk:12,def:8, mgk:5, color:'#d4a070',abil:'Second Wind',   abilDesc:'Recover 30HP now',     stats:{HP:6,MP:5,SPD:6,ATK:6,DEF:6}},
-  {id:'flash',  name:'Speedster',  emoji:'⚡',hp:70, mp:60, spd:4.8,atk:10,def:4, mgk:3, color:'#ffff44',abil:'Blitz Rush',    abilDesc:'3x speed for 3s',      stats:{HP:3,MP:4,SPD:10,ATK:5,DEF:2}},
-  {id:'giant',  name:'Titan',      emoji:'🏔',hp:220,mp:40, spd:1.4,atk:22,def:18,mgk:1, color:'#8866aa',abil:'Earthquake',   abilDesc:'AOE stomp damage',     stats:{HP:10,MP:2,SPD:2,ATK:10,DEF:10}},
-  {id:'wizard', name:'Archmage',   emoji:'🧙',hp:65, mp:180,spd:2.0,atk:6, def:3, mgk:20,color:'#aa44ff',abil:'Arcane Nova',  abilDesc:'8-way magic burst',    stats:{HP:2,MP:10,SPD:5,ATK:2,DEF:2}},
-  {id:'shadow', name:'Shadow Elf', emoji:'🌑',hp:85, mp:100,spd:3.2,atk:16,def:6, mgk:8, color:'#444466',abil:'Shadow Step',  abilDesc:'Teleport + 0.5s invis',stats:{HP:4,MP:6,SPD:7,ATK:7,DEF:4}},
-  {id:'dragon', name:'Dragonborn', emoji:'🐉',hp:140,mp:120,spd:2.0,atk:18,def:12,mgk:10,color:'#ff6622',abil:'Dragon Breath',abilDesc:'Fire line attack',     stats:{HP:7,MP:7,SPD:4,ATK:8,DEF:6}},
-];
-
-const CLANS = [
-  {id:'iron',  name:'Iron Brotherhood',color:'#888',border:'#aaa',bonusKey:'atk', bonusVal:1.2, emoji:'⚔',bonus:'ATK +20% · DEF +10%',  desc:'Strength is the only currency.'},
-  {id:'arcane',name:'Arcane Covenant', color:'#83c',border:'#a5e',bonusKey:'mgk', bonusVal:1.3, emoji:'🔮',bonus:'MGK +30% · MP +25%',    desc:'Knowledge is power.'},
-  {id:'shadow',name:'Shadow Guild',    color:'#363',border:'#585',bonusKey:'spd', bonusVal:1.25,emoji:'🌑',bonus:'SPD +25% · CRIT +15%',  desc:'You were never here.'},
-  {id:'flame', name:'Flame Pact',      color:'#822',border:'#c44',bonusKey:'fire',bonusVal:1.4, emoji:'🔥',bonus:'Fire DMG +40%',          desc:'Leave nothing but ash.'},
-];
-
-const ITEMS = {
-  hp_pot:   {n:'HP Potion',    e:'🧪',t:'pot',eff:'hp', v:50,          d:'Restores 50 HP'},
-  mp_pot:   {n:'MP Potion',    e:'💧',t:'pot',eff:'mp', v:60,          d:'Restores 60 MP'},
-  str_pot:  {n:'Str Brew',     e:'💪',t:'pot',eff:'str',v:30,dur:600,   d:'+30 ATK for 10s'},
-  spd_pot:  {n:'Speed Elixir', e:'⚡',t:'pot',eff:'spd',v:2, dur:480,   d:'2x Speed for 8s'},
-  mgk_pot:  {n:'Mana Surge',   e:'✨',t:'pot',eff:'mgk',v:40,dur:600,   d:'+40 MGK for 10s'},
-  inv_pot:  {n:'Invincibility',e:'🛡',t:'pot',eff:'inv',v:1, dur:300,   d:'Invincible for 5s (RARE)'},
-  lh:  {n:'Leather Helm', e:'🪖',t:'head', def:3,  d:'Basic leather protection'},
-  ih:  {n:'Iron Helm',    e:'⛑',t:'head', def:7,  d:'Solid iron helmet'},
-  dh:  {n:'Dragon Helm',  e:'🐲',t:'head', def:18,mgk:5,d:'Forged from dragon scales',rare:1},
-  lc:  {n:'Leather Vest', e:'🧥',t:'chest',def:5,  d:'Light flexible armor'},
-  ic:  {n:'Iron Plate',   e:'🛡',t:'chest',def:14, d:'Heavy iron breastplate'},
-  sc:  {n:'Shadow Shroud',e:'🌑',t:'chest',def:10,spd:0.5,d:'Stealth armor, faster'},
-  fc:  {n:'Infernal Plate',e:'🔥',t:'chest',def:20,fire:1,d:'Burns attackers',rare:1},
-  il:  {n:'Iron Greaves', e:'🦿',t:'legs', def:8,  d:'Solid leg protection'},
-  sl:  {n:'Swift Leggings',e:'💨',t:'legs',def:5,spd:0.4,d:'Lightweight, faster'},
-  ib:  {n:'Iron Boots',   e:'👢',t:'feet', def:4,  d:'Heavy duty boots'},
-  sw:  {n:'Iron Sword',   e:'⚔',t:'weapon',atk:12,d:'A reliable iron sword'},
-  gs:  {n:'Greatsword',   e:'🗡',t:'weapon',atk:22,d:'Massive damage, slower'},
-  st:  {n:'Arcane Staff', e:'🪄',t:'weapon',atk:6,mgk:18,d:'Channels magic energy'},
-  bw:  {n:'Hunter Bow',   e:'🏹',t:'weapon',atk:15,range:1,d:'Attack from distance'},
-  dg:  {n:'Shadow Dagger',e:'🔪',t:'weapon',atk:10,crit:0.3,d:'30% crit chance'},
-  fa:  {n:'Infernal Axe', e:'🪓',t:'weapon',atk:20,fire:1,d:'Burns enemies on hit',rare:1},
-  sb:  {n:'Soulblade',    e:'💀',t:'weapon',atk:35,mgk:10,d:'LEGENDARY - lifesteal on hit',rare:2},
-  va:  {n:'Void Armor',   e:'🌀',t:'chest', def:30,mgk:15,d:'LEGENDARY - anti-magic',rare:2},
-  cc:  {n:'Champion Crown',e:'👑',t:'head', def:25,atk:8,d:'LEGENDARY - mark of champion',rare:2},
-  gold:{n:'Gold',         e:'🪙',t:'cur',   d:'Currency of the Realm'},
-  scr: {n:'Magic Scroll', e:'📜',t:'quest', d:'Ancient knowledge. Find the Magic Man.'},
-  ds:  {n:'Dragon Scale', e:'🔮',t:'mat',   d:'Rare crafting material'},
+// ── RACES (unlocked by quest) ──
+const RACES={
+  warrior:{id:'warrior',n:'Warrior',    emoji:'🧑', hp:100,mp:80, spd:2.4,atk:12,def:8, mgk:5, col:'#c8905a',hair:'#4a2a0a',shirt:'#5a7a4a',eyeC:'#1a1008',abil:'Battle Cry',   abilD:'Temp +10 ATK for 8s',        questId:'q_warrior'},
+  flash:  {id:'flash',  n:'Speedster',  emoji:'⚡', hp:70, mp:60, spd:4.6,atk:10,def:4, mgk:3, col:'#e8e84a',hair:'#aaaa00',shirt:'#888800',eyeC:'#222200',abil:'Blitz Rush',   abilD:'3× speed for 3s',            questId:'q_flash'},
+  giant:  {id:'giant',  n:'Titan',      emoji:'🏔', hp:220,mp:40, spd:1.4,atk:22,def:18,mgk:1, col:'#9a80cc',hair:'#330033',shirt:'#553388',eyeC:'#200030',abil:'Earthquake',   abilD:'AOE slam, stuns nearby',     questId:'q_giant'},
+  wizard: {id:'wizard', n:'Archmage',   emoji:'🧙', hp:65, mp:180,spd:2.0,atk:6, def:3, mgk:20,col:'#cc99ff',hair:'#110033',shirt:'#220055',eyeC:'#8800ff',abil:'Arcane Nova',  abilD:'8-way magic burst',          questId:'q_wizard'},
+  shadow: {id:'shadow', n:'Shadow Elf', emoji:'🌑', hp:85, mp:100,spd:3.2,atk:16,def:6, mgk:8, col:'#8888bb',hair:'#000011',shirt:'#112233',eyeC:'#0022aa',abil:'Shadow Step',  abilD:'Teleport to cursor + crit',  questId:'q_shadow'},
+  dragon: {id:'dragon', n:'Dragonborn', emoji:'🐉', hp:140,mp:120,spd:2.0,atk:18,def:12,mgk:10,col:'#ff8844',hair:'#661100',shirt:'#882200',eyeC:'#ff4400',abil:'Dragon Breath',abilD:'5 fire projectiles',          questId:'q_dragon'},
 };
 
-const ETYPES = {
-  goblin:   {n:'Goblin',      e:'👺',hp:25, atk:5, spd:1.5,xp:8, gd:[1,4], sz:14,col:'#336633',z:['forest','plains']},
-  wolf:     {n:'Forest Wolf', e:'🐺',hp:35, atk:9, spd:2.0,xp:12,gd:[2,5], sz:14,col:'#554433',z:['forest']},
-  bandit:   {n:'Bandit',      e:'🗡',hp:45, atk:12,spd:1.8,xp:18,gd:[5,15],sz:14,col:'#553322',z:['plains','forest']},
-  demon:    {n:'Demon',       e:'😈',hp:80, atk:20,spd:1.6,xp:35,gd:[8,20],sz:16,col:'#440000',z:['hell']},
-  imp:      {n:'Fire Imp',    e:'🔥',hp:40, atk:14,spd:2.4,xp:20,gd:[5,12],sz:12,col:'#882200',z:['hell']},
-  beast:    {n:'Jungle Beast',e:'🐆',hp:55, atk:16,spd:2.2,xp:28,gd:[6,14],sz:16,col:'#225522',z:['jungle']},
-  spider:   {n:'Trap Spider', e:'🕷',hp:30, atk:18,spd:1.2,xp:22,gd:[4,10],sz:12,col:'#443300',z:['jungle']},
-  zombie:   {n:'Zombie',      e:'🧟',hp:60, atk:10,spd:0.8,xp:20,gd:[3,8], sz:14,col:'#334433',z:['frozen']},
-  igiant:   {n:'Ice Giant',   e:'🥶',hp:120,atk:22,spd:1.0,xp:45,gd:[12,28],sz:20,col:'#334466',z:['frozen']},
-  angel:    {n:'Fallen Angel',e:'😇',hp:90, atk:18,spd:2.0,xp:40,gd:[10,25],sz:16,col:'#665544',z:['sky']},
-  shade:    {n:'Void Shade',  e:'👻',hp:70, atk:25,spd:2.5,xp:50,gd:[15,35],sz:14,col:'#220044',z:['abyss']},
-  orc:      {n:'Orc Warrior', e:'🪖',hp:65, atk:18,spd:1.4,xp:30,gd:[8,18], sz:18,col:'#445522',z:['plains','forest']},
+// ── CLANS (unlocked by quest) ──
+const CLANS={
+  none:   {id:'none',  n:'No Clan',         col:'#888',border:'#555',bonusKey:'',  bonusVal:1, emoji:'—', bonus:'No bonus yet',        desc:'Complete a clan quest.'},
+  iron:   {id:'iron',  n:'Iron Brotherhood',col:'#888',border:'#bbb',bonusKey:'atk',bonusVal:1.2,emoji:'⚔',bonus:'ATK +20% · DEF +10%', desc:'Strength is the only currency.', questId:'q_clan_iron'},
+  arcane: {id:'arcane',n:'Arcane Covenant', col:'#83c',border:'#b5f',bonusKey:'mgk',bonusVal:1.3,emoji:'🔮',bonus:'MGK +30% · MP +25%',  desc:'Knowledge is power.',             questId:'q_clan_arc'},
+  shadow: {id:'shadow',n:'Shadow Guild',    col:'#363',border:'#585',bonusKey:'spd',bonusVal:1.25,emoji:'🌑',bonus:'SPD +25% · CRIT+15%',desc:'You were never here.',            questId:'q_clan_shd'},
+  flame:  {id:'flame', n:'Flame Pact',      col:'#822',border:'#c44',bonusKey:'fire',bonusVal:1.4,emoji:'🔥',bonus:'Fire DMG +40%',       desc:'Leave nothing but ash.',          questId:'q_clan_flm'},
 };
 
-const BOSSES = [
-  {id:'b0',n:'The Rotwood King', e:'🌿',zone:'forest',hp:500, atk:25,spd:1.2,xp:200,drop:['ic','ds'],   col:'#1a3a1a',sz:32},
-  {id:'b1',n:'Infernal Tyrant',  e:'😈',zone:'hell',  hp:900, atk:40,spd:1.5,xp:400,drop:['fc','fa'],   col:'#440000',sz:36},
-  {id:'b2',n:'Jungle Empress',   e:'🌺',zone:'jungle',hp:700, atk:30,spd:2.0,xp:300,drop:['sl','bw'],   col:'#1a3a10',sz:30},
-  {id:'b3',n:'The Lich King',    e:'💀',zone:'frozen', hp:1100,atk:45,spd:1.0,xp:500,drop:['va','scr'],  col:'#1a2a3a',sz:34},
-  {id:'b4',n:'Celestial Titan',  e:'🌩',zone:'sky',   hp:1300,atk:50,spd:1.8,xp:600,drop:['cc','ds'],   col:'#2a1a4a',sz:38},
-  {id:'b5',n:'The Void God',     e:'🌀',zone:'abyss',  hp:2000,atk:65,spd:1.5,xp:1000,drop:['sb','va'], col:'#080008',sz:42},
+// ── QUEST DEFINITIONS ──
+const QUEST_DEFS=[
+  {id:'q_warrior', n:'Trial of the Warrior',     icon:'⚔', desc:'Kill 5 enemies in the Darkwood Forest to prove your martial strength.',
+   type:'kill_zone',zone:'forest',need:5,  reward:'Unlock Warrior Race',  rewardFn:()=>{unlockRace('warrior');},  unlockedBy:'start'},
+  {id:'q_flash',   n:'Trial of the Speedster',   icon:'⚡', desc:'Dodge 10 attacks from enemies (press Space to dodge) to show your agility.',
+   type:'dodge',   need:10, reward:'Unlock Speedster Race',rewardFn:()=>{unlockRace('flash');},    unlockedBy:'q_warrior'},
+  {id:'q_giant',   n:'Trial of the Titan',       icon:'🏔', desc:'Survive 3 minutes in the Hell Territories without dying.',
+   type:'survive_zone',zone:'hell',need:180,reward:'Unlock Titan Race',    rewardFn:()=>{unlockRace('giant');},    unlockedBy:'q_warrior'},
+  {id:'q_wizard',  n:'Trial of the Archmage',    icon:'🧙', desc:'Kill 3 bosses anywhere in the Realm with magic attacks.',
+   type:'boss_kill',need:3, reward:'Unlock Archmage Race', rewardFn:()=>{unlockRace('wizard');},   unlockedBy:'q_flash'},
+  {id:'q_shadow',  n:'Trial of the Shadow Elf',  icon:'🌑', desc:'Reach the Frozen Wastes and kill 8 undead without getting hit more than twice.',
+   type:'kill_zone',zone:'frozen',need:8, reward:'Unlock Shadow Elf Race', rewardFn:()=>{unlockRace('shadow');},   unlockedBy:'q_flash'},
+  {id:'q_dragon',  n:'Trial of the Dragonborn',  icon:'🐉', desc:'Defeat the Infernal Tyrant boss in the Hell Territories.',
+   type:'boss_specific',bossId:'boss_hell',need:1,reward:'Unlock Dragonborn Race',rewardFn:()=>{unlockRace('dragon');}, unlockedBy:'q_giant'},
+  {id:'q_clan_iron',n:'Oath of the Iron Brotherhood',icon:'⚔',desc:'Collect 5 dragon scales by defeating powerful enemies.',
+   type:'collect',item:'ds',need:5,reward:'Unlock Iron Brotherhood Clan',rewardFn:()=>{unlockClan('iron');},   unlockedBy:'q_warrior'},
+  {id:'q_clan_arc', n:'Oath of the Arcane Covenant',icon:'🔮',desc:'Find and read 3 magic scrolls in the world.',
+   type:'collect',item:'scr',need:3,reward:'Unlock Arcane Covenant Clan',rewardFn:()=>{unlockClan('arcane');}, unlockedBy:'q_wizard'},
+  {id:'q_clan_shd', n:'Oath of the Shadow Guild',   icon:'🌑',desc:'Kill 10 enemies without being detected (from outside their range).',
+   type:'stealth_kill',need:10,reward:'Unlock Shadow Guild Clan',rewardFn:()=>{unlockClan('shadow');},unlockedBy:'q_shadow'},
+  {id:'q_clan_flm', n:'Oath of the Flame Pact',     icon:'🔥',desc:'Survive the Hell Territories for 5 minutes total.',
+   type:'survive_zone',zone:'hell',need:300,reward:'Unlock Flame Pact Clan',rewardFn:()=>{unlockClan('flame');},unlockedBy:'q_giant'},
 ];
 
-const NPCTYPES = [
-  {id:'merchant', n:'Merchant Gilda', e:'👩‍💼',dlg:["I sell the finest wares!","Need supplies? I got you."],shop:true},
-  {id:'blacksmith',n:'Blacksmith Torn',e:'🔨',dlg:["Bring me materials and I'll forge anything.","Need repairs?"]},
-  {id:'elder',    n:'Elder Marn',     e:'🧓',dlg:["Dark forces stir in the east...","The Realm grows dangerous."]},
+// ── ITEMS ──
+const ITEMS={
+  hp_pot:{n:'HP Potion',    e:'🧪',t:'pot',eff:'hp', v:50,          d:'Restores 50 HP'},
+  mp_pot:{n:'MP Potion',    e:'💧',t:'pot',eff:'mp', v:60,          d:'Restores 60 MP'},
+  str_pot:{n:'Str Brew',    e:'💪',t:'pot',eff:'str',v:30,dur:500,   d:'+30 ATK for 8s'},
+  spd_pot:{n:'Speed Elixir',e:'⚡',t:'pot',eff:'spd',v:2, dur:480,   d:'2× Speed for 8s'},
+  mgk_pot:{n:'Mana Surge',  e:'✨',t:'pot',eff:'mgk',v:40,dur:500,   d:'+40 MGK for 8s'},
+  inv_pot:{n:'Invincibility',e:'🛡',t:'pot',eff:'inv',v:1,dur:300,   d:'Invincible 5s (RARE)'},
+  lh:{n:'Leather Helm', e:'🪖',t:'head', def:3,  d:'Basic leather protection'},
+  ih:{n:'Iron Helm',    e:'⛑',t:'head', def:7,  d:'Solid iron helmet'},
+  dh:{n:'Dragon Helm',  e:'🐲',t:'head', def:18,mgk:5,d:'Dragon scales — rare',rare:1},
+  lc:{n:'Leather Vest', e:'🧥',t:'chest',def:5,  d:'Light flexible armor'},
+  ic:{n:'Iron Plate',   e:'🛡',t:'chest',def:14, d:'Heavy breastplate'},
+  fc:{n:'Infernal Plate',e:'🔥',t:'chest',def:20,fire:1,d:'Burns attackers',rare:1},
+  sc:{n:'Shadow Shroud',e:'🌑',t:'chest',def:10,spd:0.5,d:'Stealth armor, +speed'},
+  il:{n:'Iron Greaves', e:'🦿',t:'legs', def:8,  d:'Solid leg protection'},
+  sl:{n:'Swift Leggings',e:'💨',t:'legs',def:5,spd:0.4,d:'Lightweight legs'},
+  ib:{n:'Iron Boots',   e:'👢',t:'feet', def:4,  d:'Heavy duty boots'},
+  sw:{n:'Iron Sword',   e:'⚔',t:'weapon',atk:12, d:'A reliable iron sword'},
+  gs:{n:'Greatsword',   e:'🗡',t:'weapon',atk:22, d:'Massive damage, slower'},
+  st:{n:'Arcane Staff', e:'🪄',t:'weapon',atk:6,mgk:18,d:'Channels magic energy'},
+  bw:{n:'Hunter Bow',   e:'🏹',t:'weapon',atk:15,range:1,d:'Attack from distance'},
+  dg:{n:'Shadow Dagger',e:'🔪',t:'weapon',atk:10,crit:0.3,d:'30% critical chance'},
+  fa:{n:'Infernal Axe', e:'🪓',t:'weapon',atk:20,fire:1, d:'Burns on hit',rare:1},
+  sb:{n:'Soulblade',    e:'💀',t:'weapon',atk:35,mgk:10, d:'LEGENDARY — lifesteal',rare:2},
+  va:{n:'Void Armor',   e:'🌀',t:'chest', def:30,mgk:15, d:'LEGENDARY — anti-magic',rare:2},
+  cc:{n:'Champion Crown',e:'👑',t:'head', def:25,atk:8,  d:'LEGENDARY — champion mark',rare:2},
+  ds:{n:'Dragon Scale', e:'🔮',t:'mat',   d:'Rare crafting material (Quest)'},
+  scr:{n:'Magic Scroll',e:'📜',t:'mat',   d:'Ancient knowledge (Quest)'},
+};
+
+// ── ENEMY TYPES ──
+const ETYPES={
+  goblin: {n:'Goblin',      e:'👺',hp:25, atk:5, spd:1.5,xp:8, gd:[1,4], sz:14,col:'#2a5522',z:['forest','plains']},
+  wolf:   {n:'Forest Wolf', e:'🐺',hp:35, atk:9, spd:2.1,xp:12,gd:[2,5], sz:14,col:'#554433',z:['forest']},
+  bandit: {n:'Bandit',      e:'🗡',hp:45, atk:12,spd:1.8,xp:18,gd:[5,15],sz:14,col:'#553322',z:['plains','forest']},
+  demon:  {n:'Demon',       e:'😈',hp:80, atk:20,spd:1.6,xp:35,gd:[8,20],sz:16,col:'#440000',z:['hell']},
+  imp:    {n:'Fire Imp',    e:'🔥',hp:40, atk:14,spd:2.4,xp:20,gd:[5,12],sz:12,col:'#882200',z:['hell']},
+  beast:  {n:'Jungle Beast',e:'🐆',hp:55, atk:16,spd:2.2,xp:28,gd:[6,14],sz:16,col:'#225522',z:['jungle']},
+  spider: {n:'Trap Spider', e:'🕷',hp:30, atk:18,spd:1.2,xp:22,gd:[4,10],sz:12,col:'#443300',z:['jungle']},
+  zombie: {n:'Zombie',      e:'🧟',hp:60, atk:10,spd:0.8,xp:20,gd:[3,8], sz:14,col:'#334433',z:['frozen']},
+  igiant: {n:'Ice Giant',   e:'🥶',hp:120,atk:22,spd:1.0,xp:45,gd:[12,28],sz:20,col:'#334466',z:['frozen']},
+  angel:  {n:'Fallen Angel',e:'😇',hp:90, atk:18,spd:2.0,xp:40,gd:[10,25],sz:16,col:'#665544',z:['sky']},
+  shade:  {n:'Void Shade',  e:'👻',hp:70, atk:25,spd:2.5,xp:50,gd:[15,35],sz:14,col:'#220044',z:['abyss']},
+  orc:    {n:'Orc Warrior', e:'🪖',hp:65, atk:18,spd:1.4,xp:30,gd:[8,18], sz:18,col:'#445522',z:['plains','forest']},
+};
+
+const BOSSES=[
+  {id:'boss_forest',n:'The Rotwood King', e:'🌿',zone:'forest',hp:500, atk:10,spd:0.8,xp:200,drop:['ic','ds'],   col:'#1a3a1a',sz:32},
+  {id:'boss_hell',  n:'Infernal Tyrant',  e:'😈',zone:'hell',  hp:900, atk:14,spd:0.9,xp:400,drop:['fc','fa'],   col:'#440000',sz:36},
+  {id:'boss_jungle',n:'Jungle Empress',   e:'🌺',zone:'jungle',hp:700, atk:12,spd:1.0,xp:300,drop:['sl','bw'],   col:'#1a3a10',sz:30},
+  {id:'boss_frozen',n:'The Lich King',    e:'💀',zone:'frozen', hp:1100,atk:16,spd:0.7,xp:500,drop:['va','scr'],  col:'#1a2a3a',sz:34},
+  {id:'boss_sky',   n:'Celestial Titan',  e:'🌩',zone:'sky',   hp:1300,atk:18,spd:0.9,xp:600,drop:['cc','ds'],   col:'#2a1a4a',sz:38},
+  {id:'boss_abyss', n:'The Void God',     e:'🌀',zone:'abyss',  hp:2000,atk:22,spd:0.8,xp:1000,drop:['sb','va'], col:'#080008',sz:42},
+];
+
+const NPCTYPES=[
+  {id:'merchant', n:'Merchant Gilda', e:'👩‍💼',dlg:["I sell the finest wares!","Need supplies? I got you."],shop:true,      questGiver:'q_warrior'},
+  {id:'blacksmith',n:'Blacksmith Torn',e:'🔨',dlg:["Bring me materials and I'll forge anything.","Fine weapons come from my forge."],         questGiver:'q_clan_iron'},
+  {id:'elder',    n:'Elder Marn',     e:'🧓',dlg:["Dark forces stir in the east...","The Realm grows dangerous."],            questGiver:'q_warrior'},
   {id:'guard',    n:'Village Guard',  e:'💂',dlg:["Stay safe beyond the walls.","I've been here 6 hours..."]},
-  {id:'farmer',   n:'Farmer',         e:'👨‍🌾',dlg:["Creatures ate my livestock again!","Good day, traveller."]},
+  {id:'farmer',   n:'Farmer',         e:'👨‍🌾',dlg:["Creatures ate my livestock!","Good day, traveller."]},
   {id:'child',    n:'Village Child',  e:'🧒',dlg:["Are you a real adventurer?!","I wanna be a warrior!"]},
   {id:'bard',     n:'Bard Lyric',     e:'🎸',dlg:["♪ In the realm of shadows... ♪","Every hero needs a song."]},
   {id:'healer',   n:'Sister Aelith',  e:'👩‍⚕️',dlg:["May the light heal you.","I charge for services."],heal:true},
-  {id:'alchemist',n:'Alchemist Vex',  e:'⚗️',dlg:["Potions of all kinds. Careful."],shop:true},
-  {id:'knight',   n:'Sir Edmund',     e:'🏇',dlg:["A true knight serves the realm.","Join a clan!"]},
-  {id:'wizard_n', n:'Wizard Osgar',   e:'🧙',dlg:["The Magic Man? He wanders the edge of the world.","Very few find him."]},
-  {id:'innkeeper',n:'Innkeeper',       e:'🏠',dlg:["Welcome! A bed costs 5 gold.","Rest here to restore health."],rest:true},
+  {id:'alchemist',n:'Alchemist Vex',  e:'⚗️',dlg:["Potions of all kinds."],shop:true,                                        questGiver:'q_clan_arc'},
+  {id:'knight',   n:'Sir Edmund',     e:'🏇',dlg:["A true knight serves the realm.","Join a clan!"],                         questGiver:'q_flash'},
+  {id:'wizard_n', n:'Wizard Osgar',   e:'🧙',dlg:["The Magic Man walks the edge of the world.","Very few find him."],        questGiver:'q_wizard'},
+  {id:'innkeeper',n:'Innkeeper',       e:'🏠',dlg:["Welcome! A bed costs 5g.","Rest here."],rest:true,                       questGiver:'q_shadow'},
+  {id:'ranger',   n:'Ranger Vex',     e:'🏹',dlg:["The forest holds many secrets.","I\'ve hunted every beast here."],       questGiver:'q_giant'},
+  {id:'druid',    n:'Druid Sel',      e:'🌿',dlg:["Nature speaks to those who listen.","The trees remember everything."],    questGiver:'q_dragon'},
+  {id:'soldier',  n:'Soldier',        e:'🪖',dlg:["Always alert. Always ready."],                                            questGiver:'q_clan_shd'},
+  {id:'hunter',   n:'Hunter',         e:'🎯',dlg:["I track prey across all the Realms."],                                   questGiver:'q_clan_flm'},
+  {id:'quest_master',n:'Quest Master Aldric',e:'📋',dlg:["I hold the path to greatness.","Choose your quest wisely. The strongest fighter awaits their destiny."],questMaster:true},
+  {id:'tutorial_elder',n:'Elder Bramble',e:'🧙‍♂️',dlg:["Welcome child. Your destiny is written in the stars."],tutorial:true},
 ];
 
 // ── TILE SYSTEM ──
-const T={G:1,S:2,W:3,TR:4,WALL:5,FG:6,IC:7,SA:8,LV:9,CL:10,VD:11,PA:12};
-const TC={1:'#2d4a1e',2:'#443333',3:'#1a3a6a',4:'#1a2e0a',5:'#333233',6:'#4a2200',7:'#aaccdd',8:'#6a5a2a',9:'#6a1a00',10:'#d0d8ff',11:'#050008',12:'#3a3020'};
+const T={G:1,S:2,W:3,TR:4,WALL:5,FG:6,IC:7,SA:8,LV:9,CL:10,VD:11,PA:12,SW:13}; // SW=shallow water (swimmable)
 
+// ── STATE ──
 let world=null;
-let entities=[], npcs=[], projectiles=[], particles=[], floatTxts=[];
+let entities=[],npcs=[],projectiles=[],particles=[],floatTxts=[];
 let P={};
 let camX=0,camY=0,gameTime=0,dayTime=0,gameRunning=false,lastTs=0;
 let activeBoss=null;
-let selRace='human', selClan='iron';
+// Quest state
+let quests={}; // {questId: {progress, done, active}}
+let achievements=[]; // earned achievements
+let tutorialStep=0; // tutorial progress
+let tutorialDone=false;
+let showingTutorial=false;
+let unlockedRaces=['warrior'];
+let unlockedClans=['none'];
+let hellTimeCounter=0; // time spent in hell (for survive quests)
+let dodgeCounter=0;
+let stealthKills=0;
+let bossKillsQ=0;
 
 // ── WORLD GEN ──
 function genWorld(){
@@ -436,45 +534,208 @@ function genWorld(){
     const t=zMap[z.id]||T.G;
     for(let dy=0;dy<z.h;dy++) for(let dx=0;dx<z.w;dx++){
       const wx=z.x+dx,wy=z.y+dy;
-      if(wx>=0&&wx<WW&&wy>=0&&wy<WH){
-        const n=Math.sin(wx*0.3)*Math.cos(wy*0.2)*0.5+0.5;
-        world[wy*WW+wx]=n>0.85?T.S:t;
-      }
+      if(wx<0||wx>=WW||wy<0||wy>=WH)continue;
+      const n=Math.sin(wx*0.31)*Math.cos(wy*0.21)*0.5+0.5;
+      if(z.id==='village')world[wy*WW+wx]=(n>0.9?T.S:T.PA);
+      else world[wy*WW+wx]=(n>0.82?T.S:t);
     }
   });
-  // Village paths
+  // Village cross-path clear (no trees on path)
   const v=ZONES[0];
   for(let i=0;i<v.w;i++){const mx=v.x+i,my=v.y+Math.floor(v.h/2);if(mx<WW&&my<WH)world[my*WW+mx]=T.PA;}
   for(let i=0;i<v.h;i++){const mx=v.x+Math.floor(v.w/2),my=v.y+i;if(mx<WW&&my<WH)world[my*WW+mx]=T.PA;}
+  // Clear small circle around spawn
+  const spx=Math.floor(v.x+v.w/2),spy=Math.floor(v.y+v.h/2);
+  for(let dy=-5;dy<=5;dy++) for(let dx=-5;dx<=5;dx++){
+    if(dx*dx+dy*dy<=25){const wx=spx+dx,wy=spy+dy;if(wx>=0&&wx<WW&&wy>=0&&wy<WH)world[wy*WW+wx]=T.PA;}
+  }
   // Rivers
   for(let r=0;r<3;r++){
-    let wx=30+r*70,wy=0;
+    let wx=28+r*72,wy=0;
     while(wy<WH){
-      wx+=Math.floor(Math.sin(wy*0.1)*2);
+      wx+=Math.floor(Math.sin(wy*0.12+r)*2);
       wx=Math.max(0,Math.min(WW-1,wx));
       if(getZoneAt(wx,wy)?.safe){wy++;continue;}
       world[wy*WW+wx]=T.W;
-      if(wx>0)world[wy*WW+(wx-1)]=T.W;
+      if(wx>0)world[wy*WW+wx-1]=T.W;
       wy++;
     }
   }
-  // Lava in hell
+  // Lava pools in hell
   const h=ZONES[2];
-  for(let dy=0;dy<h.h;dy+=3)for(let dx=0;dx<h.w;dx+=3){
-    if(Math.random()<0.15){const wx=h.x+dx,wy=h.y+dy;if(wx<WW&&wy<WH)world[wy*WW+wx]=T.LV;}
+  for(let dy=0;dy<h.h;dy+=3) for(let dx=0;dx<h.w;dx+=3){
+    if(Math.random()<0.18){const wx=h.x+dx,wy=h.y+dy;if(wx<WW&&wy<WH)world[wy*WW+wx]=T.LV;}
+  }
+  // Extra stone outcrops
+  for(let i=0;i<120;i++){
+    const wx=Math.floor(Math.random()*WW),wy=Math.floor(Math.random()*WH);
+    if(gt(wx,wy)===T.G&&!getZoneAt(wx,wy)?.safe){world[wy*WW+wx]=T.S;}
   }
 }
+
 function gt(wx,wy){if(wx<0||wx>=WW||wy<0||wy>=WH)return T.VD;return world[wy*WW+wx];}
-function solid(wx,wy){const t=gt(wx,wy);return t===T.TR||t===T.WALL||t===T.W||t===T.LV||t===T.VD;}
+
+// ── IMPROVED SOLID CHECK — uses pixel bounding box ──
+function solidPx(px2,py2){
+  // Tight collision box
+  const pw=5, ph=5;
+  const tx1=Math.floor((px2-pw)/TS), ty1=Math.floor((py2-ph)/TS);
+  const tx2=Math.floor((px2+pw)/TS), ty2=Math.floor((py2+ph)/TS);
+  for(let tcy=ty1;tcy<=ty2;tcy++) for(let tcx=tx1;tcx<=tx2;tcx++){
+    const t=gt(tcx,tcy);
+    // Trees: fully walkable (walk under/through canopy)
+    if(t===T.WALL||t===T.LV||t===T.VD)return true;
+    // Water is swimmable (handled by curT check above)
+  }
+  return false;
+}
+
 function getZoneAt(wx,wy){
   for(let i=ZONES.length-1;i>=0;i--){const z=ZONES[i];if(wx>=z.x&&wx<z.x+z.w&&wy>=z.y&&wy<z.y+z.h)return z;}
   return null;
 }
 
+
+// ── ACHIEVEMENTS ──
+const ACHIEVEMENT_DEFS=[
+  {id:'ach_first_kill', n:'First Blood',      icon:'⚔',desc:'Kill your first enemy',       check:()=>P.kills>=1},
+  {id:'ach_boss1',      n:'Boss Slayer',      icon:'💀',desc:'Defeat your first boss',       check:()=>(P.bossKills||0)>=1},
+  {id:'ach_boss_all',   n:'Realm Champion',   icon:'👑',desc:'Defeat ALL 6 bosses',          check:()=>(P.bossKills||0)>=6},
+  {id:'ach_lvl10',      n:'Rising Star',      icon:'⭐',desc:'Reach Level 10',               check:()=>P.level>=10},
+  {id:'ach_lvl25',      n:'Legendary',        icon:'🌟',desc:'Reach Level 25',               check:()=>P.level>=25},
+  {id:'ach_gold',       n:'Gold Hoarder',     icon:'🪙',desc:'Accumulate 500 gold',          check:()=>P.gold>=500},
+  {id:'ach_legendary',  n:'Legendary Item',   icon:'💎',desc:'Obtain a legendary item',      check:()=>P.inv.some(i=>i&&i.rare>=2)||Object.values(P.equip).some(i=>i&&i.rare>=2)},
+  {id:'ach_swim',       n:'Aquatic',          icon:'🏊',desc:'Swim in water for 30 seconds', check:()=>(P.swimTime||0)>=1800},
+  {id:'ach_magic_man',  n:'Found Him',        icon:'✨',desc:'Find the Magic Man',           check:()=>P.foundMagicMan},
+  {id:'ach_strongest',  n:'STRONGEST FIGHTER',icon:'🏆',desc:'Defeat the Void God and all bosses — you are the strongest fighter in the world!', check:()=>(P.bossKills||0)>=6&&P.level>=20},
+];
+
+function checkAchievements(){
+  ACHIEVEMENT_DEFS.forEach(a=>{
+    if(achievements.includes(a.id))return;
+    if(a.check()){
+      achievements.push(a.id);
+      showAchievement(a);
+    }
+  });
+}
+
+function showAchievement(a){
+  // Create achievement popup
+  const el=document.createElement('div');
+  el.style.cssText=`position:fixed;top:60px;right:10px;background:rgba(18,10,4,.97);border:2px solid #ffd27a;padding:10px 14px;z-index:500;font-family:'Press Start 2P',monospace;max-width:220px;animation:achIn .4s ease;border-radius:2px`;
+  el.innerHTML=`<div style="font-size:5px;color:#a07830;letter-spacing:2px;margin-bottom:4px">✦ ACHIEVEMENT UNLOCKED ✦</div>
+    <div style="font-size:16px;margin-bottom:4px">${a.icon}</div>
+    <div style="font-size:7px;color:#ffd27a;margin-bottom:3px">${a.n}</div>
+    <div style="font-size:5px;color:#9a7040;line-height:1.8">${a.desc}</div>`;
+  document.body.appendChild(el);
+  // add animation
+  const style=document.createElement('style');
+  style.textContent='@keyframes achIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}';
+  document.head.appendChild(style);
+  setTimeout(()=>el.remove(),4500);
+  notif(a.icon+' '+a.n,'rare');
+}
+
+// ── QUEST SYSTEM ──
+function initQuests(){
+  quests={};
+  QUEST_DEFS.forEach(q=>{quests[q.id]={progress:0,done:false,active:false};});
+  // Unlock starter quest
+  quests['q_warrior'].active=true;
+}
+
+function unlockRace(id){
+  if(!unlockedRaces.includes(id)){unlockedRaces.push(id);notif('NEW RACE UNLOCKED: '+RACES[id].n,'rare');}
+  // Auto-apply if better than current
+  if(P.race?.id==='warrior'&&id!=='warrior'){applyRace(id);}
+}
+
+function unlockClan(id){
+  if(!unlockedClans.includes(id)){unlockedClans.push(id);notif('NEW CLAN UNLOCKED: '+CLANS[id].n,'rare');}
+  if(P.clan?.id==='none'){applyClan(id);}
+}
+
+function applyRace(id){
+  const r=RACES[id];if(!r)return;
+  P.race=r;P.maxHp=r.hp;P.hp=Math.min(P.hp,P.maxHp);
+  P.maxMp=r.mp;P.mp=Math.min(P.mp,P.maxMp);
+  P.atk=r.atk;P.def=r.def;P.mgk=r.mgk;P.baseSpd=r.spd;P.spd=r.spd;
+  // reapply equipped items
+  Object.values(P.equip).forEach(it=>{if(it)applyStats(it,1);});
+  notif('You are now: '+r.n,'info');
+}
+
+function applyClan(id){
+  const c=CLANS[id];if(!c)return;
+  P.clan=c;
+  if(c.bonusKey==='atk'){P.atk=Math.round(P.atk*c.bonusVal);P.def=Math.round(P.def*1.1);}
+  if(c.bonusKey==='mgk'){P.mgk=Math.round(P.mgk*c.bonusVal);P.maxMp=Math.round(P.maxMp*1.25);P.mp=P.maxMp;}
+  if(c.bonusKey==='spd'){P.spd=P.baseSpd=P.spd*c.bonusVal;}
+  notif('Clan joined: '+c.n,'info');
+}
+
+function questProgress(type,data={}){
+  QUEST_DEFS.forEach(qd=>{
+    const qs=quests[qd.id];
+    if(!qs||!qs.active||qs.done)return;
+    let prog=false;
+    if(qd.type==='kill_zone'&&type==='kill'&&data.zone===qd.zone){qs.progress++;prog=true;}
+    if(qd.type==='dodge'&&type==='dodge'){qs.progress++;prog=true;}
+    if(qd.type==='boss_kill'&&type==='boss_kill'){qs.progress++;prog=true;}
+    if(qd.type==='boss_specific'&&type==='boss_kill'&&data.bossId===qd.bossId){qs.progress++;prog=true;}
+    if(qd.type==='collect'&&type==='collect'&&data.item===qd.item){qs.progress++;prog=true;}
+    if(qd.type==='stealth_kill'&&type==='stealth_kill'){qs.progress++;prog=true;}
+    if(prog){
+      if(qs.progress>=qd.need&&!qs.done){
+        qs.done=true;qs.active=false;
+        qd.rewardFn();
+        notif('QUEST COMPLETE: '+qd.n,'rare');
+        // Unlock next quests
+        QUEST_DEFS.filter(nq=>nq.unlockedBy===qd.id).forEach(nq=>{
+          if(!quests[nq.id].done){quests[nq.id].active=true;notif('New Quest: '+nq.n,'info');}
+        });
+      }
+    }
+  });
+  updQuestHUD();
+}
+
+function updQuestHUD(){
+  const active=QUEST_DEFS.filter(q=>quests[q.id]?.active&&!quests[q.id]?.done);
+  const el=document.getElementById('hudQT');
+  if(!el)return;
+  if(!active.length){el.textContent='';return;}
+  const q=active[0];const qs=quests[q.id];
+  el.textContent='📜 '+q.n+' ('+qs.progress+'/'+q.need+')';
+}
+
+function renderQuestList(elId){
+  const el=document.getElementById(elId);if(!el)return;
+  el.innerHTML='';
+  QUEST_DEFS.forEach(qd=>{
+    const qs=quests[qd.id];if(!qs)return;
+    const div=document.createElement('div');
+    const isDone=qs.done,isActive=qs.active,isLocked=!isDone&&!isActive;
+    div.className='questCard'+(isDone?' done':isLocked?' locked':'');
+    const pct=Math.min(100,(qs.progress/qd.need)*100);
+    div.innerHTML=`<div class="qHeader">
+      <div class="qIcon">${qd.icon}</div>
+      <div class="qName">${qd.n}</div>
+      <div class="qStatus ${isDone?'done':isActive?'active':'locked'}">${isDone?'✓ Done':isActive?'Active':'Locked'}</div>
+    </div>
+    <div class="qDesc">${qd.desc}</div>
+    <div class="qReward">Reward: ${qd.reward}</div>
+    ${isActive?`<div class="qProg"><div class="qProgFill" style="width:${pct}%"></div></div>
+    <div style="font-size:5px;color:#668844;margin-top:3px">${qs.progress}/${qd.need}</div>`:''}`;
+    el.appendChild(div);
+  });
+}
+
 // ── PLAYER INIT ──
-function initPlayer(raceId,clanId){
-  const race=RACES.find(r=>r.id===raceId)||RACES[0];
-  const clan=CLANS.find(c=>c.id===clanId)||CLANS[0];
+function initPlayer(){
+  const race=RACES['warrior'];
+  const clan=CLANS['none'];
   const vz=ZONES[0];
   P={x:(vz.x+vz.w/2)*TS,y:(vz.y+vz.h/2)*TS,w:14,h:18,
     race,clan,maxHp:race.hp,hp:race.hp,maxMp:race.mp,mp:race.mp,
@@ -482,12 +743,9 @@ function initPlayer(raceId,clanId){
     xp:0,level:1,xpNext:80,gold:20,
     inv:[],equip:{head:null,chest:null,legs:null,feet:null,weapon:null},
     hotbar:[null,null,null,null,null],
-    buffs:[],invincible:false,dodgeCd:0,dodging:false,atkCd:0,
-    stamina:100,maxSt:100,kills:0,facing:{x:1,y:0},anim:0,aT:0,dead:false,
+    buffs:[],invincible:false,dodgeCd:0,atkCd:0,
+    stamina:100,maxSt:100,kills:0,bossKills:0,facing:{x:1,y:0},anim:0,aT:0,dead:false,swimming:false,
   };
-  if(clan.bonusKey==='atk'){P.atk=Math.round(P.atk*clan.bonusVal);P.def=Math.round(P.def*1.1);}
-  if(clan.bonusKey==='mgk'){P.mgk=Math.round(P.mgk*clan.bonusVal);P.maxMp=Math.round(P.maxMp*1.25);P.mp=P.maxMp;}
-  if(clan.bonusKey==='spd'){P.spd=P.baseSpd=P.spd*clan.bonusVal;}
   giveItem('sw'); giveItem('hp_pot',3); giveItem('mp_pot',2);
   P.hotbar[0]=P.inv.findIndex(i=>i&&i.id==='hp_pot');
   P.hotbar[1]=P.inv.findIndex(i=>i&&i.id==='mp_pot');
@@ -497,11 +755,17 @@ function initPlayer(raceId,clanId){
 
 function giveItem(id,qty=1){
   const def=ITEMS[id];if(!def)return;
-  if(def.t==='pot'||def.t==='cur'){
+  if(def.t==='pot'||def.t==='mat'){
     const ex=P.inv.find(i=>i&&i.id===id);
-    if(ex){ex.qty=(ex.qty||1)+qty;return;}
+    if(ex){ex.qty=(ex.qty||1)+qty;
+      // quest progress for collection
+      if(def.t==='mat'){questProgress('collect',{item:id});}
+      return;
+    }
   }
-  for(let i=0;i<32;i++){if(!P.inv[i]){P.inv[i]={id,...def,qty};return;}}
+  for(let i=0;i<32;i++){if(!P.inv[i]){P.inv[i]={id,...def,qty};
+    if(def.t==='mat'){for(let k=0;k<qty;k++)questProgress('collect',{item:id});}
+    return;}}
   notif('Inventory full!','bad');
 }
 
@@ -527,9 +791,9 @@ function useItem(idx){
   const ef=item.eff;
   if(ef==='hp'){P.hp=Math.min(P.maxHp,P.hp+item.v);notif('+'+item.v+' HP','good');}
   else if(ef==='mp'){P.mp=Math.min(P.maxMp,P.mp+item.v);notif('+'+item.v+' MP','good');}
-  else if(ef==='str'){P.buffs.push({t:'atk',v:item.v,rem:item.dur});notif('STR UP!','good');}
-  else if(ef==='spd'){P.spd*=item.v;P.buffs.push({t:'spd',v:item.v,rem:item.dur,orig:P.baseSpd*item.v});notif('SPEED UP!','good');}
-  else if(ef==='mgk'){P.buffs.push({t:'mgk',v:item.v,rem:item.dur});notif('MAGIC UP!','good');}
+  else if(ef==='str'){P.buffs.push({t:'atk_tmp',v:item.v,rem:item.dur});P.atk+=item.v;notif('STR UP!','good');}
+  else if(ef==='spd'){P.spd*=item.v;P.buffs.push({t:'spd',v:item.v,rem:item.dur});notif('SPEED UP!','good');}
+  else if(ef==='mgk'){P.buffs.push({t:'mgk_tmp',v:item.v,rem:item.dur});P.mgk+=item.v;notif('MAGIC UP!','good');}
   else if(ef==='inv'){P.invincible=true;P.buffs.push({t:'inv',rem:item.dur});notif('INVINCIBLE!','info');}
   item.qty=(item.qty||1)-1;
   if(item.qty<=0)P.inv[idx]=null;
@@ -546,38 +810,60 @@ function spawnEntities(){
       const cands=Object.entries(ETYPES).filter(([k,v])=>v.z.includes(z.id));
       if(!cands.length)return;
       const [eid,et]=cands[Math.floor(Math.random()*cands.length)];
-      const ex=(z.x+Math.random()*z.w)|0,ey=(z.y+Math.random()*z.h)|0;
+      let ex,ey,tries=0;
+      do{ex=(z.x+Math.random()*z.w)|0;ey=(z.y+Math.random()*z.h)|0;tries++;}
+      while(gt(ex,ey)===T.TR&&tries<20);
       entities.push({id:Math.random().toString(36).slice(2),t:'enemy',eid,
-        x:ex*TS,y:ey*TS,w:et.sz,h:et.sz,hp:et.hp,maxHp:et.hp,
+        x:ex*TS+TS/2,y:ey*TS+TS/2,w:et.sz,h:et.sz,hp:et.hp,maxHp:et.hp,
         atk:et.atk,spd:et.spd,xp:et.xp,gd:et.gd,e:et.e,col:et.col,n:et.n,
-        zone:z.id,state:'patrol',ptimer:0,atkCd:0,homeX:ex*TS,homeY:ey*TS,
-        tx:ex*TS,ty:ey*TS,facing:{x:1,y:0},anim:0,aT:0});
+        zone:z.id,state:'patrol',ptimer:0,atkCd:0,homeX:ex*TS+TS/2,homeY:ey*TS+TS/2,
+        tx:ex*TS,ty:ey*TS,facing:{x:1,y:0},anim:0,aT:0,dead:false});
     }
     const boss=BOSSES.find(b=>b.zone===z.id);
-    if(boss)entities.push({...boss,id:'boss_'+z.id,t:'boss',
-      x:(z.x+z.w/2)*TS,y:(z.y+z.h/2)*TS,hp:boss.hp,maxHp:boss.hp,
-      state:'idle',atkCd:0,facing:{x:1,y:0},anim:0,aT:0,dead:false});
+    if(boss){
+      let bx=(z.x+z.w/2)|0,by=(z.y+z.h/2)|0;
+      entities.push({...boss,id:boss.id,t:'boss',
+        x:bx*TS,y:by*TS,hp:boss.hp,maxHp:boss.hp,
+        state:'idle',atkCd:0,facing:{x:1,y:0},anim:0,aT:0,dead:false});
+    }
   });
 }
 
 function spawnNPCs(){
   npcs=[];
   const vz=ZONES[0];
-  const pos=[.3,.4,.7,.4,.5,.6,.2,.7,.8,.6,.4,.2,.6,.8,.5,.5,.3,.6,.7,.7,.4,.8,.6,.3,.2,.5,.8,.3].reduce((a,v,i)=>i%2?[...a.slice(0,-1),{x:a[a.length-1],y:v}]:[...a,v],[]);
+  const npcPosArr=[
+    {x:.28,y:.35},{x:.72,y:.38},{x:.50,y:.62},{x:.20,y:.72},{x:.80,y:.62},
+    {x:.42,y:.20},{x:.62,y:.80},{x:.50,y:.48},{x:.30,y:.62},{x:.70,y:.72},
+    {x:.40,y:.82},{x:.60,y:.28},{x:.18,y:.50},{x:.82,y:.30},{x:.35,y:.45},{x:.65,y:.55},
+  ];
+  // Add tutorial elder near spawn
+  npcs.push({id:'n_elder_tut',t:'npc',ntype:'tutorial_elder',n:'Elder Bramble',e:'🧙‍♂️',
+    dlg:['Welcome, young warrior. Speak with me.','Your destiny awaits — begin your quest!'],
+    tutorial:true,shop:false,heal:false,rest:false,questGiver:null,
+    x:(vz.x+Math.floor(vz.w/2)+3)*TS,y:(vz.y+Math.floor(vz.h/2)-4)*TS,
+    w:12,h:16,wt:9999,wdx:0,wdy:0,homeX:(vz.x+Math.floor(vz.w/2)+3)*TS,homeY:(vz.y+Math.floor(vz.h/2)-4)*TS});
+  // Quest Master (slightly south of village centre)
+  npcs.push({id:'n_quest_master',t:'npc',ntype:'quest_master',n:'Quest Master Aldric',e:'📋',
+    dlg:['Choose your path, warrior!','Your GOAL: defeat all 6 bosses to become the STRONGEST FIGHTER!','Boss kills: check your quest panel.','The Void God in The Abyss is the final challenge.'],
+    questMaster:true,shop:false,heal:false,rest:false,questGiver:null,
+    x:(vz.x+Math.floor(vz.w/2)-4)*TS,y:(vz.y+Math.floor(vz.h/2)+4)*TS,
+    w:12,h:16,wt:9999,wdx:0,wdy:0,homeX:(vz.x+Math.floor(vz.w/2)-4)*TS,homeY:(vz.y+Math.floor(vz.h/2)+4)*TS});
   NPCTYPES.forEach((nt,i)=>{
-    const p=pos[i%pos.length];
+    const p=npcPosArr[i%npcPosArr.length];
     npcs.push({id:'n'+i,t:'npc',ntype:nt.id,n:nt.n,e:nt.e,dlg:nt.dlg,
       shop:nt.shop||false,heal:nt.heal||false,rest:nt.rest||false,
-      x:(vz.x+(p.x||0.5)*vz.w)*TS,y:(vz.y+(p.y||0.5)*vz.h)*TS,
-      w:12,h:16,wt:Math.random()*200,wdx:0,wdy:0,
-      homeX:(vz.x+(p.x||0.5)*vz.w)*TS,homeY:(vz.y+(p.y||0.5)*vz.h)*TS});
+      questGiver:nt.questGiver||null,
+      x:(vz.x+p.x*vz.w)*TS,y:(vz.y+p.y*vz.h)*TS,
+      w:12,h:16,wt:Math.random()*200,wdx:(Math.random()-.5)*.5,wdy:(Math.random()-.5)*.5,
+      homeX:(vz.x+p.x*vz.w)*TS,homeY:(vz.y+p.y*vz.h)*TS});
   });
-  // Magic Man — very far away, hidden
+  // Magic Man
   npcs.push({id:'magic_man',t:'npc',ntype:'magic_man',n:'The Magic Man',e:'🌟',
-    dlg:['You found me. Very few ever do...','I can see the threads of fate around you.',
+    dlg:['You found me. Very few ever do...','I see the threads of fate around you.',
          'Choose wisely. I offer power beyond comprehension.',
          'Most spend their lives searching. You are different.'],
-    magic:true,x:212*TS,y:218*TS,w:14,h:18,wt:0,wdx:0,wdy:0,homeX:212*TS,homeY:218*TS});
+    magic:true,onInteract:()=>{P.foundMagicMan=true;},x:212*TS,y:218*TS,w:14,h:18,wt:9999,wdx:0,wdy:0,homeX:212*TS,homeY:218*TS});
 }
 
 // ── INPUT ──
@@ -602,40 +888,32 @@ gc.addEventListener('mousemove',e=>{
   mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;
   mouse.wx=(camX+mouse.x/SCALE)/TS;mouse.wy=(camY+mouse.y/SCALE)/TS;
 });
-gc.addEventListener('click',e=>{
-  if(!gameRunning||P.dead)return;
-  tryAttack();tryInteract();
-});
+gc.addEventListener('click',()=>{if(gameRunning&&!P.dead){tryAttack();tryInteract();}});
 gc.addEventListener('touchstart',e=>{
   if(!gameRunning||P.dead)return;
   e.preventDefault();
-  const t=e.touches[0];const r=gc.getBoundingClientRect();
+  const t=e.touches[0],r=gc.getBoundingClientRect();
   mouse.x=t.clientX-r.left;mouse.y=t.clientY-r.top;
   mouse.wx=(camX+mouse.x/SCALE)/TS;mouse.wy=(camY+mouse.y/SCALE)/TS;
   tryAttack();tryInteract();
 },{passive:false});
 
 // Joystick
-const jWrap=document.getElementById('jWrap');
-const jKnob=document.getElementById('jKnob');
+const jWrap=document.getElementById('jWrap'),jKnob=document.getElementById('jKnob');
 let jO={x:0,y:0};
 jWrap.addEventListener('touchstart',e=>{
-  e.preventDefault();
-  const t=e.touches[0],r=jWrap.getBoundingClientRect();
+  e.preventDefault();const t=e.touches[0],r=jWrap.getBoundingClientRect();
   jO={x:r.left+r.width/2,y:r.top+r.height/2};
 },{passive:false});
 jWrap.addEventListener('touchmove',e=>{
-  e.preventDefault();
-  const t=e.touches[0];
+  e.preventDefault();const t=e.touches[0];
   let dx=t.clientX-jO.x,dy=t.clientY-jO.y;
-  const d=Math.sqrt(dx*dx+dy*dy),mr=40;
+  const d=Math.sqrt(dx*dx+dy*dy),mr=42;
   if(d>mr){dx=dx/d*mr;dy=dy/d*mr;}
   joy.dx=dx/mr;joy.dy=dy/mr;
   jKnob.style.transform=`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`;
 },{passive:false});
-jWrap.addEventListener('touchend',()=>{
-  joy.dx=0;joy.dy=0;jKnob.style.transform='translate(-50%,-50%)';
-});
+jWrap.addEventListener('touchend',()=>{joy.dx=0;joy.dy=0;jKnob.style.transform='translate(-50%,-50%)';});
 document.getElementById('btnAtk').addEventListener('touchstart',e=>{e.preventDefault();tryAttack();},{passive:false});
 document.getElementById('btnDodge').addEventListener('touchstart',e=>{e.preventDefault();tryDodge();},{passive:false});
 
@@ -656,41 +934,59 @@ function gameLoop(ts){
 function update(dt){
   gameTime++;dayTime=(dayTime+dt)%1200;
   updPlayer(dt);updEntities(dt);updNPCs(dt);updProj(dt);updParts(dt);updFloats(dt);
-  updHUD();checkZone();
+  updHUD();checkZone(dt);
+  if(gameTime%120===0)checkAchievements();
+  if(P.swimming){P.swimTime=(P.swimTime||0)+1;}
   if(gameTime%300===0)replenish();
 }
 
 function updPlayer(dt){
   if(P.dead)return;
   let dx=0,dy=0;
-  if(K['KeyA']||K['ArrowLeft']||joy.dx<-0.2)dx=-1;
-  if(K['KeyD']||K['ArrowRight']||joy.dx>0.2)dx=1;
-  if(K['KeyW']||K['ArrowUp']||joy.dy<-0.2)dy=-1;
-  if(K['KeyS']||K['ArrowDown']||joy.dy>0.2)dy=1;
-  if(Math.abs(joy.dx)>0.1)dx=joy.dx;
-  if(Math.abs(joy.dy)>0.1)dy=joy.dy;
+  if(K['KeyA']||K['ArrowLeft']||joy.dx<-0.18)dx=-1;
+  if(K['KeyD']||K['ArrowRight']||joy.dx>0.18)dx=1;
+  if(K['KeyW']||K['ArrowUp']||joy.dy<-0.18)dy=-1;
+  if(K['KeyS']||K['ArrowDown']||joy.dy>0.18)dy=1;
+  if(Math.abs(joy.dx)>0.12)dx=joy.dx;
+  if(Math.abs(joy.dy)>0.12)dy=joy.dy;
   if(dx||dy){const l=Math.sqrt(dx*dx+dy*dy)||1;dx/=l;dy/=l;P.facing={x:dx,y:dy};}
-  const spd=P.spd;
-  const nx=P.x+dx*spd*dt,ny=P.y+dy*spd*dt;
-  if(!solid(Math.floor(nx/TS),Math.floor(P.y/TS)))P.x=nx;
-  if(!solid(Math.floor(P.x/TS),Math.floor(ny/TS)))P.y=ny;
-  P.x=Math.max(0,Math.min((WW-1)*TS,P.x));
-  P.y=Math.max(0,Math.min((WH-1)*TS,P.y));
+
+  const curT=gt(Math.floor(P.x/TS),Math.floor(P.y/TS));
+  P.swimming=(curT===T.W||curT===T.SW);
+  const swimMul=P.swimming?0.45:1;
+  const spd=P.spd * 2.2 * swimMul; // pixels per frame at 60fps, dt-normalized
+  const nx=P.x+dx*spd*Math.min(dt,2),ny=P.y+dy*spd*Math.min(dt,2);
+
+  // Axis-split collision
+  if(!solidPx(nx,P.y))P.x=nx;
+  if(!solidPx(P.x,ny))P.y=ny;
+  P.x=Math.max(4,Math.min((WW-1)*TS-4,P.x));
+  P.y=Math.max(4,Math.min((WH-1)*TS-4,P.y));
+
   camX=Math.max(0,Math.min(WW*TS-gc.width/SCALE,P.x-gc.width/(SCALE*2)));
   camY=Math.max(0,Math.min(WH*TS-gc.height/SCALE,P.y-gc.height/(SCALE*2)));
+
   if(P.dodgeCd>0)P.dodgeCd-=dt;
   if(P.atkCd>0)P.atkCd-=dt;
+
   P.buffs=P.buffs.filter(b=>{
     b.rem-=dt;
-    if(b.rem<=0){if(b.t==='inv')P.invincible=false;if(b.t==='spd')P.spd=P.baseSpd;return false;}
+    if(b.rem<=0){
+      if(b.t==='inv')P.invincible=false;
+      if(b.t==='spd')P.spd=P.baseSpd;
+      if(b.t==='atk_tmp')P.atk-=b.v;
+      if(b.t==='mgk_tmp')P.mgk-=b.v;
+      return false;
+    }
     return true;
   });
-  if(P.stamina<P.maxSt&&!(dx||dy))P.stamina=Math.min(P.maxSt,P.stamina+0.4*dt);
-  if(P.hp<P.maxHp&&gameTime%120===0)P.hp=Math.min(P.maxHp,P.hp+1);
+
+  if(P.stamina<P.maxSt&&!(dx||dy))P.stamina=Math.min(P.maxSt,P.stamina+0.35*dt);
+  if(P.hp<P.maxHp&&gameTime%130===0)P.hp=Math.min(P.maxHp,P.hp+1);
   P.mp=Math.min(P.maxMp,P.mp+0.06*dt);
-  // Lava/fire dmg
-  const ct=gt(Math.floor(P.x/TS),Math.floor(P.y/TS));
-  if((ct===T.LV||ct===T.FG)&&!P.invincible&&gameTime%60===0){
+
+  const curTile=curT; //
+  if((curTile===T.LV||curTile===T.FG)&&!P.invincible&&gameTime%60===0){
     P.hp-=8;addFloat(P.x,P.y,'-8','#ff4444');
     if(P.hp<=0)die('Burned alive in the Hell Territories');
   }
@@ -700,31 +996,35 @@ function updPlayer(dt){
 function tryDodge(){
   if(P.dodgeCd>0||P.stamina<20)return;
   P.dodgeCd=45;P.stamina-=20;P.invincible=true;
-  const ddx=P.facing.x*6,ddy=P.facing.y*6;
-  P.x+=ddx;P.y+=ddy;
-  setTimeout(()=>{P.invincible=false;},350);
+  const spd=P.spd*TS*0.35;
+  const nx=P.x+P.facing.x*spd,ny=P.y+P.facing.y*spd;
+  if(!solidPx(nx,P.y))P.x=nx;
+  if(!solidPx(P.x,ny))P.y=ny;
+  setTimeout(()=>{P.invincible=false;},320);
   addPart(P.x,P.y,'💨');
+  dodgeCounter++;
+  questProgress('dodge');
 }
 
 function tryAttack(){
   if(!gameRunning||P.dead||P.atkCd>0)return;
   P.atkCd=18;
   const wpn=P.equip.weapon;
-  const isMag=wpn&&wpn.mgk>5||P.race.id==='wizard';
+  const isMag=(wpn&&wpn.mgk>5)||P.race?.id==='wizard';
   const isRng=wpn&&wpn.range;
   if(isMag||isRng){
     const tx=camX+mouse.x/SCALE,ty=camY+mouse.y/SCALE;
     const dx=tx-P.x,dy=ty-P.y,l=Math.sqrt(dx*dx+dy*dy)||1;
     const dmg=isMag?Math.round(P.atk*0.5+P.mgk*1.2):P.atk;
     projectiles.push({x:P.x,y:P.y,dx:dx/l*6,dy:dy/l*6,dmg,owner:'player',
-      col:isMag?'#aa44ff':'#ffff44',life:120,sz:isMag?7:4,mag:isMag});
+      col:isMag?'#aa44ff':'#ffff44',life:120,sz:isMag?7:4,mag:isMag,fire:wpn?.fire});
     addPart(P.x,P.y,isMag?'✨':'💥');
   } else {
+    let hitAny=false;
     entities.forEach(e=>{
-      if(e.t!=='enemy'&&e.t!=='boss')return;
-      if(e.dead)return;
-      const dx=e.x-P.x,dy=e.y-P.y;
-      if(Math.sqrt(dx*dx+dy*dy)<45+e.w/2)hitEnt(e);
+      if((e.t!=='enemy'&&e.t!=='boss')||e.dead)return;
+      const ddx=e.x-P.x,ddy=e.y-P.y;
+      if(Math.sqrt(ddx*ddx+ddy*ddy)<48+e.w/2){hitEnt(e);hitAny=true;}
     });
     addPart(P.x+P.facing.x*20,P.y+P.facing.y*20,'⚔');
   }
@@ -732,54 +1032,42 @@ function tryAttack(){
 
 function useAbility(){
   if(!gameRunning||P.dead)return;
-  if(P.mp<30){notif('Not enough MP!','bad');return;}
-  P.mp-=30;
+  if(P.mp<25){notif('Not enough MP!','bad');return;}
+  P.mp-=25;
   const r=P.race;
-  if(r.id==='human'){P.hp=Math.min(P.maxHp,P.hp+30);notif('Second Wind! +30HP','good');}
-  else if(r.id==='flash'){
-    P.spd=P.baseSpd*3;P.buffs.push({t:'spd',rem:180,v:3});
-    setTimeout(()=>{P.spd=P.baseSpd;},3000);notif('BLITZ RUSH!','good');
-  }
+  if(!r||r.id==='warrior'){P.hp=Math.min(P.maxHp,P.hp+30);notif('Battle Cry! +30HP','good');}
+  else if(r.id==='flash'){P.spd=P.baseSpd*3;P.buffs.push({t:'spd',rem:180,v:3});setTimeout(()=>{P.spd=P.baseSpd;},3000);notif('BLITZ RUSH!','good');}
   else if(r.id==='giant'){
-    entities.forEach(e=>{
-      if(e.t!=='enemy'&&e.t!=='boss')return;
-      const dx=e.x-P.x,dy=e.y-P.y;
-      if(Math.sqrt(dx*dx+dy*dy)<90)hitEnt(e,P.atk*2,true);
-    });
+    entities.forEach(e=>{if((e.t==='enemy'||e.t==='boss')&&!e.dead){const ddx=e.x-P.x,ddy=e.y-P.y;if(Math.sqrt(ddx*ddx+ddy*ddy)<95)hitEnt(e,P.atk*2,true);}});
     notif('EARTHQUAKE!','info');addPart(P.x,P.y,'💥');
   }
   else if(r.id==='wizard'){
-    for(let a=0;a<8;a++){
-      const ang=a/8*Math.PI*2;
-      projectiles.push({x:P.x,y:P.y,dx:Math.cos(ang)*5,dy:Math.sin(ang)*5,
-        dmg:P.mgk*2,owner:'player',col:'#ff44ff',life:80,sz:8,mag:true});
-    }
+    for(let a=0;a<8;a++){const ang=a/8*Math.PI*2;projectiles.push({x:P.x,y:P.y,dx:Math.cos(ang)*5.5,dy:Math.sin(ang)*5.5,dmg:P.mgk*2,owner:'player',col:'#ff44ff',life:85,sz:8,mag:true});}
     notif('ARCANE NOVA!','rare');
   }
   else if(r.id==='shadow'){
     const tx=camX+mouse.x/SCALE,ty=camY+mouse.y/SCALE;
-    P.x=tx;P.y=ty;P.invincible=true;
-    setTimeout(()=>{P.invincible=false;},500);
-    notif('SHADOW STEP!','rare');addPart(tx,ty,'🌑');
+    if(!solidPx(tx,ty)){P.x=tx;P.y=ty;}
+    P.invincible=true;setTimeout(()=>{P.invincible=false;},480);
+    notif('SHADOW STEP!','rare');addPart(P.x,P.y,'🌑');
   }
   else if(r.id==='dragon'){
     const fdx=P.facing.x,fdy=P.facing.y;
     for(let i=0;i<5;i++)setTimeout(()=>{
       if(P.dead)return;
-      projectiles.push({x:P.x,y:P.y,dx:fdx*7+(Math.random()-.5),dy:fdy*7+(Math.random()-.5),
-        dmg:P.atk*1.5+P.mgk,owner:'player',col:'#ff6600',life:55,sz:9,fire:true});
-    },i*80);
+      projectiles.push({x:P.x,y:P.y,dx:fdx*7+(Math.random()-.5),dy:fdy*7+(Math.random()-.5),dmg:P.atk*1.5+P.mgk,owner:'player',col:'#ff6600',life:58,sz:9,fire:true});
+    },i*75);
     notif('DRAGON BREATH!','info');
   }
 }
 
 function hitEnt(e,dmgOvr,forceCrit=false){
-  const crit=forceCrit||Math.random()<(P.equip.weapon?.crit||0)||Math.random()<(P.race.id==='shadow'?.15:.05);
+  const crit=forceCrit||Math.random()<(P.equip.weapon?.crit||0)||(Math.random()<(P.race?.id==='shadow'?.18:.05));
   let dmg=dmgOvr!=null?dmgOvr:(P.atk+(Math.random()*4|0))*(crit?2:1);
-  if(P.clan.bonusKey==='fire')dmg*=1.3;
+  if(P.clan?.bonusKey==='fire')dmg*=1.3;
   dmg=Math.max(1,Math.round(dmg-((e.def||0)*0.3)));
   e.hp-=dmg;e.state='chase';
-  addFloat(e.x,e.y,(crit?'CRIT ':'')+(dmg),crit?'#ff4444':'#fff');
+  addFloat(e.x,e.y,(crit?'CRIT! ':'')+dmg,crit?'#ff4444':'#fff');
   addPart(e.x,e.y,'💢');
   if(e.hp<=0)killEnt(e);
 }
@@ -788,14 +1076,24 @@ function killEnt(e){
   if(e.dead)return;e.dead=true;
   const xp=e.xp||0,gold=e.gd?e.gd[0]+Math.floor(Math.random()*(e.gd[1]-e.gd[0])):0;
   P.xp+=xp;P.gold+=gold;P.kills++;
-  addFloat(e.x,e.y-8,'+'+xp+' XP','#22ff44');
-  if(gold)addFloat(e.x,e.y-16,'+'+gold+'g','#ffd700');
+  addFloat(e.x,e.y-8,'+'+xp+'XP','#44ee66');
+  if(gold)addFloat(e.x,e.y-18,'+'+gold+'g','#ffd27a');
   addPart(e.x,e.y,'💀');
+
+  // Quest tracking
+  const zone=getZoneAt(Math.floor(e.x/TS),Math.floor(e.y/TS));
+  questProgress('kill',{zone:zone?.id});
+
+  // Stealth kill (enemy wasn't chasing = stealth)
+  if(e.state!=='chase')questProgress('stealth_kill');
+
   if(e.t==='boss'){
-    activeBoss=null;
-    document.getElementById('bossBar').classList.remove('on');
+    P.bossKills=(P.bossKills||0)+1;
+    activeBoss=null;document.getElementById('bossBar').classList.remove('on');
     notif('⚠ BOSS DEFEATED: '+e.n,'rare');
+    questProgress('boss_kill',{bossId:e.id});
     (e.drop||[]).forEach(d=>{giveItem(d);notif('Got: '+(ITEMS[d]?.n||d),'rare');});
+    if(P.bossKills>=6){setTimeout(()=>showVictory(),1500);}
   }
   levelUp();
   entities=entities.filter(x=>x.id!==e.id);
@@ -806,7 +1104,7 @@ function levelUp(){
     P.level++;P.xp-=P.xpNext;P.xpNext=Math.floor(P.xpNext*1.5);
     P.maxHp+=10;P.hp=P.maxHp;P.maxMp+=8;P.mp=P.maxMp;
     P.atk+=2;P.def+=1;P.mgk+=1;
-    notif('LEVEL UP! Now Level '+P.level,'rare');addPart(P.x,P.y,'🌟');
+    notif('LEVEL UP! Lv '+P.level,'rare');addPart(P.x,P.y,'🌟');
   }
 }
 
@@ -814,28 +1112,32 @@ function updEntities(dt){
   entities.forEach(e=>{
     if(e.dead)return;
     const dx=P.x-e.x,dy=P.y-e.y,dist=Math.sqrt(dx*dx+dy*dy);
-    const ar=75+e.w,ad=e.w/2+P.w/2+8;
-    if(e.t==='boss'){
-      if(dist<350){
-        e.state='chase';activeBoss=e;
-        document.getElementById('bossBar').classList.add('on');
-        document.getElementById('bossName').textContent=e.n.toUpperCase();
-        document.getElementById('bossHp').style.width=(e.hp/e.maxHp*100)+'%';
-      }
+    const ar=80+e.w,ad=e.w/2+10;
+
+    if(e.t==='boss'&&dist<380){
+      e.state='chase';activeBoss=e;
+      document.getElementById('bossBar').classList.add('on');
+      document.getElementById('bossN').textContent=e.n.toUpperCase();
+      document.getElementById('bossH').style.width=(e.hp/e.maxHp*100)+'%';
     }
-    if(dist<ar)e.state='chase';
-    else if(dist>220&&e.t!=='boss')e.state='patrol';
+    if(dist<ar&&e.state!=='chase')e.state='chase';
+    else if(dist>240&&e.t!=='boss')e.state='patrol';
+
     if(e.state==='patrol'){
       e.ptimer-=dt;
-      if(e.ptimer<=0){e.ptimer=60+Math.random()*120;e.tx=e.homeX+(Math.random()-.5)*80;e.ty=e.homeY+(Math.random()-.5)*80;}
+      if(e.ptimer<=0){e.ptimer=60+Math.random()*120;
+        e.tx=e.homeX+(Math.random()-.5)*80;e.ty=e.homeY+(Math.random()-.5)*80;}
       const tdx=e.tx-e.x,tdy=e.ty-e.y,tl=Math.sqrt(tdx*tdx+tdy*tdy)||1;
-      e.x+=tdx/tl*e.spd*0.5*dt;e.y+=tdy/tl*e.spd*0.5*dt;
-    } else if(e.state==='chase'){
-      if(dist>ad){const l=dist||1;e.x+=dx/l*e.spd*dt;e.y+=dy/l*e.spd*dt;e.facing={x:dx/l,y:dy/l};}
-      else{
+      const mspd=e.spd*TS*0.08;
+      e.x+=tdx/tl*mspd*dt;e.y+=tdy/tl*mspd*dt;
+    } else {
+      if(dist>ad){
+        const l=dist||1,mspd=e.spd*TS*0.14;
+        e.x+=dx/l*mspd*dt;e.y+=dy/l*mspd*dt;e.facing={x:dx/l,y:dy/l};
+      } else {
         e.atkCd=(e.atkCd||0)-dt;
         if(e.atkCd<=0){
-          e.atkCd=60/Math.max(0.5,e.spd);
+          const isBoss=e.t==='boss'; e.atkCd=(isBoss?90:65)/Math.max(0.5,e.spd);
           if(!P.invincible&&!P.dead){
             const red=Math.max(1,e.atk-Math.floor(P.def*0.5));
             P.hp-=red;addFloat(P.x,P.y,'-'+red,'#ff4444');
@@ -854,22 +1156,25 @@ function updNPCs(dt){
   npcs.forEach(n=>{
     if(n.ntype==='magic_man')return;
     n.wt-=dt;
-    if(n.wt<=0){n.wt=100+Math.random()*200;n.wdx=(Math.random()-.5)*2;n.wdy=(Math.random()-.5)*2;}
-    const nx=n.x+n.wdx*0.5*dt,ny=n.y+n.wdy*0.5*dt;
-    if(nx>vz.x*TS&&nx<(vz.x+vz.w)*TS)n.x=nx;else n.wdx*=-1;
-    if(ny>vz.y*TS&&ny<(vz.y+vz.h)*TS)n.y=ny;else n.wdy*=-1;
+    if(n.wt<=0){n.wt=100+Math.random()*200;n.wdx=(Math.random()-.5)*1.2;n.wdy=(Math.random()-.5)*1.2;}
+    const nx=n.x+n.wdx*TS*0.04*dt,ny=n.y+n.wdy*TS*0.04*dt;
+    if(nx>vz.x*TS&&nx<(vz.x+vz.w-1)*TS&&!solidPx(nx,n.y))n.x=nx;else n.wdx*=-1;
+    if(ny>vz.y*TS&&ny<(vz.y+vz.h-1)*TS&&!solidPx(n.x,ny))n.y=ny;else n.wdy*=-1;
   });
 }
 
 function updProj(dt){
   projectiles=projectiles.filter(p=>{
     p.x+=p.dx*dt;p.y+=p.dy*dt;p.life-=dt;
-    if(p.life<=0||solid(Math.floor(p.x/TS),Math.floor(p.y/TS)))return false;
+    if(p.life<=0)return false;
+    if(solidPx(p.x,p.y)){addPart(p.x,p.y,'💥');return false;}
     if(p.owner==='player'){
       for(let i=entities.length-1;i>=0;i--){
         const e=entities[i];if(e.dead)continue;
-        const dx=e.x-p.x,dy=e.y-p.y;
-        if(Math.sqrt(dx*dx+dy*dy)<e.w/2+p.sz){hitEnt(e,p.dmg,false);addPart(p.x,p.y,p.mag?'✨':'💥');return false;}
+        const ddx=e.x-p.x,ddy=e.y-p.y;
+        if(Math.sqrt(ddx*ddx+ddy*ddy)<e.w/2+p.sz){
+          hitEnt(e,p.dmg,false);addPart(p.x,p.y,p.mag?'✨':'💥');return false;
+        }
       }
     }
     return true;
@@ -880,134 +1185,850 @@ function replenish(){
   const zone=getZoneAt(Math.floor(P.x/TS),Math.floor(P.y/TS));
   if(!zone||zone.safe)return;
   const cnt=entities.filter(e=>e.zone===zone.id&&!e.dead&&e.t==='enemy').length;
-  if(cnt<4+zone.danger){
-    const cands=Object.entries(ETYPES).filter(([k,v])=>v.z.includes(zone.id));
-    if(!cands.length)return;
-    const [eid,et]=cands[Math.floor(Math.random()*cands.length)];
-    const angle=Math.random()*Math.PI*2,dist=200+Math.random()*100;
-    entities.push({id:Math.random().toString(36).slice(2),t:'enemy',eid,
-      x:P.x+Math.cos(angle)*dist,y:P.y+Math.sin(angle)*dist,
-      w:et.sz,h:et.sz,hp:et.hp,maxHp:et.hp,atk:et.atk,spd:et.spd,
-      xp:et.xp,gd:et.gd,e:et.e,col:et.col,n:et.n,zone:zone.id,
-      state:'patrol',ptimer:0,atkCd:0,homeX:P.x+Math.cos(angle)*dist,homeY:P.y+Math.sin(angle)*dist,
-      tx:P.x,ty:P.y,facing:{x:1,y:0},anim:0,aT:0});
-  }
+  if(cnt>=4+zone.danger)return;
+  const cands=Object.entries(ETYPES).filter(([k,v])=>v.z.includes(zone.id));
+  if(!cands.length)return;
+  const [,et]=cands[Math.floor(Math.random()*cands.length)];
+  const angle=Math.random()*Math.PI*2,dist=220+Math.random()*80;
+  const nx=P.x+Math.cos(angle)*dist,ny=P.y+Math.sin(angle)*dist;
+  const etx=Math.floor(nx/TS),ety=Math.floor(ny/TS);
+  if(gt(etx,ety)===T.TR)return;
+  entities.push({id:Math.random().toString(36).slice(2),t:'enemy',eid:'',
+    x:nx,y:ny,w:et.sz,h:et.sz,hp:et.hp,maxHp:et.hp,atk:et.atk,spd:et.spd,
+    xp:et.xp,gd:et.gd,e:et.e,col:et.col,n:et.n,zone:zone.id,
+    state:'patrol',ptimer:0,atkCd:0,homeX:nx,homeY:ny,tx:nx,ty:ny,
+    facing:{x:1,y:0},anim:0,aT:0,dead:false});
 }
 
-function checkZone(){
-  const zone=getZoneAt(Math.floor(P.x/TS),Math.floor(P.y/TS));
-  document.getElementById('hZone').textContent=zone?zone.name:'Unknown';
+function checkZone(dt){
+  const tx=Math.floor(P.x/TS),ty=Math.floor(P.y/TS);
+  const zone=getZoneAt(tx,ty);
+  document.getElementById('hZone').textContent=zone?zone.n:'Unknown';
   const ph=dayTime<300?'Dawn':dayTime<600?'Day':dayTime<900?'Dusk':'Night';
   document.getElementById('hDay').textContent='Day '+(Math.floor(gameTime/1200)+1)+' · '+ph;
+  // Hell survive quest
+  if(zone?.id==='hell'&&!P.dead){
+    hellTimeCounter+=(dt/60);
+    QUEST_DEFS.filter(q=>q.type==='survive_zone'&&q.zone==='hell').forEach(qd=>{
+      const qs=quests[qd.id];if(!qs||!qs.active||qs.done)return;
+      qs.progress=Math.floor(hellTimeCounter);
+      if(qs.progress>=qd.need&&!qs.done){qs.done=true;qs.active=false;qd.rewardFn();notif('QUEST COMPLETE: '+qd.n,'rare');}
+    });
+    updQuestHUD();
+  }
 }
 
 // ── PARTICLES ──
 function addPart(x,y,e,s=1){
-  for(let i=0;i<2;i++)particles.push({x,y,e,s,vx:(Math.random()-.5)*3,vy:-1-Math.random()*2,life:40,maxL:40});
-}
-function addFloat(x,y,txt,col='#fff'){floatTxts.push({x,y,txt,col,vy:-0.8,life:55,maxL:55});}
-function updParts(dt){particles=particles.filter(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=0.08*dt;p.life-=dt;return p.life>0;});}
+  for(let i=0;i<2;i++)particles.push({x,y,e,s,vx:(Math.random()-.5)*2.5,vy:-1-Math.random()*2,life:38,maxL:38});}
+function addFloat(x,y,txt,col='#fff'){floatTxts.push({x,y,txt,col,vy:-0.75,life:52,maxL:52});}
+function updParts(dt){particles=particles.filter(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=0.07*dt;p.life-=dt;return p.life>0;});}
 function updFloats(dt){floatTxts=floatTxts.filter(f=>{f.y+=f.vy*dt;f.life-=dt;return f.life>0;});}
 
-// ── RENDERER ──
-function render(){
-  gctx.clearRect(0,0,gc.width,gc.height);
-  gctx.save();gctx.scale(SCALE,SCALE);gctx.translate(-camX,-camY);
-  // Sky
-  const t=dayTime/1200;
-  gctx.fillStyle=t<0.25?'#050a18':t<0.5?'#0a0520':t<0.75?'#070315':'#050a18';
-  gctx.fillRect(camX,camY,gc.width/SCALE+2,gc.height/SCALE+2);
-  drawTiles();drawEnts();drawNPCs_r();drawProjs();drawParts_r();drawFloats_r();drawPlayer_r();
-  gctx.restore();
-  drawMM();
+// ════════════════════════════════════════════════════
+//  KINGDOM OF REALMS — ULTRA HD PIXEL ART RENDERER
+// ════════════════════════════════════════════════════
+
+// ── Helpers ──
+function tRng(tx,ty,s=0){let h=(tx*374761393+ty*668265263+(s+1)*2654435761)>>>0;h=((h^(h>>>16))*0x45d9f3b)>>>0;h^=h>>>16;return(h&0xffff)/0xffff;}
+function lgt(hex,a){const n=parseInt(hex.slice(1),16);const r=Math.min(255,((n>>16)&255)+a),g=Math.min(255,((n>>8)&255)+a),b=Math.min(255,(n&255)+a);return'#'+(((r<<16)|(g<<8)|b)>>>0).toString(16).padStart(6,'0');}
+function drk(h,a){return lgt(h,-a);}
+function px(x,y,w,h,c){gctx.fillStyle=c;gctx.fillRect(x,y,w,h);}
+function ln(x1,y1,x2,y2,c,lw=1){gctx.strokeStyle=c;gctx.lineWidth=lw;gctx.beginPath();gctx.moveTo(x1,y1);gctx.lineTo(x2,y2);gctx.stroke();}
+
+// Zone-aware grass palettes — each zone has 6 variants for micro-diversity
+const ZPALS={
+  village:{g:['#4e8230','#5a9438','#446a28','#60a03a','#508833','#6aaa42'],path:'#c8a860',pathD:'#a08035',stone:'#907a68',edgeD:10},
+  forest: {g:['#28561a','#336620','#204d12','#3a7228','#2a5e1c','#447830'],stone:'#564636',edgeD:15},
+  hell:   {g:['#541600','#681c00','#3e1000','#5e1800','#741e00','#4a1200'],stone:'#4a1e10',edgeD:18},
+  jungle: {g:['#164808','#1e5e10','#103808','#286e14','#1a5210','#326018'],stone:'#364626',edgeD:14},
+  frozen: {g:['#92b8cc','#a4ccdf','#80acbf','#b4d2e6','#9abece','#c0dcee'],stone:'#607686',edgeD:8},
+  sky:    {g:['#545898','#6060b2','#4848a0','#6e6ec0','#5858a8','#7878cc'],stone:'#726898',edgeD:12},
+  abyss:  {g:['#07000f','#0c001a','#040009','#110020','#090014','#0f001e'],stone:'#261636',edgeD:20},
+  plains: {g:['#80a230','#92bc3c','#6e9028','#a2ca46','#869835','#94b83e'],stone:'#988860',edgeD:8},
+};
+function zpal(tx,ty){const z=getZoneAt(tx,ty);return z?ZPALS[z.id]||ZPALS.plains:ZPALS.plains;}
+
+// ──────────────────────────────────────
+// GRASS — rich variation, blades, flowers, pebbles
+// ──────────────────────────────────────
+function drawGrass(tx,ty){
+  const x=tx*TS,y=ty*TS,p=zpal(tx,ty);
+  const r=tRng(tx,ty,0),gi=Math.floor(r*p.g.length);
+  const base=p.g[gi];
+  px(x,y,TS,TS,base);
+
+  // Subtle neighbour-blend shading on right & bottom edges
+  gctx.fillStyle=`rgba(0,0,0,0.${p.edgeD||10})`;
+  gctx.fillRect(x+TS-1,y,1,TS);
+  gctx.fillRect(x,y+TS-1,TS,1);
+  // top-left highlight
+  gctx.fillStyle='rgba(255,255,255,0.06)';
+  gctx.fillRect(x,y,TS,1); gctx.fillRect(x,y,1,TS);
+
+  // Grass blades — present in 40% of tiles
+  const r2=tRng(tx,ty,1);
+  if(r2>0.60){
+    const bx=x+Math.floor(r2*9)+1;
+    const lc=lgt(base,22),lc2=lgt(base,14);
+    // 3 individual blades
+    px(bx,  y+1, 1, 5, lc);
+    px(bx+3,y+2, 1, 4, lc2);
+    px(bx+6,y+1, 1, 6, lc);
+    // blade tips curve
+    px(bx-1,y+1,1,1,lc);
+    px(bx+7,y+1,1,1,lc2);
+  }
+
+  // Flowers — 12% of tiles
+  const r3=tRng(tx,ty,2);
+  if(r3>0.88){
+    const fx=x+Math.floor(tRng(tx,ty,9)*10)+1;
+    const fy=y+Math.floor(tRng(tx,ty,10)*7)+2;
+    const flcols=['#ff8888','#ffee44','#ff88ee','#88eeff','#ffbb44','#aaffaa','#ff6644'];
+    const fc=flcols[Math.floor(r3*7)%7];
+    const sc2=lgt(base,16);
+    // stem
+    px(fx+1,fy+2,1,3,sc2);
+    // petals (5-pixel cross)
+    px(fx,  fy,  1,1,fc); px(fx+2,fy,  1,1,fc);
+    px(fx+1,fy-1,1,1,fc); px(fx+1,fy+1,1,1,fc);
+    // centre
+    px(fx+1,fy,1,1,'#fff8cc');
+  }
+
+  // Pebbles — 8% of tiles
+  const r4=tRng(tx,ty,3);
+  if(r4>0.92){
+    const pbx=x+Math.floor(r4*11)+1,pby=y+Math.floor(tRng(tx,ty,4)*10)+2;
+    px(pbx,pby,3,2,drk(base,12));
+    px(pbx,pby,2,1,'rgba(255,255,255,0.18)');
+  }
 }
 
+// ──────────────────────────────────────
+// PATH — cobblestone with grout, highlights, wear
+// ──────────────────────────────────────
+function drawPath(tx,ty){
+  const x=tx*TS,y=ty*TS,p=zpal(tx,ty);
+  const pc=p.path||'#c8a860',pd=p.pathD||'#a08035';
+  // base mortar
+  px(x,y,TS,TS,drk(pc,20));
+  // 4 cobbles
+  const stones=[[1,1,6,6],[9,1,6,6],[1,9,6,6],[9,9,6,6]];
+  stones.forEach(([sx,sy2,sw,sh],i)=>{
+    const sv=tRng(tx+i,ty+i,5);
+    px(x+sx,y+sy2,sw,sh,sv>0.5?pd:lgt(pd,8));
+    // highlight top-left
+    gctx.fillStyle='rgba(255,255,255,0.22)';
+    gctx.fillRect(x+sx,y+sy2,sw,1);
+    gctx.fillRect(x+sx,y+sy2,1,sh);
+    // shadow bottom-right
+    gctx.fillStyle='rgba(0,0,0,0.18)';
+    gctx.fillRect(x+sx,y+sy2+sh-1,sw,1);
+    gctx.fillRect(x+sx+sw-1,y+sy2,1,sh);
+  });
+  // grout lines
+  gctx.fillStyle='rgba(0,0,0,0.2)';
+  gctx.fillRect(x+7,y,2,TS); gctx.fillRect(x,y+7,TS,2);
+}
+
+// ──────────────────────────────────────
+// WATER — animated shimmer, ripples, foam edges
+// ──────────────────────────────────────
+function drawWater(tx,ty){
+  const x=tx*TS,y=ty*TS;
+  const wv=Math.floor(gameTime/8)%8;
+  const dep=Math.floor(gameTime/22)%2;
+  // deep base
+  px(x,y,TS,TS,'#1858a0');
+  px(x,y,TS,TS,`rgba(40,110,210,0.45)`);
+  // animated highlight ripples
+  gctx.fillStyle='rgba(110,190,255,0.5)';
+  gctx.fillRect(x+(wv*2+1)%14,y+2,5,1);
+  gctx.fillRect(x+(wv*2+8)%14,y+8,4,1);
+  gctx.fillRect(x+(wv*3+3)%14,y+13,6,1);
+  // secondary ripple
+  gctx.fillStyle='rgba(160,220,255,0.3)';
+  gctx.fillRect(x+(wv*2+5)%14,y+5+dep,3,1);
+  gctx.fillRect(x+(wv*2+11)%14,y+11,4,1);
+  // depth centre
+  px(x+3,y+3,10,10,'rgba(0,30,90,0.22)');
+  // foam edge
+  gctx.fillStyle='rgba(210,240,255,0.25)';
+  gctx.fillRect(x,y,1,TS); gctx.fillRect(x,y,TS,1);
+}
+
+// ──────────────────────────────────────
+// LAVA — animated glowing cracks, heat shimmer
+// ──────────────────────────────────────
+function drawLava(tx,ty){
+  const x=tx*TS,y=ty*TS;
+  const t2=Math.floor(gameTime/6)%10;
+  const t3=Math.floor(gameTime/18)%3;
+  // base dark rock
+  px(x,y,TS,TS,'#5a1000');
+  // lava base
+  px(x+2,y+2,12,12,'rgba(160,40,0,0.7)');
+  // glowing veins (animated)
+  gctx.fillStyle='rgba(255,120,0,0.65)';
+  gctx.fillRect(x+t2%8,    y,    1,TS);
+  gctx.fillRect(x+(t2+4)%8,y,    1,TS);
+  gctx.fillStyle='rgba(255,200,0,0.35)';
+  gctx.fillRect(x,y+t2%8,    TS,1);
+  // hotspot glow
+  px(x+4+t3,y+4,8-t3,8,'rgba(255,80,0,0.28)');
+  px(x+5,y+5,6,6,'rgba(255,220,0,0.18)');
+  // surface crust edges
+  gctx.fillStyle='rgba(80,20,0,0.5)';
+  gctx.fillRect(x,y,TS,2); gctx.fillRect(x,y+TS-2,TS,2);
+}
+
+// ──────────────────────────────────────
+// ICE — glassy facets, cracks, sparkle
+// ──────────────────────────────────────
+function drawIce(tx,ty){
+  const x=tx*TS,y=ty*TS;
+  const r=tRng(tx,ty,6);
+  px(x,y,TS,TS,'#a8cce4');
+  // subsurface colour variation
+  px(x+2,y+2,12,12,r>0.5?'rgba(160,210,240,0.4)':'rgba(120,190,230,0.4)');
+  // glassy highlight facets
+  gctx.fillStyle='rgba(255,255,255,0.6)';
+  gctx.fillRect(x+1,y+1,5,2); gctx.fillRect(x+1,y+1,2,5);
+  gctx.fillStyle='rgba(255,255,255,0.3)';
+  gctx.fillRect(x+9,y+6,4,2); gctx.fillRect(x+3,y+11,5,1);
+  // crack lines
+  gctx.strokeStyle='rgba(80,140,210,0.28)'; gctx.lineWidth=1;
+  gctx.beginPath();gctx.moveTo(x+6,y);gctx.lineTo(x+8,y+TS);gctx.stroke();
+  gctx.beginPath();gctx.moveTo(x,y+7);gctx.lineTo(x+TS,y+9);gctx.stroke();
+  // sparkle dot
+  if(Math.floor(gameTime/25)%3===0){gctx.fillStyle='rgba(255,255,255,0.8)';gctx.fillRect(x+3,y+3,1,1);}
+  // shadow bottom
+  gctx.fillStyle='rgba(0,0,60,0.12)';gctx.fillRect(x,y+TS-2,TS,2);
+}
+
+// ──────────────────────────────────────
+// CLOUD — layered, soft, floating
+// ──────────────────────────────────────
+function drawCloud(tx,ty){
+  const x=tx*TS,y=ty*TS;
+  const dr=Math.floor(gameTime/40)%3;
+  px(x,y,TS,TS,'#6878b8');
+  // cloud puff
+  gctx.fillStyle='rgba(200,215,255,0.38)';
+  gctx.fillRect(x+1+dr,y+2,12-dr,6);
+  gctx.fillStyle='rgba(230,240,255,0.28)';
+  gctx.fillRect(x+2,y+5,10,5);
+  // highlight top
+  gctx.fillStyle='rgba(255,255,255,0.3)';
+  gctx.fillRect(x+2+dr,y+2,5,2);
+  // shadow base
+  gctx.fillStyle='rgba(20,20,60,0.2)';
+  gctx.fillRect(x+2,y+9,12,3);
+}
+
+// ──────────────────────────────────────
+// VOID — deep purple, cosmic tendrils
+// ──────────────────────────────────────
+function drawVoid(tx,ty){
+  const x=tx*TS,y=ty*TS;
+  const r=tRng(tx,ty,7),r2=tRng(tx,ty,8);
+  px(x,y,TS,TS,'#050010');
+  // purple vein
+  if(r>0.5){gctx.fillStyle='rgba(140,0,220,0.35)';gctx.fillRect(x+Math.floor(r*10),y,1,TS);}
+  if(r2>0.45){gctx.fillStyle='rgba(90,0,160,0.25)';gctx.fillRect(x,y+Math.floor(r2*12),TS,1);}
+  // void sparkles
+  if(tRng(tx,ty,9)>0.85){
+    const frame=Math.floor(gameTime/20)%4;
+    gctx.fillStyle='rgba(200,100,255,0.7)';
+    gctx.fillRect(x+Math.floor(r*14),y+Math.floor(r2*14),1+(frame===0?1:0),1+(frame===0?1:0));
+  }
+}
+
+// ──────────────────────────────────────
+// STONE — mossy, chipped, textured
+// ──────────────────────────────────────
+function drawStone(tx,ty){
+  const x=tx*TS,y=ty*TS,p=zpal(tx,ty);
+  const sc=p.stone||'#907a68',r=tRng(tx,ty,11);
+  px(x,y,TS,TS,drk(sc,10));
+  px(x+1,y+1,TS-2,TS-2,sc);
+  // chip marks
+  gctx.fillStyle=drk(sc,8);
+  gctx.fillRect(x+4,y+4,3,2); gctx.fillRect(x+9,y+9,2,3);
+  // moss patch (some tiles)
+  if(r>0.65){gctx.fillStyle='rgba(60,100,30,0.35)';gctx.fillRect(x+1,y+TS-4,5,3);}
+  // highlight
+  gctx.fillStyle='rgba(255,255,255,0.18)';
+  gctx.fillRect(x+1,y+1,TS-3,1); gctx.fillRect(x+1,y+1,1,TS-3);
+  // shadow
+  gctx.fillStyle='rgba(0,0,0,0.25)';
+  gctx.fillRect(x+1,y+TS-2,TS-1,1); gctx.fillRect(x+TS-2,y+1,1,TS-1);
+}
+
+// ──────────────────────────────────────
+// TREES — 8 zone variants, deeply detailed
+// ──────────────────────────────────────
+function drawTree(tx,ty){
+  const x=tx*TS,y=ty*TS;
+  const zone=getZoneAt(tx,ty);
+  const zid=zone?.id||'forest';
+  const r=tRng(tx,ty,0);
+  const fr=Math.floor(gameTime/30)%2; // slow sway frame
+
+  if(zid==='hell'){
+    // Charcoal dead tree — ember glow
+    px(x+7,y+10,2,6,'#190e00'); px(x+6,y+8,4,3,'#261200');
+    gctx.fillStyle='#321600';gctx.fillRect(x+3,y+5,3,4);gctx.fillRect(x+10,y+6,3,3);
+    px(x+5,y+2,6,4,'#3a1200');
+    // bark texture
+    gctx.fillStyle='rgba(80,30,0,0.3)';
+    gctx.fillRect(x+7,y+10,1,6); gctx.fillRect(x+8,y+8,1,5);
+    // ember glow (animated)
+    const eg=Math.floor(gameTime/15)%3;
+    gctx.fillStyle=`rgba(255,${80+eg*30},0,0.5)`;
+    gctx.fillRect(x+5+eg,y+3,4-eg,2);
+    gctx.fillStyle='rgba(255,200,0,0.25)';
+    gctx.fillRect(x+6,y+4,3,1);
+    // ash at base
+    px(x+5,y+15,6,1,'rgba(150,100,60,0.4)');
+
+  } else if(zid==='frozen'){
+    // Snow pine — layered triangular
+    px(x+7,y+12,2,4,'#6a4a28'); // trunk brown
+    gctx.fillStyle='rgba(80,50,20,0.4)';gctx.fillRect(x+8,y+12,1,4); // trunk shade
+    // snow layers (3 levels)
+    const sl=[{y:9,w:8,c:'#a4c8dc'},{y:6,w:6,c:'#b8d8ea'},{y:3,w:4,c:'#cce8f6'}];
+    sl.forEach(({y:sy2,w:sw,c})=>{
+      px(x+(16-sw)/2,y+sy2,sw,4,c);
+      // highlight top of snow
+      gctx.fillStyle='rgba(255,255,255,0.5)';gctx.fillRect(x+(16-sw)/2,y+sy2,sw,1);
+      // shadow underside
+      gctx.fillStyle='rgba(0,0,80,0.15)';gctx.fillRect(x+(16-sw)/2,y+sy2+3,sw,1);
+    });
+    // icicle drops
+    gctx.fillStyle='rgba(180,230,255,0.6)';
+    gctx.fillRect(x+4,y+13,1,2); gctx.fillRect(x+7,y+13,1,3); gctx.fillRect(x+11,y+12,1,2);
+
+  } else if(zid==='jungle'){
+    // Massive tropical — wide layered canopy
+    px(x+7,y+11,2,5,'#583818');
+    gctx.fillStyle='rgba(0,0,0,0.3)';gctx.fillRect(x+8,y+11,1,5); // trunk shade
+    // trunk roots
+    gctx.fillStyle='rgba(70,40,15,0.5)';gctx.fillRect(x+5,y+15,2,1);gctx.fillRect(x+9,y+15,2,1);
+    // layered wide canopy
+    px(x+0,y+5,16,5,'#1c5808'); px(x+1,y+3,14,4,'#246a0c');
+    px(x+3,y+1,10,3,'#2e7e10'); px(x+5,y+0,6,2,'#389414');
+    // highlight
+    gctx.fillStyle='rgba(80,200,40,0.22)';gctx.fillRect(x+2,y+3,6,3);
+    // shade right side
+    gctx.fillStyle='rgba(0,0,0,0.2)';gctx.fillRect(x+9,y+3,7,7);
+    // dangling vines
+    gctx.fillStyle='rgba(30,100,10,0.55)';
+    gctx.fillRect(x+2,y+9,1,6+fr); gctx.fillRect(x+13,y+8,1,7+fr);
+    gctx.fillRect(x+6,y+9,1,4); gctx.fillRect(x+10,y+10,1,5);
+    // tropical fruit
+    if(r>0.75){gctx.fillStyle='#ff4422';gctx.fillRect(x+4,y+6,2,2);gctx.fillRect(x+10,y+7,2,2);}
+
+  } else if(zid==='sky'){
+    // Ethereal — glowing, crystalline
+    px(x+7,y+12,2,4,'#7070cc');
+    // trunk glow
+    gctx.fillStyle='rgba(130,130,255,0.3)';gctx.fillRect(x+6,y+10,4,6);
+    // canopy layers
+    px(x+3,y+7,10,6,'#5050a0'); px(x+4,y+5,8,4,'#6060b8');
+    px(x+5,y+3,6,3,'#7070cc'); px(x+6,y+1,4,3,'#8888dd');
+    // crystal tip
+    px(x+7,y+0,2,2,'#b0b0ff');
+    // ambient glow
+    gctx.fillStyle='rgba(120,130,255,0.18)';gctx.fillRect(x+2,y+4,12,9);
+    // sparkles
+    const sp=Math.floor(gameTime/12)%5;
+    gctx.fillStyle='rgba(200,210,255,0.8)';
+    gctx.fillRect(x+sp+2,y+3+sp%3,1,1);
+    gctx.fillStyle='rgba(255,255,255,0.5)';
+    gctx.fillRect(x+12-sp,y+8+sp%2,1,1);
+
+  } else if(zid==='abyss'){
+    // Void tendril tree — corruption
+    px(x+7,y+11,2,5,'#120020');
+    gctx.fillStyle='rgba(80,0,140,0.3)';gctx.fillRect(x+6,y+9,4,7);
+    px(x+4,y+7,8,5,'#1a0030'); px(x+5,y+4,6,4,'#220042');
+    px(x+6,y+2,4,3,'#2e0058'); px(x+7,y+1,2,2,'#8800dd');
+    // tendrils reaching out
+    gctx.fillStyle='rgba(120,0,200,0.45)';
+    gctx.fillRect(x+2,y+8,3,1); gctx.fillRect(x+11,y+7,3,1);
+    gctx.fillRect(x+3,y+9,1,5); gctx.fillRect(x+12,y+9,1,4);
+    // pulsing void crown
+    const vp=Math.floor(gameTime/18)%3;
+    gctx.fillStyle=`rgba(${140+vp*30},0,${220+vp*10},0.6)`;
+    gctx.fillRect(x+7,y+0+vp,2,2);
+
+  } else {
+    // LUSH OAK — the star of the show (forest/plains/village)
+    const light=r>0.48;
+    const cv  =light?'#3a7c18':'#2e6412';
+    const cvl =lgt(cv,14); const cvll=lgt(cv,26); const cvd=drk(cv,10);
+    const trk ='#5c3a18'; const trkD=drk(trk,12);
+
+    // Roots (base)
+    px(x+5,y+15,2,1,trkD); px(x+9,y+15,2,1,trkD);
+    // Trunk — 3px wide, textured
+    px(x+6,y+9,4,7,trk);
+    gctx.fillStyle=trkD;gctx.fillRect(x+9,y+9,1,7); // right-side shadow
+    gctx.fillStyle='rgba(255,255,255,0.1)';gctx.fillRect(x+6,y+9,1,7); // left highlight
+    // Bark knot
+    if(r>0.6){gctx.fillStyle=drk(trk,6);gctx.fillRect(x+7,y+12,1,2);}
+
+    // Canopy — 5 layers, rounded silhouette
+    px(x+2,y+7, 12,6,cv);  // main body
+    px(x+3,y+5, 10,4,cvl); // upper mid
+    px(x+4,y+3,  8,3,cvll);// upper bright
+    px(x+6,y+2,  4,2,lgt(cv,34)); // near-top
+    // Side bulges for roundness
+    px(x+1,y+8, 2,4,cv); px(x+13,y+8,2,4,cv);
+    px(x+2,y+6, 1,3,cvl); px(x+13,y+6,1,3,cvl);
+
+    // Right-side shadow (3D feel)
+    gctx.fillStyle='rgba(0,0,0,0.2)';
+    gctx.fillRect(x+10,y+5,5,7);
+    // Bottom-canopy shadow
+    gctx.fillStyle=cvd;
+    gctx.fillRect(x+2,y+12,12,1);
+
+    // Top highlight (sunlit crown)
+    gctx.fillStyle='rgba(255,255,255,0.14)';
+    gctx.fillRect(x+4,y+3,6,2);
+
+    // Seasonal fruit (rare)
+    if(tRng(tx,ty,7)>0.88){
+      const fc=tRng(tx,ty,8)>0.5?'#dd2222':'#ee9922';
+      gctx.fillStyle=fc;
+      gctx.fillRect(x+4,y+8,2,2); gctx.fillRect(x+10,y+9,2,2);
+      // fruit highlight
+      gctx.fillStyle='rgba(255,255,255,0.3)';
+      gctx.fillRect(x+4,y+8,1,1); gctx.fillRect(x+10,y+9,1,1);
+    }
+    // Wind sway (subtle animation every 60 frames)
+    if(fr&&r>0.5){
+      gctx.fillStyle='rgba(255,255,255,0.05)';
+      gctx.fillRect(x+3,y+5,1,2);
+    }
+  }
+}
+
+// ── TILE RENDER PASS ──
+let treeTiles=[];
 function drawTiles(){
+  treeTiles=[];
   const sx=Math.max(0,Math.floor(camX/TS)-1),sy=Math.max(0,Math.floor(camY/TS)-1);
   const ex=Math.min(WW,sx+Math.ceil(gc.width/SCALE/TS)+3),ey=Math.min(WH,sy+Math.ceil(gc.height/SCALE/TS)+3);
-  for(let ty=sy;ty<ey;ty++)for(let tx=sx;tx<ex;tx++){
+  for(let ty=sy;ty<ey;ty++) for(let tx=sx;tx<ex;tx++){
     const tile=gt(tx,ty);
-    gctx.fillStyle=TC[tile]||'#111';
-    gctx.fillRect(tx*TS,ty*TS,TS,TS);
-    if(tile===T.TR){
-      gctx.fillStyle='#0d2008';gctx.fillRect(tx*TS+4,ty*TS+4,8,10);
-      gctx.fillStyle='#1a3a0a';gctx.beginPath();gctx.arc(tx*TS+8,ty*TS+6,5,0,Math.PI*2);gctx.fill();
-    } else if(tile===T.PA){
-      gctx.fillStyle='rgba(0,0,0,0.2)';gctx.fillRect(tx*TS+1,ty*TS+1,TS-2,TS-2);
-    } else if(tile===T.LV){
-      gctx.fillStyle='rgba(255,80,0,0.35)';gctx.fillRect(tx*TS,ty*TS,TS,TS);
-    } else if(tile===T.W){
-      gctx.fillStyle='rgba(80,140,255,0.25)';gctx.fillRect(tx*TS,ty*TS+(gameTime%30<15?0:1),TS,2);
-    } else if(tile===T.IC){
-      gctx.fillStyle='rgba(150,200,255,0.2)';gctx.fillRect(tx*TS,ty*TS,TS,TS);
-    } else if(tile===T.CL){
-      gctx.fillStyle='rgba(200,210,255,0.15)';gctx.fillRect(tx*TS,ty*TS,TS,TS);
-    }
+    if(tile===T.TR){treeTiles.push({tx,ty});drawGrass(tx,ty);}
+    else if(tile===T.G||tile===T.FG)drawGrass(tx,ty);
+    else if(tile===T.PA)drawPath(tx,ty);
+    else if(tile===T.W)drawWater(tx,ty);
+    else if(tile===T.LV)drawLava(tx,ty);
+    else if(tile===T.IC)drawIce(tx,ty);
+    else if(tile===T.CL)drawCloud(tx,ty);
+    else if(tile===T.VD)drawVoid(tx,ty);
+    else if(tile===T.S)drawStone(tx,ty);
+    else{px(tx*TS,ty*TS,TS,TS,'#1e2e10');}
+  }
+}
+function drawTreeShadows(){
+  treeTiles.forEach(({tx,ty})=>{
+    gctx.fillStyle='rgba(0,0,0,0.2)';
+    gctx.beginPath();gctx.ellipse(tx*TS+8,ty*TS+15,8,3.5,0,0,Math.PI*2);gctx.fill();
+  });
+}
+function drawTrees(){treeTiles.forEach(({tx,ty})=>drawTree(tx,ty));}
+
+// ──────────────────────────────────────
+// 8-BIT CHUNKY PIXEL CHARACTER SPRITES (Image 4 style)
+// Each pixel = 1 canvas unit. Sprites are 12×20px, very chunky & readable.
+// ──────────────────────────────────────
+
+// Draw one 2×2 "pixel block" for chunky 8-bit look
+function ppx(x,y,c){gctx.fillStyle=c;gctx.fillRect(x,y,2,2);}
+
+// 8-bit sprite renderer: cx,cy = world centre, bob = walk anim offset
+function drawCharSprite(cx,cy,bob,skinC,hairC,shirtC,pantsC,armorC,bootC,eyeC,w,facing,invis,accessory){
+  const ox=cx-8, oy=cy-18-bob; // top-left of sprite (16w x 20h in ppx units)
+
+  // Drop shadow
+  gctx.fillStyle='rgba(0,0,0,0.3)';
+  gctx.beginPath();gctx.ellipse(cx,cy+2,7,3,0,0,Math.PI*2);gctx.fill();
+
+  // Invincibility aura
+  if(invis){
+    gctx.strokeStyle='rgba(255,220,80,0.6)';gctx.lineWidth=2;
+    gctx.beginPath();gctx.arc(cx,cy-6,14,0,Math.PI*2);gctx.stroke();
+  }
+
+  // ── HAIR / HAT (top 4px) ──
+  ppx(ox+2,oy,    hairC); ppx(ox+4,oy,    hairC); ppx(ox+6,oy,    hairC); ppx(ox+8,oy,    hairC);ppx(ox+10,oy,hairC);
+  ppx(ox+0,oy+2,  hairC); ppx(ox+2,oy+2,  hairC); ppx(ox+4,oy+2,  hairC); ppx(ox+6,oy+2,  hairC);ppx(ox+8,oy+2,hairC);ppx(ox+10,oy+2,hairC);ppx(ox+12,oy+2,hairC);
+
+  // ── HEAD (6px tall) ──
+  const hx=ox+0, hy=oy+4;
+  // head bg
+  for(let row=0;row<6;row+=2)for(let col=0;col<16;col+=2){ppx(hx+col,hy+row,skinC);}
+  // dark right-side shade
+  gctx.fillStyle='rgba(0,0,0,0.15)';gctx.fillRect(hx+10,hy,6,12);
+  // EYES (direction-aware)
+  const eo=facing.x>0.3?6:(facing.x<-0.3?2:4);
+  ppx(hx+eo,    hy+2, eyeC||'#1a1008'); ppx(hx+eo+4,  hy+2, eyeC||'#1a1008');
+  // eye whites
+  gctx.fillStyle='rgba(255,255,255,0.55)';
+  gctx.fillRect(hx+eo,hy+2,2,2); gctx.fillRect(hx+eo+4,hy+2,2,2);
+  // pupils back on
+  ppx(hx+eo+0,hy+2,eyeC||'#1a1008'); ppx(hx+eo+4,hy+2,eyeC||'#1a1008');
+  // mouth
+  gctx.fillStyle='rgba(0,0,0,0.3)';gctx.fillRect(hx+4,hy+8,6,2);
+  // nose dot
+  gctx.fillStyle='rgba(0,0,0,0.15)';gctx.fillRect(hx+6,hy+5,2,2);
+
+  // ── NECK ──
+  ppx(ox+6,oy+10,skinC); ppx(ox+8,oy+10,skinC);
+
+  // ── BODY / SHIRT (5px tall) ──
+  const by=oy+12;
+  for(let row=0;row<8;row+=2)for(let col=2;col<14;col+=2){ppx(ox+col,by+row,armorC||shirtC);}
+  // body highlight top
+  gctx.fillStyle='rgba(255,255,255,0.12)';gctx.fillRect(ox+2,by,10,2);
+  // body shade right
+  gctx.fillStyle='rgba(0,0,0,0.18)';gctx.fillRect(ox+9,by,5,8);
+  // collar
+  ppx(ox+5,by,shirtC); ppx(ox+7,by,shirtC);
+
+  // ── ARMS ──
+  const walkArmL = bob?2:0, walkArmR = bob?0:2;
+  ppx(ox+0,by+walkArmL,  skinC); ppx(ox+0,by+walkArmL+2,skinC); ppx(ox+0,by+walkArmL+4,skinC);
+  ppx(ox+14,by+walkArmR, skinC); ppx(ox+14,by+walkArmR+2,skinC); ppx(ox+14,by+walkArmR+4,skinC);
+  // sleeve colour
+  ppx(ox+2,by+walkArmL,  armorC||shirtC);
+  ppx(ox+12,by+walkArmR, armorC||shirtC);
+
+  // ── BELT ──
+  gctx.fillStyle='#4a2e10';gctx.fillRect(ox+2,by+8,12,2);
+  gctx.fillStyle='rgba(220,180,60,0.5)';gctx.fillRect(ox+7,by+8,2,2); // buckle
+
+  // ── LEGS / PANTS (walk-animated) ──
+  const ly=by+10;
+  const lLoff=bob?0:2, lRoff=bob?2:0;
+  // left leg
+  ppx(ox+2, ly+lLoff,   pantsC); ppx(ox+2, ly+lLoff+2, pantsC); ppx(ox+2, ly+lLoff+4, pantsC);
+  ppx(ox+4, ly+lLoff,   pantsC); ppx(ox+4, ly+lLoff+2, pantsC); ppx(ox+4, ly+lLoff+4, pantsC);
+  // right leg
+  ppx(ox+8, ly+lRoff,   pantsC); ppx(ox+8, ly+lRoff+2, pantsC); ppx(ox+8, ly+lRoff+4, pantsC);
+  ppx(ox+10,ly+lRoff,   pantsC); ppx(ox+10,ly+lRoff+2, pantsC); ppx(ox+10,ly+lRoff+4, pantsC);
+  // pants shade
+  gctx.fillStyle='rgba(0,0,0,0.2)';gctx.fillRect(ox+4,ly+lLoff,2,6);gctx.fillRect(ox+10,ly+lRoff,2,6);
+
+  // ── BOOTS ──
+  const bootL=ly+lLoff+6, bootR=ly+lRoff+6;
+  ppx(ox+1, bootL, bootC); ppx(ox+3, bootL, bootC); ppx(ox+5,bootL,bootC);
+  ppx(ox+7, bootR, bootC); ppx(ox+9, bootR, bootC); ppx(ox+11,bootR,bootC);
+  // boot highlight
+  gctx.fillStyle='rgba(255,255,255,0.2)';gctx.fillRect(ox+1,bootL,2,1);gctx.fillRect(ox+7,bootR,2,1);
+
+  // ── ACCESSORY (weapon/tool in right hand) ──
+  if(accessory){
+    gctx.font='10px serif';gctx.textAlign='center';gctx.textBaseline='middle';
+    const ax=cx+(facing.x>=0?10:-12);
+    gctx.fillText(accessory,ax,cy-6-bob);
+    gctx.textAlign='left';gctx.textBaseline='alphabetic';
   }
 }
 
 function drawPlayer_r(){
   if(P.dead)return;
   const bob=P.anim%2===0?0:1;
-  const sx=P.x-P.w/2,sy=P.y-P.h/2-bob;
-  if(P.invincible){gctx.fillStyle='rgba(255,215,0,0.2)';gctx.beginPath();gctx.arc(P.x,P.y,P.w+5,0,Math.PI*2);gctx.fill();}
-  gctx.fillStyle='rgba(0,0,0,0.3)';gctx.beginPath();gctx.ellipse(P.x,P.y+P.h/2-1,P.w/2,3,0,0,Math.PI*2);gctx.fill();
-  gctx.fillStyle=P.race.color||'#d4a070';gctx.fillRect(sx,sy,P.w,P.h);
-  if(P.equip.chest){gctx.fillStyle=P.equip.chest.fire?'#660000':'#334455';gctx.fillRect(sx,sy+4,P.w,8);}
-  gctx.font='13px serif';gctx.textAlign='center';gctx.textBaseline='middle';
-  gctx.fillText(P.race.emoji,P.x,P.y-bob);
-  gctx.font='4px monospace';gctx.fillStyle=P.clan.border||'rgba(255,215,0,.6)';
-  gctx.fillText(P.clan.name.slice(0,5),P.x,sy-4);
+  const r=P.race;
+  // 8-bit palette from race
+  const skinC=r.col||'#c8905a';
+  const hairC=r.hair||'#3a1a08';
+  const shirtC=r.shirt||'#4a6a3a';
+  const pantsC=P.equip.legs?'#3a3a68':drk(shirtC,20);
+  const bootC='#2a1808';
+  const armorC=P.equip.chest?(P.equip.chest.fire?'#8a2200':P.equip.chest.def>15?'#3a4a58':'#556878'):null;
+  const eyeC=r.eyeC||'#1a1008';
+  const wpn=P.equip.weapon;
+  drawCharSprite(P.x,P.y,bob,skinC,hairC,shirtC,pantsC,armorC,bootC,eyeC,P.w,P.facing,P.invincible,wpn?.e||null);
+
+  // Swimming splash
+  if(P.swimming){
+    gctx.fillStyle='rgba(80,180,255,0.4)';
+    gctx.fillRect(P.x-10,P.y+4,20,6);
+    gctx.fillStyle='rgba(200,240,255,0.6)';
+    gctx.fillRect(P.x-8+Math.floor(gameTime/4)%6,P.y+4,4,1);
+  }
+
+  // Clan badge
+  if(P.clan?.id!=='none'){
+    gctx.font='4px monospace';gctx.fillStyle=P.clan.border||'rgba(255,210,80,.8)';gctx.textAlign='center';
+    gctx.fillText((P.clan.emoji||'')+' '+P.clan.n.slice(0,7),P.x,P.y-26);
+    gctx.textAlign='left';
+  }
+  // Race tag
+  gctx.font='4px monospace';gctx.fillStyle='rgba(180,140,60,.55)';gctx.textAlign='center';
+  gctx.fillText(r.emoji+' '+r.n,P.x,P.y-22);
+  gctx.textAlign='left';
+
+  // Attack swing
+  if(P.atkCd>14){
+    gctx.strokeStyle='rgba(255,255,160,0.65)';gctx.lineWidth=1.5;
+    gctx.beginPath();gctx.moveTo(P.x,P.y);
+    gctx.lineTo(P.x+P.facing.x*26,P.y+P.facing.y*26);gctx.stroke();
+  }
+  // Level
+  gctx.font='4px monospace';gctx.fillStyle='rgba(200,160,60,.55)';gctx.textAlign='center';
+  gctx.fillText('Lv'+P.level,P.x,P.y+12);gctx.textAlign='left';
+}
+
+// ──────────────────────────────────────
+// ENEMY SPRITE — chunky pixel monsters
+// ──────────────────────────────────────
+function drawEnt(e){
+  if(e.dead)return;
+  const x=e.x,y=e.y,w=e.w;
+  const bob=(e.anim||0)%2===0?0:1;
+  // shadow
+  gctx.fillStyle='rgba(0,0,0,0.22)';
+  gctx.beginPath();gctx.ellipse(x,y+w/2,w/2,3,0,0,Math.PI*2);gctx.fill();
+  // body with gradient feel (dark base + lit top)
+  gctx.fillStyle=e.col||'#666';
+  gctx.fillRect(x-w/2,y-w/2-bob,w,w);
+  gctx.fillStyle='rgba(255,255,255,0.1)';
+  gctx.fillRect(x-w/2,y-w/2-bob,w,Math.max(2,w/3));
+  gctx.fillStyle='rgba(0,0,0,0.25)';
+  gctx.fillRect(x-w/2,y-bob,w,w/2);
+
+  // emoji face
+  const fsz=Math.max(8,Math.min(w*0.9,18));
+  gctx.font=fsz+'px serif';gctx.textAlign='center';gctx.textBaseline='middle';
+  gctx.fillText(e.e||'?',x,y-bob-1);
+
+  // HP bar — only when damaged
+  if(e.hp<e.maxHp){
+    const bw=w+10,bx=x-bw/2,by=y-w/2-bob-10;
+    // border
+    px(bx-1,by-1,bw+2,9,'rgba(0,0,0,0.85)');
+    // bg
+    px(bx,by,bw,7,'#330000');
+    // fill with colour ramp
+    const pct=e.hp/e.maxHp;
+    const barCol=pct>0.6?'#22cc44':pct>0.3?'#eeaa22':'#ee2222';
+    px(bx,by,Math.max(1,bw*pct),7,barCol);
+    // shine
+    gctx.fillStyle='rgba(255,255,255,0.25)';gctx.fillRect(bx,by,Math.max(1,bw*pct),2);
+  }
+
+  // Boss pulsing ring
+  if(e.t==='boss'){
+    const p2=Math.sin(gameTime*.07)*3;
+    gctx.strokeStyle='rgba(255,60,60,0.6)';gctx.lineWidth=2.5;
+    gctx.beginPath();gctx.arc(x,y,w/2+8+p2,0,Math.PI*2);gctx.stroke();
+    gctx.strokeStyle='rgba(255,180,0,0.22)';gctx.lineWidth=1;
+    gctx.beginPath();gctx.arc(x,y,w/2+14+p2,0,Math.PI*2);gctx.stroke();
+    // boss name under
+    gctx.font='4px monospace';gctx.fillStyle='rgba(255,120,120,0.8)';gctx.textAlign='center';
+    gctx.fillText(e.n,x,y+w/2+10);gctx.textAlign='left';
+  }
   gctx.textAlign='left';gctx.textBaseline='alphabetic';
+}
+
+// ──────────────────────────────────────
+// NPC SPRITE — 8-bit chunky villager style (Image 4)
+// ──────────────────────────────────────
+const NPC_PALETTES={
+  merchant:   {skin:'#d4a06a',hair:'#220022',shirt:'#8844aa',pants:'#443388',boot:'#221108',eye:'#220044',acc:'💼'},
+  blacksmith: {skin:'#b8825a',hair:'#111',shirt:'#553322',pants:'#332211',boot:'#1a1008',eye:'#1a1008',acc:'🔨'},
+  elder:      {skin:'#c8a878',hair:'#ccc',shirt:'#667744',pants:'#445533',boot:'#2a1808',eye:'#224422',acc:null},
+  guard:      {skin:'#c8905a',hair:'#222',shirt:'#335533',pants:'#223322',boot:'#1a1008',eye:'#1a1008',acc:'🗡'},
+  farmer:     {skin:'#d4a060',hair:'#884422',shirt:'#887744',pants:'#665533',boot:'#3a2010',eye:'#2a1808',acc:'🌾'},
+  child:      {skin:'#d8b888',hair:'#ffcc44',shirt:'#44aa88',pants:'#226655',boot:'#3a2010',eye:'#1a5a1a',acc:null},
+  bard:       {skin:'#c07050',hair:'#440066',shirt:'#884488',pants:'#553366',boot:'#221008',eye:'#440066',acc:'🎸'},
+  healer:     {skin:'#d4c0a0',hair:'#fff8f0',shirt:'#88aa44',pants:'#557733',boot:'#2a1808',eye:'#224422',acc:'✚'},
+  alchemist:  {skin:'#a08060',hair:'#222244',shirt:'#224466',pants:'#112233',boot:'#1a1008',eye:'#0022aa',acc:'⚗️'},
+  knight:     {skin:'#c8905a',hair:'#1a1a1a',shirt:'#445566',pants:'#334455',boot:'#1a1a1a',eye:'#1a1a1a',acc:'🏇'},
+  wizard_n:   {skin:'#b090d0',hair:'#1a1a44',shirt:'#2233aa',pants:'#112288',boot:'#111122',eye:'#6622cc',acc:'🪄'},
+  innkeeper:  {skin:'#c8a070',hair:'#553322',shirt:'#886644',pants:'#664422',boot:'#2a1808',eye:'#2a1808',acc:'🍺'},
+  ranger:     {skin:'#b8905a',hair:'#443322',shirt:'#3a6622',pants:'#224411',boot:'#2a1808',eye:'#224411',acc:'🏹'},
+  druid:      {skin:'#a0b878',hair:'#224422',shirt:'#226633',pants:'#114422',boot:'#1a2210',eye:'#226633',acc:'🌿'},
+  soldier:    {skin:'#c8905a',hair:'#1a1a1a',shirt:'#556644',pants:'#334433',boot:'#1a1a1a',eye:'#1a1a1a',acc:'🪖'},
+  hunter:     {skin:'#b88058',hair:'#5a3a18',shirt:'#6a5830',pants:'#4a3820',boot:'#2a1808',eye:'#2a1808',acc:'🎯'},
+  quest_master:{skin:'#d0a880',hair:'#442200',shirt:'#885522',pants:'#664411',boot:'#2a1808',eye:'#cc4400',acc:'📋'},
+  tutorial_elder:{skin:'#c8b898',hair:'#e8e8e8',shirt:'#557755',pants:'#334433',boot:'#2a1808',eye:'#336633',acc:'📖'},
+  magic_man:  {skin:'#b090e0',hair:'#1a0030',shirt:'#280044',pants:'#1a0030',boot:'#0e001e',eye:'#cc44ff',acc:'⭐'},
+};
+
+function drawNPC(n){
+  const x=n.x,y=n.y;
+  const bob=Math.floor(gameTime/22)%2===0?0:1;
+  const pal=NPC_PALETTES[n.ntype]||NPC_PALETTES.guard;
+
+  // Draw using same 8-bit sprite system as player (slightly smaller scale)
+  // NPCs are 0.85× player size — drawn at same coords but offset
+  const ox=x-7, oy=y-16-bob;
+
+  // Drop shadow
+  gctx.fillStyle='rgba(0,0,0,0.22)';
+  gctx.beginPath();gctx.ellipse(x,y+2,6,2.5,0,0,Math.PI*2);gctx.fill();
+
+  // Magic man special glow
+  if(n.ntype==='magic_man'){
+    const r2=20+Math.sin(gameTime*.04)*4;
+    gctx.strokeStyle='rgba(200,100,255,0.5)';gctx.lineWidth=1.5;
+    gctx.beginPath();gctx.arc(x,y-6,r2,0,Math.PI*2);gctx.stroke();
+    for(let i=0;i<3;i++){
+      const a=gameTime*.04+i*Math.PI*2/3;
+      gctx.fillStyle=`rgba(220,${140+i*40},255,0.8)`;
+      gctx.fillRect(x+Math.cos(a)*(r2+1)-1,y-6+Math.sin(a)*(r2+1)-1,2,2);
+    }
+  }
+
+  // ── HAIR ──
+  gctx.fillStyle=pal.hair;
+  gctx.fillRect(ox+2,oy,10,2); gctx.fillRect(ox,oy+2,12,2);
+
+  // ── HEAD ──
+  for(let row=0;row<10;row+=2)for(let col=0;col<12;col+=2){ppx(ox+col,oy+4+row,pal.skin);}
+  // shade
+  gctx.fillStyle='rgba(0,0,0,0.12)';gctx.fillRect(ox+8,oy+4,4,10);
+  // eyes
+  ppx(ox+2,oy+6,pal.eye); ppx(ox+6,oy+6,pal.eye);
+  // shine
+  gctx.fillStyle='rgba(255,255,255,0.5)';gctx.fillRect(ox+2,oy+6,1,1);gctx.fillRect(ox+6,oy+6,1,1);
+  // mouth
+  gctx.fillStyle='rgba(0,0,0,0.25)';gctx.fillRect(ox+3,oy+10,5,1);
+
+  // ── BODY ──
+  const by=oy+14;
+  for(let row=0;row<8;row+=2)for(let col=1;col<11;col+=2){gctx.fillStyle=pal.shirt;gctx.fillRect(ox+col,by+row,2,2);}
+  gctx.fillStyle='rgba(0,0,0,0.15)';gctx.fillRect(ox+7,by,4,8);
+  // arms
+  gctx.fillStyle=pal.skin;
+  gctx.fillRect(ox-1,by+bob%2,2,5); gctx.fillRect(ox+11,by+(bob+1)%2,2,5);
+
+  // ── LEGS ──
+  const ly=by+8;
+  const ll=bob?0:2, lr=bob?2:0;
+  gctx.fillStyle=pal.pants;
+  gctx.fillRect(ox+1,ly+ll,4,5); gctx.fillRect(ox+7,ly+lr,4,5);
+
+  // ── BOOTS ──
+  gctx.fillStyle=pal.boot;
+  gctx.fillRect(ox,ly+ll+5,5,2); gctx.fillRect(ox+6,ly+lr+5,5,2);
+
+  // ── ACCESSORY / TOOL ──
+  if(pal.acc){
+    gctx.font='9px serif';gctx.textAlign='center';gctx.textBaseline='middle';
+    gctx.fillText(pal.acc,x+9,y-10-bob);
+    gctx.textAlign='left';gctx.textBaseline='alphabetic';
+  }
+
+  // ── NAME TAG ──
+  gctx.font='4px monospace';
+  gctx.fillStyle=n.ntype==='magic_man'?'#dd88ff':'rgba(255,235,170,.9)';
+  gctx.textAlign='center';gctx.fillText(n.n.slice(0,14),x,y-22);
+
+  // Quest ! badge
+  if(n.questGiver){
+    const qd=QUEST_DEFS.find(q=>q.id===n.questGiver);
+    const qs=qd?quests[qd.id]:null;
+    if(qs&&qs.active&&!qs.done){
+      gctx.fillStyle='#ffdd00';gctx.fillRect(x+5,y-28,6,7);
+      gctx.fillStyle='rgba(0,0,0,0.6)';gctx.font='5px monospace';gctx.fillText('!',x+7,y-25);
+      gctx.strokeStyle='rgba(255,220,0,0.5)';gctx.lineWidth=1;gctx.strokeRect(x+4,y-29,8,9);
+    }
+  }
+  // Tutorial/QuestMaster crown marker
+  if(n.tutorial){
+    gctx.fillStyle='#ffdd00';gctx.font='8px serif';gctx.textAlign='center';
+    gctx.fillText('💬',x,y-28);
+  }
+  if(n.questMaster){
+    gctx.fillStyle='#ffaa00';gctx.font='8px serif';gctx.textAlign='center';
+    gctx.fillText('📋',x,y-28);
+  }
+
+  // [E] speech bubble
+  const ddx=P.x-n.x,ddy=P.y-n.y;
+  if(Math.sqrt(ddx*ddx+ddy*ddy)<44){
+    gctx.fillStyle='rgba(255,248,220,.96)';
+    gctx.beginPath();
+    if(gctx.roundRect)gctx.roundRect(x-8,y-32,16,9,2);else gctx.rect(x-8,y-32,16,9);
+    gctx.fill();
+    gctx.beginPath();gctx.moveTo(x-2,y-23);gctx.lineTo(x+2,y-23);gctx.lineTo(x,y-20);gctx.fill();
+    gctx.fillStyle='#3a2008';gctx.font='4px monospace';gctx.textAlign='center';
+    gctx.fillText('[E]',x,y-27);
+  }
+  gctx.textAlign='left';gctx.textBaseline='alphabetic';
+}
+
+// ── DAY/NIGHT TINT ──
+function skyTint(){
+  const t=dayTime/1200;
+  if(t<0.08||t>0.96) return'rgba(6,3,22,0.65)';
+  if(t<0.18) return'rgba(100,45,8,0.32)';
+  if(t<0.72) return null;
+  if(t<0.86) return'rgba(150,60,0,0.28)';
+  return'rgba(6,3,22,0.52)';
+}
+
+// ── MAIN RENDER ──
+function render(){
+  gctx.clearRect(0,0,gc.width,gc.height);
+  gctx.save();gctx.scale(SCALE,SCALE);gctx.translate(-camX,-camY);
+  // Background fill
+  gctx.fillStyle='#1a2e10';gctx.fillRect(camX,camY,gc.width/SCALE+2,gc.height/SCALE+2);
+  // Ground tiles
+  drawTiles();
+  // Tree base shadows (before entities)
+  drawTreeShadows();
+  // Game objects
+  drawEnts();drawNPCs_r();drawProjs_r();drawParts_r();drawFloats_r();drawPlayer_r();
+  // Trees on top (render over player when standing behind)
+  drawTrees();
+  // Atmospheric tint
+  const tint=skyTint();
+  if(tint){gctx.fillStyle=tint;gctx.fillRect(camX,camY,gc.width/SCALE+2,gc.height/SCALE+2);}
+  gctx.restore();
+  drawMM();
 }
 
 function drawEnts(){
   const vx=Math.floor(camX/TS),vy=Math.floor(camY/TS);
-  const vxe=vx+Math.ceil(gc.width/SCALE/TS)+3,vye=vy+Math.ceil(gc.height/SCALE/TS)+3;
+  const vxe=vx+Math.ceil(gc.width/SCALE/TS)+4,vye=vy+Math.ceil(gc.height/SCALE/TS)+4;
   entities.forEach(e=>{
     if(e.dead)return;
-    const ex=Math.floor(e.x/TS),ey=Math.floor(e.y/TS);
-    if(ex<vx-2||ex>vxe||ey<vy-2||ey>vye)return;
-    gctx.fillStyle='rgba(0,0,0,0.25)';gctx.beginPath();gctx.ellipse(e.x,e.y+e.h/2-1,e.w/2,3,0,0,Math.PI*2);gctx.fill();
-    gctx.fillStyle=e.col||'#666';gctx.fillRect(e.x-e.w/2,e.y-e.h/2,e.w,e.h);
-    if(e.hp<e.maxHp){
-      const bw=e.w+4;gctx.fillStyle='#220000';gctx.fillRect(e.x-bw/2-1,e.y-e.h/2-6,bw,3);
-      gctx.fillStyle='#cc2222';gctx.fillRect(e.x-bw/2-1,e.y-e.h/2-6,bw*(e.hp/e.maxHp),3);
-    }
-    gctx.font=(e.w*0.9)+'px serif';gctx.textAlign='center';gctx.textBaseline='middle';
-    gctx.fillText(e.e||'?',e.x,e.y);
-    if(e.t==='boss'){gctx.strokeStyle='rgba(255,50,50,.45)';gctx.lineWidth=2;gctx.beginPath();gctx.arc(e.x,e.y,e.w+4,0,Math.PI*2);gctx.stroke();}
-    gctx.textAlign='left';gctx.textBaseline='alphabetic';
+    const ex=Math.floor(e.x/TS),ey2=Math.floor(e.y/TS);
+    if(ex<vx-3||ex>vxe||ey2<vy-3||ey2>vye)return;
+    drawEnt(e);
   });
 }
-
 function drawNPCs_r(){
   const vx=Math.floor(camX/TS),vy=Math.floor(camY/TS);
-  const vxe=vx+Math.ceil(gc.width/SCALE/TS)+3,vye=vy+Math.ceil(gc.height/SCALE/TS)+3;
+  const vxe=vx+Math.ceil(gc.width/SCALE/TS)+4,vye=vy+Math.ceil(gc.height/SCALE/TS)+4;
   npcs.forEach(n=>{
     const nx=Math.floor(n.x/TS),ny2=Math.floor(n.y/TS);
-    if(nx<vx-2||nx>vxe||ny2<vy-2||ny2>vye)return;
-    const bob=Math.floor(gameTime/18)%2===0?0:1;
-    gctx.fillStyle=n.ntype==='magic_man'?'rgba(130,80,255,.25)':'rgba(60,45,30,.5)';
-    gctx.fillRect(n.x-5,n.y-7,10,14);
-    gctx.font='12px serif';gctx.textAlign='center';gctx.textBaseline='middle';
-    gctx.fillText(n.e,n.x,n.y-bob);
-    gctx.font='4px monospace';gctx.fillStyle=n.ntype==='magic_man'?'#cc88ff':'rgba(255,215,0,.65)';
-    gctx.textAlign='center';gctx.fillText(n.n.slice(0,10),n.x,n.y-13);
-    const ddx=P.x-n.x,ddy=P.y-n.y;
-    if(Math.sqrt(ddx*ddx+ddy*ddy)<38){gctx.font='4px monospace';gctx.fillStyle='rgba(255,255,200,.9)';gctx.fillText('[E]',n.x,n.y-21);}
-    if(n.ntype==='magic_man'){gctx.strokeStyle='rgba(160,80,255,.35)';gctx.lineWidth=1.5;gctx.beginPath();gctx.arc(n.x,n.y,20+Math.sin(gameTime*.05)*4,0,Math.PI*2);gctx.stroke();}
-    gctx.textAlign='left';gctx.textBaseline='alphabetic';
+    if(nx<vx-3||nx>vxe||ny2<vy-3||ny2>vye)return;
+    drawNPC(n);
   });
 }
-
-function drawProjs(){
+function drawProjs_r(){
   projectiles.forEach(p=>{
     gctx.fillStyle=p.col||'#ffff44';gctx.beginPath();gctx.arc(p.x,p.y,p.sz||4,0,Math.PI*2);gctx.fill();
-    if(p.mag){gctx.strokeStyle=p.col;gctx.lineWidth=1;gctx.beginPath();gctx.arc(p.x,p.y,(p.sz||4)+3,0,Math.PI*2);gctx.stroke();}
+    if(p.mag||p.fire){
+      gctx.strokeStyle=p.fire?'rgba(255,140,0,0.65)':p.col;
+      gctx.lineWidth=2;gctx.beginPath();gctx.arc(p.x,p.y,(p.sz||4)+3,0,Math.PI*2);gctx.stroke();
+    }
   });
 }
-
 function drawParts_r(){
   particles.forEach(p=>{
     gctx.globalAlpha=Math.max(0,p.life/p.maxL);
@@ -1016,12 +2037,13 @@ function drawParts_r(){
   });
   gctx.globalAlpha=1;gctx.textAlign='left';gctx.textBaseline='alphabetic';
 }
-
 function drawFloats_r(){
   floatTxts.forEach(f=>{
     gctx.globalAlpha=Math.max(0,f.life/f.maxL);
-    gctx.font='5px monospace';gctx.fillStyle=f.col;gctx.textAlign='center';
-    gctx.fillText(f.txt,f.x,f.y);
+    gctx.font='bold 5px monospace';gctx.fillStyle=f.col;gctx.textAlign='center';
+    // text shadow
+    gctx.fillStyle='rgba(0,0,0,0.6)';gctx.fillText(f.txt,f.x+1,f.y+1);
+    gctx.fillStyle=f.col;gctx.fillText(f.txt,f.x,f.y);
   });
   gctx.globalAlpha=1;gctx.textAlign='left';
 }
@@ -1029,9 +2051,9 @@ function drawFloats_r(){
 function drawMM(){
   const s=100/WW;
   mmctx.fillStyle='#050510';mmctx.fillRect(0,0,100,100);
-  ZONES.forEach(z=>{mmctx.fillStyle=z.color;mmctx.fillRect(z.x*s,z.y*s,z.w*s,z.h*s);});
-  const px=P.x/TS*s,py=P.y/TS*s;
-  mmctx.fillStyle='#ffd700';mmctx.fillRect(Math.max(0,Math.min(98,px-1)),Math.max(0,Math.min(98,py-1)),3,3);
+  ZONES.forEach(z=>{mmctx.fillStyle=z.col;mmctx.fillRect(z.x*s,z.y*s,z.w*s,z.h*s);});
+  const mpx=P.x/TS*s,mpy=P.y/TS*s;
+  mmctx.fillStyle='#ffd27a';mmctx.fillRect(Math.max(0,Math.min(98,mpx-1)),Math.max(0,Math.min(98,mpy-1)),3,3);
   entities.forEach(e=>{
     if(e.dead)return;const ex=e.x/TS*s,ey2=e.y/TS*s;
     mmctx.fillStyle=e.t==='boss'?'#ff4444':'#cc3333';
@@ -1050,12 +2072,17 @@ function updHUD(){
   document.getElementById('vLv').textContent='Lv'+P.level;
   document.getElementById('bSt').style.width=(P.stamina/P.maxSt*100)+'%';
   document.getElementById('vSt').textContent=Math.ceil(P.stamina);
-  document.getElementById('pClan').textContent='⚜ '+P.clan.name.slice(0,10);
+  document.getElementById('pClan').textContent=(P.clan?.emoji||'—')+' '+(P.clan?.n?.slice(0,10)||'No Clan');
   document.getElementById('pGold').textContent='🪙 '+P.gold+'g';
+  document.getElementById('pRace').textContent=(P.race?.emoji||'👤')+' '+(P.race?.n||'Warrior');
+  const swimEl=document.getElementById('swimBar');
+  if(swimEl)swimEl.style.display=P.swimming?'block':'none';
+  const gp=document.getElementById('goalPill');
+  if(gp){const bk=P.bossKills||0;gp.textContent='🏆 '+bk+'/6 Bosses';gp.style.color=bk>=6?'#ffdd00':'#ffd27a';}
   for(let i=0;i<5;i++){
     const hs=document.getElementById('hs'+i);if(!hs)continue;
     const si=P.hotbar[i];const item=si!=null?P.inv[si]:null;
-    hs.innerHTML=item?(item.e+'<span class="hotN">'+(i+1)+'</span>'):'<span class="hotN">'+(i+1)+'</span>';
+    hs.innerHTML=item?item.e+'<span class="hsN">'+(i+1)+'</span>':'<span class="hsN">'+(i+1)+'</span>';
   }
 }
 
@@ -1065,63 +2092,96 @@ function tryInteract(){
   if(!gameRunning)return;
   for(const n of npcs){
     const dx=P.x-n.x,dy=P.y-n.y;
-    if(Math.sqrt(dx*dx+dy*dy)<38){showDlg(n);return;}
+    if(Math.sqrt(dx*dx+dy*dy)<42){
+      if(n.onInteract)n.onInteract();
+      // Tutorial elder triggers tutorial
+      if(n.tutorial&&!tutorialDone){startTutorial();return;}
+      // Quest master opens quest panel
+      if(n.questMaster){showDlg(n);renderQuestList('questListIG');setTimeout(()=>toggleP('pQP'),200);return;}
+      showDlg(n);return;
+    }
   }
 }
 
 function showDlg(npc){
   dlgNPC=npc;
-  document.getElementById('dialog').classList.add('on');
-  document.getElementById('dlgName').textContent=npc.e+' '+npc.n;
-  document.getElementById('dlgText').textContent=npc.dlg[Math.floor(Math.random()*npc.dlg.length)];
-  const opts=document.getElementById('dlgOpts');opts.innerHTML='';
-  const addOpt=(txt,fn)=>{const b=document.createElement('button');b.className='dlgOpt';b.textContent=txt;b.onclick=fn;opts.appendChild(b);};
-  if(npc.shop)addOpt('🛒 Shop',()=>openShop(npc));
-  if(npc.heal)addOpt('💊 Heal (10g)',()=>healP());
-  if(npc.rest)addOpt('💤 Rest (5g)',()=>restP());
-  if(npc.magic)addOpt('⚡ Request Power',()=>magicPower());
-  addOpt('✕ Farewell',closeDlg);
+  document.getElementById('dlg').classList.add('on');
+  document.getElementById('dlgN').textContent=npc.e+' '+npc.n;
+  document.getElementById('dlgT').textContent=npc.dlg[Math.floor(Math.random()*npc.dlg.length)];
+  const opts=document.getElementById('dlgOs');opts.innerHTML='';
+  const addO=(txt,fn)=>{const b=document.createElement('button');b.className='dlgO';b.textContent=txt;b.onclick=fn;opts.appendChild(b);};
+  // Quest giver option
+  if(npc.questGiver){
+    const qd=QUEST_DEFS.find(q=>q.id===npc.questGiver);
+    const qs=qd?quests[qd.id]:null;
+    if(qs&&qs.active&&!qs.done)addO('📜 Quest: '+qd.n,()=>{notif('Quest active: '+qd.n,'info');renderQuestList('questListIG');toggleP('pQP');closeDlg();});
+    if(qs&&qs.done)addO('✓ '+qd.n+' (Done)',()=>{});
+  }
+  if(npc.shop)addO('🛒 Shop',()=>openShop());
+  if(npc.heal)addO('💊 Heal (10g)',()=>healP());
+  if(npc.rest)addO('💤 Rest (5g)',()=>restP());
+  if(npc.magic)addO('⚡ Request Power (50g)',()=>magicPower());
+  // Race swap if unlocked
+  if(unlockedRaces.length>1)addO('🧬 Change Race',()=>openRaceSwap());
+  if(unlockedClans.filter(c=>c!=='none').length>0)addO('⚜ Change Clan',()=>openClanSwap());
+  addO('✕ Farewell',closeDlg);
 }
-function closeDlg(){document.getElementById('dialog').classList.remove('on');dlgNPC=null;}
+
+function closeDlg(){document.getElementById('dlg').classList.remove('on');dlgNPC=null;}
 function healP(){if(P.gold<10){notif('Need 10 gold!','bad');return;}P.gold-=10;P.hp=P.maxHp;P.mp=P.maxMp;notif('Fully healed!','good');closeDlg();}
 function restP(){if(P.gold<5){notif('Need 5 gold!','bad');return;}P.gold-=5;P.hp=P.maxHp;P.mp=P.maxMp;P.stamina=P.maxSt;notif('Rested!','good');closeDlg();}
-
-function openShop(){
-  const shopItems=['hp_pot','mp_pot','str_pot','spd_pot','mgk_pot','lh','lc','il','ib','sw','dg'];
-  const prices={hp_pot:8,mp_pot:8,str_pot:15,spd_pot:15,mgk_pot:15,lh:20,lc:22,il:18,ib:15,sw:30,dg:35};
-  document.getElementById('iDesc').innerHTML='<div style="font-size:6px;color:var(--gold);margin-bottom:6px">🛒 SHOP — tap to buy</div>'
-    +shopItems.map(id=>{const it=ITEMS[id];if(!it)return'';const p=prices[id]||20;
-      return`<span onclick="buyItem('${id}',${p})" style="cursor:pointer;margin:2px;display:inline-block;font-size:18px" title="${it.n} (${p}g)">${it.e}<span style="font-size:4px;color:var(--gold)">${p}g</span></span>`;
-    }).join('');
-  toggleP('pInv');
-}
-function buyItem(id,price){if(P.gold<price){notif('Not enough gold!','bad');return;}P.gold-=price;giveItem(id);notif('Bought '+(ITEMS[id]?.n||id),'good');renderInv();}
-
 function magicPower(){
   if(P.gold<50){notif('The Magic Man wants 50 gold...','bad');return;}
   P.gold-=50;
   const b=['Vitality','Power','Swiftness','Arcane Might','Iron Skin'][Math.floor(Math.random()*5)];
-  if(b==='Vitality'){P.maxHp+=50;P.hp=P.maxHp;}
-  else if(b==='Power'){P.atk+=15;P.mgk+=10;}
-  else if(b==='Swiftness'){P.spd+=0.8;P.baseSpd+=0.8;}
-  else if(b==='Arcane Might'){P.maxMp+=80;P.mgk+=20;}
+  if(b==='Vitality'){P.maxHp+=50;P.hp=P.maxHp;}else if(b==='Power'){P.atk+=15;P.mgk+=10;}
+  else if(b==='Swiftness'){P.spd+=0.8;P.baseSpd+=0.8;}else if(b==='Arcane Might'){P.maxMp+=80;P.mgk+=20;}
   else{P.def+=12;}
-  notif('⚠ BOON OF '+b.toUpperCase()+'!','rare');closeDlg();
+  notif('BOON OF '+b.toUpperCase()+'!','rare');closeDlg();
+}
+function openShop(){
+  const shopItems=[['hp_pot',8],['mp_pot',8],['str_pot',15],['spd_pot',15],['mgk_pot',15],['lh',20],['lc',22],['il',18],['ib',15],['sw',30],['dg',35]];
+  document.getElementById('iDesc').innerHTML='<div style="font-size:6px;color:#c8a860;margin-bottom:7px">🛒 SHOP — tap/click to buy</div>'
+    +shopItems.map(([id,p])=>{const it=ITEMS[id];if(!it)return'';
+      return`<span onclick="buyItem('${id}',${p})" style="cursor:pointer;margin:3px;display:inline-block;text-align:center" title="${it.n} (${p}g)"><span style="font-size:20px">${it.e}</span><div style="font-size:4px;color:#c8a860">${p}g</div></span>`;
+    }).join('');
+  toggleP('pInv');closeDlg();
+}
+function buyItem(id,price){if(P.gold<price){notif('Not enough gold!','bad');return;}P.gold-=price;giveItem(id);notif('Bought '+(ITEMS[id]?.n||id),'good');renderInv();}
+
+function openRaceSwap(){
+  closeDlg();
+  document.getElementById('iDesc').innerHTML='<div style="font-size:6px;color:#c8a860;margin-bottom:7px">🧬 CHANGE RACE (unlocked)</div>'
+    +unlockedRaces.map(id=>{const r=RACES[id];if(!r)return'';
+      return`<span onclick="applyRace('${id}');notif('Race: ${r.n}','info')" style="cursor:pointer;margin:3px 5px;display:inline-flex;align-items:center;gap:4px;font-size:6px;color:#ffd27a;border:1px solid #6a4020;padding:3px 6px">
+        ${r.emoji} ${r.n}</span>`;
+    }).join('');
+  toggleP('pInv');
+}
+function openClanSwap(){
+  closeDlg();
+  const avail=unlockedClans.filter(c=>c!=='none');
+  document.getElementById('iDesc').innerHTML='<div style="font-size:6px;color:#c8a860;margin-bottom:7px">⚜ CHANGE CLAN (unlocked)</div>'
+    +avail.map(id=>{const c=CLANS[id];if(!c)return'';
+      return`<span onclick="applyClan('${id}')" style="cursor:pointer;margin:3px 5px;display:inline-flex;align-items:center;gap:4px;font-size:6px;color:#ffd27a;border:1px solid #6a4020;padding:3px 6px">
+        ${c.emoji} ${c.n}</span>`;
+    }).join('');
+  toggleP('pInv');
 }
 
-// ── INVENTORY UI ──
+// ── INVENTORY ──
 function renderInv(){
-  const grid=document.getElementById('invGrid');if(!grid)return;
+  const grid=document.getElementById('invG');if(!grid)return;
   grid.innerHTML='';
   for(let i=0;i<32;i++){
     const item=P.inv[i];
     const d=document.createElement('div');
-    d.className='invSlot'+(item&&Object.values(P.equip).includes(item)?' eq':'');
+    d.className='iSl'+(item&&Object.values(P.equip).includes(item)?' eq':'');
     d.innerHTML=item?(item.e+(item.qty>1?'<span class="iQty">'+item.qty+'</span>':'')):'';
     d.title=item?(item.n+': '+item.d):'';
     d.onclick=()=>{
       if(!item)return;
-      document.getElementById('iDesc').textContent=item.n+' — '+item.d+(item.def?' | DEF+'+item.def:'')+(item.atk?' | ATK+'+item.atk:'')+(item.mgk?' | MGK+'+item.mgk:'');
+      document.getElementById('iDesc').textContent=item.n+' — '+item.d+(item.def?' DEF+'+item.def:'')+(item.atk?' ATK+'+item.atk:'')+(item.mgk?' MGK+'+item.mgk:'');
       equipItem(i);
     };
     grid.appendChild(d);
@@ -1135,33 +2195,28 @@ function renderInv(){
 // ── WORLD MAP ──
 function renderWM(){
   const c=document.getElementById('wmCv');if(!c)return;
-  c.width=c.offsetWidth||700;c.height=c.offsetHeight||400;
+  c.width=c.offsetWidth||700;c.height=c.offsetHeight||380;
   const cx=c.getContext('2d'),sw=c.width/WW,sh=c.height/WH;
-  cx.fillStyle='#050510';cx.fillRect(0,0,c.width,c.height);
+  cx.fillStyle='#08040c';cx.fillRect(0,0,c.width,c.height);
   ZONES.forEach(z=>{
-    cx.fillStyle=z.color;cx.fillRect(z.x*sw,z.y*sh,z.w*sw,z.h*sh);
-    cx.strokeStyle='rgba(200,160,50,.2)';cx.lineWidth=1;cx.strokeRect(z.x*sw,z.y*sh,z.w*sw,z.h*sh);
-    cx.fillStyle='rgba(255,215,0,.75)';cx.font='bold clamp(6px,1.5vw,9px) sans-serif';cx.textAlign='center';
-    cx.fillText(z.name,(z.x+z.w/2)*sw,(z.y+z.h/2)*sh);
+    cx.fillStyle=z.col;cx.fillRect(z.x*sw,z.y*sh,z.w*sw,z.h*sh);
+    cx.strokeStyle='rgba(200,160,80,.2)';cx.lineWidth=1;cx.strokeRect(z.x*sw,z.y*sh,z.w*sw,z.h*sh);
+    cx.fillStyle='rgba(255,210,120,.8)';cx.font='bold 8px sans-serif';cx.textAlign='center';
+    cx.fillText(z.n,(z.x+z.w/2)*sw,(z.y+z.h/2)*sh);
   });
-  const px=(P.x/TS)*sw,py=(P.y/TS)*sh;
-  cx.fillStyle='#ffd700';cx.beginPath();cx.arc(px,py,4,0,Math.PI*2);cx.fill();
+  const mpx=(P.x/TS)*sw,mpy=(P.y/TS)*sh;
+  cx.fillStyle='#ffd27a';cx.beginPath();cx.arc(mpx,mpy,4,0,Math.PI*2);cx.fill();
+  cx.strokeStyle='#ffd27a';cx.lineWidth=1.5;cx.beginPath();cx.arc(mpx,mpy,8,0,Math.PI*2);cx.stroke();
   cx.textAlign='left';
-  // Legend
   const leg=document.getElementById('zoneLeg');
-  if(leg)leg.innerHTML=ZONES.map(z=>`<div style="background:${z.color};border:1px solid rgba(200,160,50,.15);padding:4px 7px">
-    <div style="font-size:5px;color:rgba(255,215,0,.8);margin-bottom:2px">${z.name}</div>
-    <div style="font-size:4px;color:rgba(200,180,150,.5)">${z.danger===0?'SAFE':'DANGER '+'⚔'.repeat(z.danger)}</div>
+  if(leg)leg.innerHTML=ZONES.map(z=>`<div style="background:${z.col};border:1px solid rgba(180,130,50,.2);padding:4px 7px;border-radius:1px">
+    <div style="font-size:5px;color:rgba(255,210,120,.85);margin-bottom:1px">${z.n}</div>
+    <div style="font-size:4px;color:rgba(180,150,80,.6)">${z.danger===0?'SAFE':'⚔'.repeat(Math.min(z.danger,5))}</div>
   </div>`).join('');
 }
 
 // ── PANELS ──
-function toggleP(id){
-  const p=document.getElementById(id);if(!p)return;
-  const was=p.classList.contains('on');
-  closeAllP();
-  if(!was){p.classList.add('on');if(id==='pInv')renderInv();if(id==='pMap')renderWM();}
-}
+function toggleP(id){const p=document.getElementById(id);if(!p)return;const was=p.classList.contains('on');closeAllP();if(!was){p.classList.add('on');if(id==='pInv')renderInv();if(id==='pMap')renderWM();if(id==='pQP')renderQuestList('questListIG');}}
 function closeAllP(){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));closeDlg();}
 
 // ── NOTIFS ──
@@ -1188,90 +2243,171 @@ function respawn(){
 }
 
 // ── SCREEN MANAGEMENT ──
-function SS(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-  if(id)document.getElementById(id)?.classList.add('on');
-}
+function SS(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));if(id)document.getElementById(id)?.classList.add('on');}
 
-// ── RACE/CLAN SELECT UI ──
-function buildRaceUI(){
-  document.getElementById('raceGrid').innerHTML=RACES.map(r=>`
-    <div class="raceCard ${r.id===selRace?'sel':''}" onclick="pickRace('${r.id}',this)">
-      <div class="raceEmoji">${r.emoji}</div>
-      <div class="raceName">${r.name}</div>
-      <div>${Object.entries(r.stats).map(([k,v])=>`<div class="raceStat"><span style="font-size:5px;color:rgba(200,160,50,.5);width:22px">${k}</span><div class="rsBg"><div class="rsFill" style="width:${v*10}%"></div></div></div>`).join('')}</div>
-      <div class="raceAbil">⚡ ${r.abil}: ${r.abilDesc}</div>
-    </div>`).join('');
-}
-
-function pickRace(id,el){selRace=id;document.querySelectorAll('.raceCard').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
-
-function buildClanUI(){
-  document.getElementById('clanGrid').innerHTML=CLANS.map(c=>`
-    <div class="clanCard ${c.id===selClan?'selc':''}" style="border-color:${c.border};background:${c.color}22" onclick="pickClan('${c.id}',this)">
-      <div style="font-size:22px;margin-bottom:4px">${c.emoji}</div>
-      <div class="clanName" style="color:${c.border}">${c.name}</div>
-      <div class="clanDesc">${c.desc}</div>
-      <div class="clanBonus" style="color:${c.border}">${c.bonus}</div>
-    </div>`).join('');
-}
-
-function pickClan(id,el){selClan=id;document.querySelectorAll('.clanCard').forEach(c=>c.style.outline='none');el.style.outline='2px solid rgba(255,215,0,.5)';}
-
-function confirmRace(){SS('sClan');buildClanUI();}
-function confirmClan(){beginGame(selRace,selClan);}
-
-// ── MOBILE DETECT ──
-function isMobile(){return window.innerWidth<900||('ontouchstart' in window);}
-function setupMobile(){if(isMobile())document.getElementById('mCtrl').style.display='block';}
+// ── MOBILE ──
+function setupMobile(){if(window.innerWidth<920||('ontouchstart' in window))document.getElementById('mCtrl').style.display='block';}
 window.addEventListener('resize',setupMobile);setupMobile();
 
-// ── GAME START ──
-function startNew(){selRace='human';selClan='iron';SS('sRace');buildRaceUI();}
 
-function beginGame(raceId,clanId){
+// ── TUTORIAL ──
+const TUTORIAL_STEPS=[
+  {title:"Welcome, Young Warrior!",
+   text:"I am Elder Bramble. You have been chosen by destiny.\n\nYour GOAL: Become the STRONGEST FIGHTER in the entire Realm!\n\nTo achieve this, you must defeat all 6 Bosses across the land.",
+   highlight:null},
+  {title:"Movement & Combat",
+   text:"• WASD or Arrow Keys to move\n• Click / Tap to attack enemies\n• F key = your Special Ability\n• SPACE = Dodge Roll (costs stamina)\n• E key = Talk to NPCs\n• You can WALK THROUGH trees and SWIM in water!",
+   highlight:null},
+  {title:"Quests & Your Race",
+   text:"You start as a basic Warrior. Talk to villagers to get QUESTS.\n\nCompleting quests unlocks powerful Races (Speedster, Titan, Archmage, Shadow Elf, Dragonborn).\n\nVisit the QUEST MASTER to track your journey to greatness!",
+   highlight:null},
+  {title:"The 6 Bosses",
+   text:"Each zone has a deadly Boss:\n🌿 Rotwood King — Darkwood Forest\n😈 Infernal Tyrant — Hell Territories\n🌺 Jungle Empress — Jungle Wilds\n💀 Lich King — Frozen Wastes\n🌩 Celestial Titan — Sky Realm\n🌀 Void God — The Abyss\n\nDefeat them ALL to become the strongest!",
+   highlight:null},
+  {title:"The Magic Man",
+   text:"Rumour has it... a mysterious figure wanders the far reaches of the world.\n\nFor 50 gold, he grants permanent power to those bold enough to find him.\n\nFew have ever returned with tales of this encounter...\n\nGood luck, hero. The Realm awaits!",
+   highlight:null},
+];
+
+function startTutorial(){
+  tutorialStep=0;showingTutorial=true;
+  showTutorialStep();
+}
+
+
+// Draw tutorial elder on the canvas in tutorial box
+function drawTutorialElderSprite(){
+  const c=document.getElementById('tutElderCanvas');if(!c)return;
+  const ctx=c.getContext('2d');
+  ctx.clearRect(0,0,48,72);
+  const pal=NPC_PALETTES['tutorial_elder'];
+  const ox=18,oy=4;
+  // Use same ppx but local ctx
+  function lppx(x,y,col){ctx.fillStyle=col;ctx.fillRect(x,y,3,3);}
+  // hair
+  ctx.fillStyle=pal.hair;ctx.fillRect(ox,oy,18,3);ctx.fillRect(ox-2,oy+3,20,3);
+  // head
+  for(let r=0;r<15;r+=3)for(let c2=0;c2<18;c2+=3)lppx(ox+c2,oy+6+r,pal.skin);
+  ctx.fillStyle='rgba(0,0,0,.1)';ctx.fillRect(ox+12,oy+6,6,15);
+  // eyes
+  lppx(ox+3,oy+9,pal.eye);lppx(ox+9,oy+9,pal.eye);
+  ctx.fillStyle='rgba(255,255,255,.5)';ctx.fillRect(ox+3,oy+9,2,2);ctx.fillRect(ox+9,oy+9,2,2);
+  // smile
+  ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(ox+5,oy+15,7,2);
+  // body
+  const by=oy+21;
+  ctx.fillStyle=pal.shirt;ctx.fillRect(ox-2,by,22,12);
+  ctx.fillStyle='rgba(255,255,255,.1)';ctx.fillRect(ox-2,by,22,3);
+  ctx.fillStyle='rgba(0,0,0,.15)';ctx.fillRect(ox+12,by,8,12);
+  // arms
+  ctx.fillStyle=pal.skin;ctx.fillRect(ox-5,by+2,4,8);ctx.fillRect(ox+19,by+2,4,8);
+  // legs
+  ctx.fillStyle=pal.pants;
+  ctx.fillRect(ox,by+12,8,10); ctx.fillRect(ox+12,by+12,8,10);
+  // boots
+  ctx.fillStyle=pal.boot;
+  ctx.fillRect(ox-1,by+22,10,4); ctx.fillRect(ox+11,by+22,10,4);
+  // staff
+  ctx.strokeStyle='#8a6030';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(ox+21,oy);ctx.lineTo(ox+21,by+26);ctx.stroke();
+  ctx.fillStyle='#c8a050';ctx.fillRect(ox+19,oy-2,6,5);
+}
+
+function showTutorialStep(){
+  const el=document.getElementById('tutorialBox');
+  if(!el)return;
+  const step=TUTORIAL_STEPS[tutorialStep];
+  if(!step){endTutorial();return;}
+  el.style.display='flex';
+  drawTutorialElderSprite();
+  document.getElementById('tutTitle').textContent=step.title;
+  document.getElementById('tutText').textContent=step.text;
+  document.getElementById('tutProg').textContent=(tutorialStep+1)+'/'+TUTORIAL_STEPS.length;
+}
+
+function tutNext(){
+  tutorialStep++;
+  if(tutorialStep>=TUTORIAL_STEPS.length){endTutorial();}
+  else{showTutorialStep();}
+}
+
+function tutSkip(){endTutorial();}
+
+function endTutorial(){
+  tutorialDone=true;showingTutorial=false;
+  const el=document.getElementById('tutorialBox');
+  if(el)el.style.display='none';
+  notif('Tutorial complete! Go find the Quest Master!','rare');
+}
+
+
+function showVictory(){
+  gameRunning=false;
+  const el=document.createElement('div');
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:700;font-family:Press Start 2P,monospace;text-align:center;padding:20px';
+  el.innerHTML=`
+    <div style="font-size:clamp(10px,3vw,20px);color:#ffd700;text-shadow:0 0 40px gold;animation:dp 2s infinite;margin-bottom:16px">🏆 YOU ARE THE STRONGEST!</div>
+    <div style="font-size:clamp(8px,2vw,14px);color:#fff;margin-bottom:12px">WARRIOR OF THE REALM</div>
+    <div style="font-size:clamp(5px,1.2vw,8px);color:#c8a050;line-height:2.2;margin-bottom:20px">All 6 Bosses defeated.<br>Level ${P.level} · ${P.kills} enemies slain · ${P.gold} gold<br><br>You have achieved the ultimate goal:<br>STRONGEST FIGHTER IN ALL THE REALM!</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+      <button onclick="location.reload()" style="background:rgba(30,18,8,.9);border:2px solid #ffd700;color:#ffd700;font-family:inherit;font-size:8px;padding:10px 18px;cursor:pointer">🔄 Play Again</button>
+      <button onclick="this.parentElement.parentElement.remove();gameRunning=true;requestAnimationFrame(gameLoop);" style="background:rgba(30,18,8,.9);border:2px solid #888;color:#aaa;font-family:inherit;font-size:8px;padding:10px 18px;cursor:pointer">Continue Playing</button>
+    </div>`;
+  document.body.appendChild(el);
+  checkAchievements();
+}
+
+// ── GAME START ──
+function startNew(){SS('sQuest');renderQuestList('questList');}
+
+function enterWorld(){
   closeAllP();SS(null);
   document.getElementById('hud').style.display='block';
-  genWorld();initPlayer(raceId,clanId);spawnEntities();spawnNPCs();
+  genWorld();initPlayer();initQuests();spawnEntities();spawnNPCs();
   gameRunning=true;lastTs=performance.now();
   requestAnimationFrame(gameLoop);
   notif('Welcome to Kingdom of Realms!','rare');
-  notif('WASD=Move  Click/Tap=Attack  F=Ability  Space=Dodge','info');
-  setTimeout(()=>notif('Hint: The Magic Man hides in the far south-east corner...','info'),4500);
+  // Auto-start tutorial after short delay
+  setTimeout(()=>{if(!tutorialDone){startTutorial();}},1200);
+  setTimeout(()=>notif('Press E near NPCs to talk. Watch for the 💛 ! above their heads.','info'),4000);
+  setTimeout(()=>notif('Tip: The Magic Man hides in the far south-east...','info'),8000);
 }
 
 function loadGame(){
   try{
-    const s=localStorage.getItem('kor_v2');
+    const s=localStorage.getItem('kor_v3');
     if(!s){notif('No save found.','bad');return;}
     const d=JSON.parse(s);
-    closeAllP();SS(null);
-    document.getElementById('hud').style.display='block';
+    SS(null);document.getElementById('hud').style.display='block';
     genWorld();spawnEntities();spawnNPCs();
-    Object.assign(P,d);
-    P.equip=P.equip||{head:null,chest:null,legs:null,feet:null,weapon:null};
-    P.inv=P.inv||[];P.buffs=[];P.dead=false;P.invincible=false;
-    P.race=RACES.find(r=>r.id===P.race?.id)||RACES[0];
-    P.clan=CLANS.find(c=>c.id===P.clan?.id)||CLANS[0];
+    Object.assign(P,d.player);
+    P.buffs=[];P.dead=false;P.invincible=false;
+    P.race=RACES[d.player.raceId]||RACES['warrior'];
+    P.clan=CLANS[d.player.clanId]||CLANS['none'];
+    quests=d.quests||{};
+    QUEST_DEFS.forEach(q=>{if(!quests[q.id])quests[q.id]={progress:0,done:false,active:false};});
+    if(!Object.values(quests).some(q=>q.active))quests['q_warrior'].active=true;
+    unlockedRaces=d.unlockedRaces||['warrior'];
+    unlockedClans=d.unlockedClans||['none'];
+    hellTimeCounter=d.hellTimeCounter||0;
     gameRunning=true;lastTs=performance.now();
     requestAnimationFrame(gameLoop);notif('Game loaded!','good');
   }catch(e){notif('No save or corrupt save.','bad');}
 }
 
 setInterval(()=>{
-  if(gameRunning&&P&&P.hp)
-    try{localStorage.setItem('kor_v2',JSON.stringify({...P,buffs:[],dead:false,invincible:false}));}catch(e){}
+  if(!gameRunning||!P?.hp)return;
+  try{localStorage.setItem('kor_v3',JSON.stringify({
+    player:{...P,buffs:[],dead:false,invincible:false,raceId:P.race?.id,clanId:P.clan?.id},
+    quests,unlockedRaces,unlockedClans,hellTimeCounter
+  }));}catch(e){}
 },15000);
 
 // ── TITLE STARS ──
-(function(){
-  const c=document.getElementById('titleStars');
-  for(let i=0;i<100;i++){
-    const s=document.createElement('div');s.className='star';
+(()=>{const c=document.getElementById('titleStars');
+  for(let i=0;i<110;i++){const s=document.createElement('div');s.className='starDot';
     s.style.cssText=`width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${1.5+Math.random()*3}s;animation-delay:${Math.random()*3}s`;
-    c.appendChild(s);
-  }
-})();
+    c.appendChild(s);}})();
 </script>
 </body>
 </html>
