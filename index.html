@@ -184,8 +184,14 @@ canvas{display:block;position:fixed;top:0;left:0;image-rendering:pixelated;image
   </div>
   <div class="tLine"></div>
   <div class="tMenu">
+    <div style="margin-bottom:8px">
+      <input id="nameInput" type="text" placeholder="Enter your hero name..." maxlength="18"
+        style="width:100%;background:rgba(20,12,4,.9);border:2px solid #6a4020;color:#ffd27a;font-family:inherit;font-size:8px;padding:9px 12px;outline:none;letter-spacing:1px;box-sizing:border-box"
+        onkeydown="if(event.key==='Enter')startNew()">
+    </div>
     <button class="tBtn" onclick="startNew()">⚔ &nbsp;Begin Your Journey</button>
     <button class="tBtn" onclick="loadGame()">📜 &nbsp;Continue Adventure</button>
+    <button class="tBtn" onclick="resetStory()" style="color:#ff8888;border-color:#662222">🗑 &nbsp;Reset Story</button>
     <button class="tBtn" onclick="SS('sHelp')">❓ &nbsp;How to Play</button>
   </div>
   <div class="tHint">WASD · CLICK/TAP · F=ABILITY · SPACE=DODGE · E=TALK · I=INV · M=MAP</div>
@@ -230,17 +236,34 @@ canvas{display:block;position:fixed;top:0;left:0;image-rendering:pixelated;image
 
 <!-- ═══ HUD ═══ -->
 <div id="hud">
-  <div class="hudBars">
-    <div class="barRow"><span class="barLbl">HP</span><div class="barOut"><div class="barIn" id="bHp" style="background:linear-gradient(90deg,#881111,#dd2222,#ff4444);width:100%"></div></div><span class="barVal" id="vHp">100</span></div>
+  <!-- Top-left: XP + MP small bars -->
+  <div class="hudBars" style="gap:3px">
     <div class="barRow"><span class="barLbl">MP</span><div class="barOut"><div class="barIn" id="bMp" style="background:linear-gradient(90deg,#112288,#2244cc,#4466ff);width:100%"></div></div><span class="barVal" id="vMp">80</span></div>
     <div class="barRow"><span class="barLbl">XP</span><div class="barOut"><div class="barIn" id="bXp" style="background:linear-gradient(90deg,#224411,#336622,#55aa33);width:0%"></div></div><span class="barVal" id="vLv">Lv1</span></div>
-    <div class="barRow"><span class="barLbl">ST</span><div class="barOut"><div class="barIn" id="bSt" style="background:linear-gradient(90deg,#664400,#aa7700,#ddaa00);width:100%"></div></div><span class="barVal" id="vSt">100</span></div>
+  </div>
+  <!-- Bottom-center: BIG HP + Stamina bars -->
+  <div id="botBars" style="position:absolute;bottom:calc(env(safe-area-inset-bottom,0px)+60px);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:4px;align-items:center;pointer-events:none;min-width:220px">
+    <div style="display:flex;align-items:center;gap:6px;width:100%">
+      <span style="font-size:6px;color:#ff4444;min-width:18px;text-align:right">❤</span>
+      <div style="flex:1;height:14px;background:rgba(0,0,0,.75);border:2px solid rgba(180,40,40,.5);border-radius:3px;overflow:hidden">
+        <div id="bHp" style="height:100%;background:linear-gradient(90deg,#881111,#dd3333,#ff5555);width:100%;transition:width .15s;border-radius:2px"></div>
+      </div>
+      <span id="vHp" style="font-size:6px;color:#ff8888;min-width:36px">100/100</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;width:100%">
+      <span style="font-size:6px;color:#ddaa00;min-width:18px;text-align:right">⚡</span>
+      <div style="flex:1;height:10px;background:rgba(0,0,0,.75);border:2px solid rgba(180,140,0,.4);border-radius:3px;overflow:hidden">
+        <div id="bSt" style="height:100%;background:linear-gradient(90deg,#664400,#cc9900,#ffdd22);width:100%;transition:width .15s;border-radius:2px"></div>
+      </div>
+      <span id="vSt" style="font-size:6px;color:#ddaa44;min-width:36px">100</span>
+    </div>
+    <div id="pName" style="font-size:6px;color:rgba(255,210,120,.6);letter-spacing:2px;text-align:center;margin-top:2px">Hero</div>
   </div>
   <div class="hudInfo">
     <div class="hudZone" id="hZone">Heartwood Village</div>
     <div class="hudDay" id="hDay">Day 1 · Dawn</div>
   </div>
-  <div class="hudMM"><canvas id="mmCv" width="100" height="100" style="display:block;image-rendering:pixelated"></canvas></div>
+  <div class="hudMM"><canvas id="mmCv" width="120" height="120" style="display:block;image-rendering:pixelated"></canvas></div>
   <div class="hudQ"><div class="hudQT" id="hudQT"></div></div>
   <div class="hudHB" id="hotbar">
     <div class="hs" id="hs0" onclick="useHS(0)"><span class="hsN">1</span></div>
@@ -260,6 +283,7 @@ canvas{display:block;position:fixed;top:0;left:0;image-rendering:pixelated;image
     <div class="pill" onclick="toggleP('pQP')" style="pointer-events:all">📜 QUESTS</div>
     <div class="pill" onclick="useAbility()" style="pointer-events:all;color:#cc88ff">⚡ SKILL [F]</div>
     <div class="pill" id="goalPill" style="color:#ffd27a">🏆 0/6 Bosses</div>
+    <div class="pill" onclick="manualSave()" style="pointer-events:all;color:#88ff88">💾 SAVE</div>
   </div>
   <div id="swimBar" style="display:none;position:absolute;top:60px;left:50%;transform:translateX(-50%);font-size:6px;color:#60d0ff;background:rgba(0,30,80,.8);border:1px solid rgba(100,200,255,.4);padding:3px 10px;border-radius:2px">🏊 Swimming — slower movement</div>
 <div class="bossBar" id="bossBar">
@@ -368,23 +392,35 @@ const gc=document.getElementById('gc');
 const gctx=gc.getContext('2d');
 const mmCv=document.getElementById('mmCv');
 const mmctx=mmCv.getContext('2d');
-const TS=16, WW=256, WH=256;
+mmCv.width=120;mmCv.height=120;
+const TS=16, WW=512, WH=512;
 let SCALE=3;
 
 // ── ZONES ──
 const ZONES=[
-  {id:'village',n:'Heartwood Village',col:'#1a2e1a',x:100,y:100,w:40,h:40,safe:true, danger:0,desc:'Peaceful starting village.'},
-  {id:'forest', n:'Darkwood Forest',  col:'#0d1f0d',x:60, y:80, w:60,h:60,safe:false,danger:2,desc:'Twisted trees, lurking beasts.'},
-  {id:'hell',   n:'Hell Territories', col:'#2e0a00',x:160,y:160,w:50,h:50,safe:false,danger:5,desc:'Scorched hellscape of demons.'},
-  {id:'jungle', n:'Jungle Wilds',     col:'#0a2210',x:30, y:150,w:55,h:50,safe:false,danger:3,desc:'Dense jungle with deadly traps.'},
-  {id:'frozen', n:'Frozen Wastes',    col:'#0d1e2e',x:140,y:20, w:60,h:55,safe:false,danger:4,desc:'Blizzards and undead hordes.'},
-  {id:'sky',    n:'Sky Realm',        col:'#1a1535',x:70, y:20, w:55,h:45,safe:false,danger:4,desc:'Floating islands. Celestial danger.'},
-  {id:'abyss',  n:'The Abyss',        col:'#080010',x:180,y:90, w:40,h:45,safe:false,danger:5,desc:'Deepest dungeon.'},
-  {id:'plains', n:'Golden Plains',    col:'#1e1a08',x:85, y:145,w:55,h:45,safe:false,danger:1,desc:'Rolling plains with bandits.'},
+  // SAFE
+  {id:'village', n:'Heartwood Village',col:'#1a3a1a',x:220,y:220,w:60,h:60,  safe:true, danger:0,desc:'Peaceful starting village.'},
+  {id:'farm',    n:'Farmlands',        col:'#2a3a10',x:200,y:285,w:55,h:45,  safe:true, danger:0,desc:'Rolling farmland south of the village.',animals:['sheep','cow','chicken']},
+  // EASY
+  {id:'plains',  n:'Golden Plains',   col:'#2a2a08',x:150,y:230,w:70,h:65,  safe:false,danger:1,desc:'Rolling plains with bandits.',animals:['deer','rabbit']},
+  {id:'meadow',  n:'Meadow',          col:'#1e3510',x:285,y:200,w:55,h:50,  safe:false,danger:1,desc:'Peaceful meadow — watch the foxes.',animals:['fox','deer']},
+  // MEDIUM
+  {id:'forest',  n:'Darkwood Forest', col:'#0a1a08',x:100,y:150,w:100,h:100,safe:false,danger:2,desc:'Ancient twisted forest.',animals:['wolf','bear']},
+  {id:'jungle',  n:'Jungle Wilds',    col:'#061a08',x:50, y:320,w:100,h:100,safe:false,danger:3,desc:'Dense jungle — snakes and big cats.', animals:['snake','panther']},
+  {id:'swamp',   n:'Murky Swamp',     col:'#0a1a08',x:340,y:320,w:80,h:70,  safe:false,danger:3,desc:'Toxic swamp, crocodiles lurk.', animals:['croc','toad']},
+  // HARD
+  {id:'frozen',  n:'Frozen Wastes',   col:'#0a1824',x:280,y:80, w:120,h:100,safe:false,danger:4,desc:'Blizzards and undead hordes.',animals:['polarbear','penguin']},
+  {id:'sky',     n:'Sky Realm',       col:'#12103a',x:100,y:50, w:120,h:100,safe:false,danger:4,desc:'Floating islands. Celestial danger.',animals:['eagle']},
+  {id:'desert',  n:'Scorched Desert', col:'#2a1a08',x:380,y:180,w:100,h:120,safe:false,danger:4,desc:'Blistering desert and scorpions.', animals:['scorpion','camel']},
+  // EXTREME
+  {id:'hell',    n:'Hell Territories',col:'#2a0800',x:380,y:330,w:100,h:120,safe:false,danger:5,desc:'Scorched hellscape of demons.'},
+  {id:'abyss',   n:'The Abyss',       col:'#04000a',x:150,y:380,w:90,h:100, safe:false,danger:5,desc:'Deepest dungeon. Enter at your peril.'},
+  {id:'volcano', n:'Volcano Peak',    col:'#3a0800',x:60, y:50,  w:80,h:80,  safe:false,danger:5,desc:'Active volcano. Lava rivers everywhere.'},
 ];
 
 // ── RACES (unlocked by quest) ──
 const RACES={
+  human:  {id:'human',  n:'Human',      emoji:'👤', hp:90, mp:60, spd:2.2,atk:10,def:6, mgk:3, col:'#c8905a',hair:'#4a2a0a',shirt:'#6a7a5a',eyeC:'#2a1808',abil:'Rally',      abilD:'Restore 15 HP',              questId:null},
   warrior:{id:'warrior',n:'Warrior',    emoji:'🧑', hp:100,mp:80, spd:2.4,atk:12,def:8, mgk:5, col:'#c8905a',hair:'#4a2a0a',shirt:'#5a7a4a',eyeC:'#1a1008',abil:'Battle Cry',   abilD:'Temp +10 ATK for 8s',        questId:'q_warrior'},
   flash:  {id:'flash',  n:'Speedster',  emoji:'⚡', hp:70, mp:60, spd:4.6,atk:10,def:4, mgk:3, col:'#e8e84a',hair:'#aaaa00',shirt:'#888800',eyeC:'#222200',abil:'Blitz Rush',   abilD:'3× speed for 3s',            questId:'q_flash'},
   giant:  {id:'giant',  n:'Titan',      emoji:'🏔', hp:220,mp:40, spd:1.4,atk:22,def:18,mgk:1, col:'#9a80cc',hair:'#330033',shirt:'#553388',eyeC:'#200030',abil:'Earthquake',   abilD:'AOE slam, stuns nearby',     questId:'q_giant'},
@@ -471,15 +507,35 @@ const ETYPES={
   angel:  {n:'Fallen Angel',e:'😇',hp:90, atk:18,spd:2.0,xp:40,gd:[10,25],sz:16,col:'#665544',z:['sky']},
   shade:  {n:'Void Shade',  e:'👻',hp:70, atk:25,spd:2.5,xp:50,gd:[15,35],sz:14,col:'#220044',z:['abyss']},
   orc:    {n:'Orc Warrior', e:'🪖',hp:65, atk:18,spd:1.4,xp:30,gd:[8,18], sz:18,col:'#445522',z:['plains','forest']},
+  // ── ANIMALS ──
+  deer:   {n:'Deer',        e:'🦌',hp:30, atk:4, spd:2.8,xp:10,gd:[2,5],  sz:12,col:'#8a6030',z:['plains','meadow'],animal:true},
+  wolf2:  {n:'Wild Wolf',   e:'🐺',hp:40, atk:8, spd:2.2,xp:14,gd:[3,6],  sz:13,col:'#556655',z:['forest','plains'],animal:true},
+  bear:   {n:'Forest Bear', e:'🐻',hp:80, atk:14,spd:1.6,xp:25,gd:[5,12], sz:18,col:'#5a3010',z:['forest'],animal:true},
+  rabbit: {n:'Rabbit',      e:'🐇',hp:12, atk:1, spd:3.5,xp:5, gd:[1,2],  sz:8, col:'#ccbbaa',z:['meadow','plains'],animal:true},
+  fox:    {n:'Fox',         e:'🦊',hp:22, atk:6, spd:3.0,xp:8, gd:[2,5],  sz:10,col:'#cc6620',z:['meadow','plains'],animal:true},
+  sheep:  {n:'Sheep',       e:'🐑',hp:20, atk:2, spd:1.2,xp:6, gd:[2,4],  sz:10,col:'#e8e8e8',z:['farm'],animal:true},
+  cow:    {n:'Cow',         e:'🐄',hp:50, atk:5, spd:1.0,xp:10,gd:[3,8],  sz:14,col:'#d4c8b4',z:['farm'],animal:true},
+  chicken:{n:'Chicken',     e:'🐔',hp:8,  atk:1, spd:2.0,xp:3, gd:[1,2],  sz:8, col:'#e8d89a',z:['farm'],animal:true},
+  snake:  {n:'King Snake',  e:'🐍',hp:35, atk:12,spd:2.5,xp:18,gd:[4,8],  sz:10,col:'#2a4a10',z:['jungle','swamp'],animal:true},
+  panther:{n:'Black Panther',e:'🐆',hp:60,atk:16,spd:3.2,xp:28,gd:[6,14], sz:15,col:'#1a1a2a',z:['jungle'],animal:true},
+  croc:   {n:'Crocodile',   e:'🐊',hp:70, atk:14,spd:1.0,xp:22,gd:[5,10], sz:18,col:'#2a4a1a',z:['swamp'],animal:true},
+  toad:   {n:'Giant Toad',  e:'🐸',hp:25, atk:6, spd:1.4,xp:10,gd:[2,4],  sz:10,col:'#2a4a10',z:['swamp'],animal:true},
+  polarbear:{n:'Polar Bear',e:'🐻‍❄️',hp:100,atk:18,spd:1.4,xp:35,gd:[8,16],sz:20,col:'#d0e8f0',z:['frozen'],animal:true},
+  penguin:{n:'Warrior Penguin',e:'🐧',hp:25,atk:6,spd:1.8,xp:10,gd:[3,6], sz:10,col:'#1a1a2a',z:['frozen'],animal:true},
+  eagle:  {n:'Sky Eagle',   e:'🦅',hp:45, atk:12,spd:3.0,xp:20,gd:[4,10], sz:13,col:'#5a4020',z:['sky'],animal:true},
+  scorpion:{n:'Scorpion',   e:'🦂',hp:40, atk:14,spd:1.8,xp:18,gd:[4,9],  sz:12,col:'#5a3a10',z:['desert'],animal:true},
 };
 
 const BOSSES=[
-  {id:'boss_forest',n:'The Rotwood King', e:'🌿',zone:'forest',hp:500, atk:10,spd:0.8,xp:200,drop:['ic','ds'],   col:'#1a3a1a',sz:32},
-  {id:'boss_hell',  n:'Infernal Tyrant',  e:'😈',zone:'hell',  hp:900, atk:14,spd:0.9,xp:400,drop:['fc','fa'],   col:'#440000',sz:36},
-  {id:'boss_jungle',n:'Jungle Empress',   e:'🌺',zone:'jungle',hp:700, atk:12,spd:1.0,xp:300,drop:['sl','bw'],   col:'#1a3a10',sz:30},
-  {id:'boss_frozen',n:'The Lich King',    e:'💀',zone:'frozen', hp:1100,atk:16,spd:0.7,xp:500,drop:['va','scr'],  col:'#1a2a3a',sz:34},
-  {id:'boss_sky',   n:'Celestial Titan',  e:'🌩',zone:'sky',   hp:1300,atk:18,spd:0.9,xp:600,drop:['cc','ds'],   col:'#2a1a4a',sz:38},
-  {id:'boss_abyss', n:'The Void God',     e:'🌀',zone:'abyss',  hp:2000,atk:22,spd:0.8,xp:1000,drop:['sb','va'], col:'#080008',sz:42},
+  {id:'boss_forest',n:'The Rotwood King',  e:'🌿',zone:'forest', hp:500, atk:8, spd:0.7,xp:200,drop:['ic','ds'],  col:'#1a3a1a',sz:28},
+  {id:'boss_jungle',n:'Jungle Empress',    e:'🌺',zone:'jungle',  hp:700, atk:10,spd:0.9,xp:300,drop:['sl','bw'],  col:'#1a3a10',sz:28},
+  {id:'boss_swamp', n:'Swamp Hydra',       e:'🐉',zone:'swamp',   hp:800, atk:12,spd:0.8,xp:350,drop:['sl','ic'],  col:'#2a4a10',sz:30},
+  {id:'boss_frozen',n:'The Lich King',     e:'💀',zone:'frozen',  hp:1100,atk:13,spd:0.6,xp:500,drop:['va','scr'], col:'#1a2a3a',sz:30},
+  {id:'boss_sky',   n:'Celestial Titan',   e:'🌩',zone:'sky',     hp:1300,atk:15,spd:0.8,xp:600,drop:['cc','ds'],  col:'#2a1a4a',sz:32},
+  {id:'boss_desert',n:'Sand Colossus',     e:'🏜',zone:'desert',  hp:1000,atk:14,spd:0.7,xp:450,drop:['ic','fa'],  col:'#6a4a10',sz:32},
+  {id:'boss_hell',  n:'Infernal Tyrant',   e:'😈',zone:'hell',    hp:1500,atk:18,spd:0.8,xp:700,drop:['fc','fa'],  col:'#440000',sz:34},
+  {id:'boss_volcano',n:'Magma Titan',      e:'🌋',zone:'volcano',  hp:1800,atk:20,spd:0.7,xp:800,drop:['fc','cc'], col:'#5a1000',sz:36},
+  {id:'boss_abyss', n:'The Void God',      e:'🌀',zone:'abyss',   hp:2500,atk:24,spd:0.7,xp:1200,drop:['sb','va'],col:'#080008',sz:40},
 ];
 
 const NPCTYPES=[
@@ -529,7 +585,7 @@ let bossKillsQ=0;
 function genWorld(){
   world=new Uint8Array(WW*WH);
   world.fill(T.G);
-  const zMap={village:T.PA,forest:T.TR,hell:T.FG,jungle:T.TR,frozen:T.IC,sky:T.CL,abyss:T.VD,plains:T.G};
+  const zMap={village:T.PA,forest:T.TR,hell:T.FG,jungle:T.TR,frozen:T.IC,sky:T.CL,abyss:T.VD,plains:T.G,farm:T.G,meadow:T.G,swamp:T.W,desert:T.SA,volcano:T.LV};
   ZONES.forEach(z=>{
     const t=zMap[z.id]||T.G;
     for(let dy=0;dy<z.h;dy++) for(let dx=0;dx<z.w;dx++){
@@ -600,7 +656,7 @@ function getZoneAt(wx,wy){
 const ACHIEVEMENT_DEFS=[
   {id:'ach_first_kill', n:'First Blood',      icon:'⚔',desc:'Kill your first enemy',       check:()=>P.kills>=1},
   {id:'ach_boss1',      n:'Boss Slayer',      icon:'💀',desc:'Defeat your first boss',       check:()=>(P.bossKills||0)>=1},
-  {id:'ach_boss_all',   n:'Realm Champion',   icon:'👑',desc:'Defeat ALL 6 bosses',          check:()=>(P.bossKills||0)>=6},
+  {id:'ach_boss_all',   n:'Realm Champion',   icon:'👑',desc:'Defeat ALL 6 bosses',          check:()=>(P.bossKills||0)>=9},
   {id:'ach_lvl10',      n:'Rising Star',      icon:'⭐',desc:'Reach Level 10',               check:()=>P.level>=10},
   {id:'ach_lvl25',      n:'Legendary',        icon:'🌟',desc:'Reach Level 25',               check:()=>P.level>=25},
   {id:'ach_gold',       n:'Gold Hoarder',     icon:'🪙',desc:'Accumulate 500 gold',          check:()=>P.gold>=500},
@@ -734,17 +790,18 @@ function renderQuestList(elId){
 
 // ── PLAYER INIT ──
 function initPlayer(){
-  const race=RACES['warrior'];
+  const race=RACES['human'];
   const clan=CLANS['none'];
   const vz=ZONES[0];
-  P={x:(vz.x+vz.w/2)*TS,y:(vz.y+vz.h/2)*TS,w:14,h:18,
-    race,clan,maxHp:race.hp,hp:race.hp,maxMp:race.mp,mp:race.mp,
+  P={x:(vz.x+vz.w/2)*TS,y:(vz.y+vz.h/2)*TS,w:9,h:14, // SMALLER player
+    race,clan,name:window._heroName||'Hero',
+    maxHp:race.hp,hp:race.hp,maxMp:race.mp,mp:race.mp,
     atk:race.atk,def:race.def,mgk:race.mgk,spd:race.spd,baseSpd:race.spd,
-    xp:0,level:1,xpNext:80,gold:20,
+    xp:0,level:1,xpNext:80,gold:30,
     inv:[],equip:{head:null,chest:null,legs:null,feet:null,weapon:null},
     hotbar:[null,null,null,null,null],
     buffs:[],invincible:false,dodgeCd:0,atkCd:0,
-    stamina:100,maxSt:100,kills:0,bossKills:0,facing:{x:1,y:0},anim:0,aT:0,dead:false,swimming:false,
+    stamina:100,maxSt:100,kills:0,bossKills:0,facing:{x:1,y:0},anim:0,aT:0,dead:false,swimming:false,swimTime:0,foundMagicMan:false,
   };
   giveItem('sw'); giveItem('hp_pot',3); giveItem('mp_pot',2);
   P.hotbar[0]=P.inv.findIndex(i=>i&&i.id==='hp_pot');
@@ -819,12 +876,28 @@ function spawnEntities(){
         zone:z.id,state:'patrol',ptimer:0,atkCd:0,homeX:ex*TS+TS/2,homeY:ey*TS+TS/2,
         tx:ex*TS,ty:ey*TS,facing:{x:1,y:0},anim:0,aT:0,dead:false});
     }
+    // Spawn zone animals
+    if(z.animals&&z.animals.length){
+      const animalCount=6+z.animals.length*2;
+      for(let ai=0;ai<animalCount;ai++){
+        const atype=z.animals[Math.floor(Math.random()*z.animals.length)];
+        const et=ETYPES[atype];if(!et)continue;
+        let ax=(z.x+Math.random()*z.w)|0,ay=(z.y+Math.random()*z.h)|0;
+        entities.push({id:'a'+Math.random().toString(36).slice(2),t:'animal',eid:atype,
+          x:ax*TS+TS/2,y:ay*TS+TS/2,w:et.sz,h:et.sz,hp:et.hp,maxHp:et.hp,
+          atk:et.atk,spd:et.spd,xp:et.xp,gd:et.gd,e:et.e,col:et.col,n:et.n,
+          zone:z.id,state:'roam',ptimer:0,atkCd:0,homeX:ax*TS+TS/2,homeY:ay*TS+TS/2,
+          tx:ax*TS,ty:ay*TS,facing:{x:1,y:0},anim:0,aT:0,dead:false,animal:true});
+      }
+    }
     const boss=BOSSES.find(b=>b.zone===z.id);
     if(boss){
-      let bx=(z.x+z.w/2)|0,by=(z.y+z.h/2)|0;
+      // Boss placed deep in zone (75% from edge, not center)
+      const bx=(z.x+Math.floor(z.w*0.75))|0, by=(z.y+Math.floor(z.h*0.75))|0;
       entities.push({...boss,id:boss.id,t:'boss',
         x:bx*TS,y:by*TS,hp:boss.hp,maxHp:boss.hp,
-        state:'idle',atkCd:0,facing:{x:1,y:0},anim:0,aT:0,dead:false});
+        homeX:bx*TS,homeY:by*TS,
+        state:'patrol',atkCd:0,facing:{x:1,y:0},anim:0,aT:0,dead:false});
     }
   });
 }
@@ -920,7 +993,7 @@ document.getElementById('btnDodge').addEventListener('touchstart',e=>{e.preventD
 // ── GAME LOOP ──
 function resize(){
   gc.width=window.innerWidth;gc.height=window.innerHeight;
-  SCALE=Math.max(2,Math.min(4,Math.floor(Math.min(window.innerWidth,window.innerHeight)/180)));
+  SCALE=Math.max(2,Math.min(3,Math.floor(Math.min(window.innerWidth,window.innerHeight)/220)));
 }
 window.addEventListener('resize',resize);resize();
 
@@ -934,7 +1007,7 @@ function gameLoop(ts){
 function update(dt){
   gameTime++;dayTime=(dayTime+dt)%1200;
   updPlayer(dt);updEntities(dt);updNPCs(dt);updProj(dt);updParts(dt);updFloats(dt);
-  updHUD();checkZone(dt);
+  updHUD();checkZone(dt);updWanderers(dt);
   if(gameTime%120===0)checkAchievements();
   if(P.swimming){P.swimTime=(P.swimTime||0)+1;}
   if(gameTime%300===0)replenish();
@@ -1087,13 +1160,14 @@ function killEnt(e){
   // Stealth kill (enemy wasn't chasing = stealth)
   if(e.state!=='chase')questProgress('stealth_kill');
 
+  if(e.animal){notif(e.n+' killed!','info');}
   if(e.t==='boss'){
     P.bossKills=(P.bossKills||0)+1;
     activeBoss=null;document.getElementById('bossBar').classList.remove('on');
     notif('⚠ BOSS DEFEATED: '+e.n,'rare');
     questProgress('boss_kill',{bossId:e.id});
     (e.drop||[]).forEach(d=>{giveItem(d);notif('Got: '+(ITEMS[d]?.n||d),'rare');});
-    if(P.bossKills>=6){setTimeout(()=>showVictory(),1500);}
+    if(P.bossKills>=9){setTimeout(()=>showVictory(),1500);}
   }
   levelUp();
   entities=entities.filter(x=>x.id!==e.id);
@@ -1114,22 +1188,36 @@ function updEntities(dt){
     const dx=P.x-e.x,dy=P.y-e.y,dist=Math.sqrt(dx*dx+dy*dy);
     const ar=80+e.w,ad=e.w/2+10;
 
-    if(e.t==='boss'&&dist<380){
+    const BOSS_AGGRO_RANGE=160; // 10 tiles
+    if(e.t==='boss'&&dist<BOSS_AGGRO_RANGE){
       e.state='chase';activeBoss=e;
       document.getElementById('bossBar').classList.add('on');
       document.getElementById('bossN').textContent=e.n.toUpperCase();
       document.getElementById('bossH').style.width=(e.hp/e.maxHp*100)+'%';
+    } else if(e.t==='boss'&&dist>BOSS_AGGRO_RANGE+32){
+      e.state='patrol'; // boss returns to patrol if player moves away
     }
-    if(dist<ar&&e.state!=='chase')e.state='chase';
-    else if(dist>240&&e.t!=='boss')e.state='patrol';
+    if(e.animal){
+      // Animals: roam peacefully, flee when player gets within 40px, fight when hit
+      if(e.state==='flee'){if(dist>120)e.state='roam';}
+      else if(dist<40&&e.state!=='chase'){e.state='flee';}
+      else if(e.state!=='chase'&&e.state!=='flee'){e.state='roam';}
+    } else {
+      if(e.t!=='boss'&&dist<ar&&e.state!=='chase')e.state='chase';
+      else if(dist>240&&e.t!=='boss')e.state='patrol';
+    }
 
-    if(e.state==='patrol'){
+    if(e.state==='patrol'||e.state==='roam'){
       e.ptimer-=dt;
       if(e.ptimer<=0){e.ptimer=60+Math.random()*120;
         e.tx=e.homeX+(Math.random()-.5)*80;e.ty=e.homeY+(Math.random()-.5)*80;}
       const tdx=e.tx-e.x,tdy=e.ty-e.y,tl=Math.sqrt(tdx*tdx+tdy*tdy)||1;
       const mspd=e.spd*TS*0.08;
       e.x+=tdx/tl*mspd*dt;e.y+=tdy/tl*mspd*dt;
+    } else if(e.state==='flee'){
+      // Run AWAY from player
+      const l=dist||1,mspd=e.spd*TS*0.16;
+      e.x-=dx/l*mspd*dt;e.y-=dy/l*mspd*dt;
     } else {
       if(dist>ad){
         const l=dist||1,mspd=e.spd*TS*0.14;
@@ -1178,6 +1266,94 @@ function updProj(dt){
       }
     }
     return true;
+  });
+}
+
+// ── WANDERERS (random people wandering the world) ──
+let wanderers=[];
+const WANDERER_SKINS=['#c8905a','#d4a070','#b87040','#e8c098','#a06030','#d0b090','#c07850','#f0d0a0'];
+const WANDERER_SHIRTS=['#4a6a8a','#6a4a8a','#8a4a4a','#4a8a4a','#8a6a2a','#2a6a6a','#8a4a6a','#4a4a8a','#6a8a2a','#8a2a4a'];
+const WANDERER_PANTS=['#2a3a4a','#3a2a4a','#4a3a2a','#2a4a3a','#4a4a2a','#2a2a4a'];
+const WANDER_NAMES=['Aric','Mira','Tol','Bren','Lysa','Dox','Vel','Finn','Nara','Petra','Gus','Hale','Issa','Jorn','Kira','Lev','Mae','Nix','Ora','Paz','Quin','Reva','Sev','Tris','Uma','Vex','Wren','Xal','Yeva','Zane'];
+function spawnWanderers(){
+  wanderers=[];
+  // Spawn ~60 wanderers scattered around safe and semi-safe areas
+  const safeZ=ZONES.filter(z=>z.safe||z.danger<=1);
+  for(let i=0;i<60;i++){
+    const z=safeZ[Math.floor(Math.random()*safeZ.length)];
+    const wx=(z.x+Math.random()*z.w)|0, wy=(z.y+Math.random()*z.h)|0;
+    wanderers.push({
+      id:'w'+i,
+      x:wx*TS,y:wy*TS,
+      homeX:wx*TS,homeY:wy*TS,
+      name:WANDER_NAMES[Math.floor(Math.random()*WANDER_NAMES.length)],
+      skin:WANDERER_SKINS[Math.floor(Math.random()*WANDERER_SKINS.length)],
+      shirt:WANDERER_SHIRTS[Math.floor(Math.random()*WANDERER_SHIRTS.length)],
+      pants:WANDERER_PANTS[Math.floor(Math.random()*WANDERER_PANTS.length)],
+      hair:['#1a1008','#3a2008','#882200','#888888','#ffcc44','#220022','#111122'][Math.floor(Math.random()*7)],
+      dx:(Math.random()-.5)*1.5, dy:(Math.random()-.5)*1.5,
+      wt:Math.random()*180, anim:0,aT:0,facing:{x:1,y:0},zone:z
+    });
+  }
+}
+function updWanderers(dt){
+  wanderers.forEach(w=>{
+    w.wt-=dt;
+    if(w.wt<=0){
+      w.wt=80+Math.random()*200;
+      w.dx=(Math.random()-.5)*1.8; w.dy=(Math.random()-.5)*1.8;
+      if(Math.random()<0.2){w.dx=0;w.dy=0;} // occasionally stop
+    }
+    if(w.dx||w.dy){
+      const nx=w.x+w.dx*TS*0.045*dt, ny=w.y+w.dy*TS*0.045*dt;
+      const z=w.zone;
+      const inZ=(nx>z.x*TS&&nx<(z.x+z.w-1)*TS&&ny>z.y*TS&&ny<(z.y+z.h-1)*TS);
+      if(inZ&&!solidPx(nx,w.y)){w.x=nx;if(w.dx>0.1)w.facing.x=1;else if(w.dx<-0.1)w.facing.x=-1;}
+      else{w.dx*=-1;}
+      if(inZ&&!solidPx(w.x,ny)){w.y=ny;}else{w.dy*=-1;}
+      w.aT+=dt;if(w.aT>8){w.aT=0;w.anim=(w.anim+1)%4;}
+    }
+  });
+}
+function drawWanderers(){
+  const vx=Math.floor(camX/TS),vy=Math.floor(camY/TS);
+  const vxe=vx+Math.ceil(gc.width/SCALE/TS)+4,vye=vy+Math.ceil(gc.height/SCALE/TS)+4;
+  wanderers.forEach(w=>{
+    const wx2=Math.floor(w.x/TS),wy2=Math.floor(w.y/TS);
+    if(wx2<vx-2||wx2>vxe||wy2<vy-2||wy2>vye)return;
+    const bob=w.anim%2===0?0:1;
+    const ox=w.x-6,oy=w.y-13-bob;
+    // shadow
+    gctx.fillStyle='rgba(0,0,0,0.2)';
+    gctx.beginPath();gctx.ellipse(w.x,w.y+2,5,2,0,0,Math.PI*2);gctx.fill();
+    // hair
+    gctx.fillStyle=w.hair;gctx.fillRect(ox+1,oy,8,2);gctx.fillRect(ox,oy+2,9,2);
+    // head
+    gctx.fillStyle=w.skin;gctx.fillRect(ox,oy+4,10,8);
+    gctx.fillStyle='rgba(0,0,0,0.1)';gctx.fillRect(ox+7,oy+4,3,8);
+    // eyes
+    gctx.fillStyle='#1a1008';
+    const eo=w.facing.x>=0?4:2;
+    gctx.fillRect(ox+eo,oy+6,2,2);gctx.fillRect(ox+eo+3,oy+6,2,2);
+    // body
+    gctx.fillStyle=w.shirt;gctx.fillRect(ox+1,oy+12,8,6);
+    gctx.fillStyle='rgba(255,255,255,0.09)';gctx.fillRect(ox+1,oy+12,8,2);
+    gctx.fillStyle='rgba(0,0,0,0.15)';gctx.fillRect(ox+6,oy+12,3,6);
+    // arms
+    gctx.fillStyle=w.skin;gctx.fillRect(ox-1,oy+12+bob%2,2,4);gctx.fillRect(ox+9,oy+12+(bob+1)%2,2,4);
+    // legs
+    const ll=bob?0:2,lr=bob?2:0;
+    gctx.fillStyle=w.pants;
+    gctx.fillRect(ox+1,oy+18+ll,3,4);gctx.fillRect(ox+5,oy+18+lr,3,4);
+    // boots
+    gctx.fillStyle='#1a1008';
+    gctx.fillRect(ox,oy+22+ll,4,2);gctx.fillRect(ox+4,oy+22+lr,4,2);
+    // name on hover
+    const ddx=P.x-w.x,ddy=P.y-w.y;
+    if(Math.sqrt(ddx*ddx+ddy*ddy)<36){
+      gctx.font='4px monospace';gctx.fillStyle='rgba(255,235,170,.8)';gctx.textAlign='center';
+      gctx.fillText(w.name,w.x,w.y-17);gctx.textAlign='left';
+    }
   });
 }
 
@@ -1246,6 +1422,11 @@ const ZPALS={
   sky:    {g:['#545898','#6060b2','#4848a0','#6e6ec0','#5858a8','#7878cc'],stone:'#726898',edgeD:12},
   abyss:  {g:['#07000f','#0c001a','#040009','#110020','#090014','#0f001e'],stone:'#261636',edgeD:20},
   plains: {g:['#80a230','#92bc3c','#6e9028','#a2ca46','#869835','#94b83e'],stone:'#988860',edgeD:8},
+  farm:   {g:['#7a9828','#8aac30','#6a8820','#9ab83c','#78962a','#8aaa32'],path:'#b09850',pathD:'#907830',stone:'#908060',edgeD:8},
+  meadow: {g:['#58a030','#6ab83c','#4a8c26','#78c848','#60a834','#6ab23a'],stone:'#808860',edgeD:6},
+  swamp:  {g:['#2a4820','#344e26','#203a18','#3a5428','#2e4c1e','#3a5222'],stone:'#404830',edgeD:18},
+  desert: {g:['#c8a84a','#d4b858','#b89838','#dcc060','#c8a840','#d0b050'],path:'#c8b080',pathD:'#a89060',stone:'#c0a860',edgeD:5},
+  volcano:{g:['#5a1800','#6a2000','#4a1000','#601a00','#501400','#6a1e00'],stone:'#5a2010',edgeD:22},
 };
 function zpal(tx,ty){const z=getZoneAt(tx,ty);return z?ZPALS[z.id]||ZPALS.plains:ZPALS.plains;}
 
@@ -1266,18 +1447,20 @@ function drawGrass(tx,ty){
   gctx.fillStyle='rgba(255,255,255,0.06)';
   gctx.fillRect(x,y,TS,1); gctx.fillRect(x,y,1,TS);
 
-  // Grass blades — present in 40% of tiles
+  // Grass blades — present in 55% of tiles, richer
   const r2=tRng(tx,ty,1);
-  if(r2>0.60){
-    const bx=x+Math.floor(r2*9)+1;
-    const lc=lgt(base,22),lc2=lgt(base,14);
-    // 3 individual blades
-    px(bx,  y+1, 1, 5, lc);
-    px(bx+3,y+2, 1, 4, lc2);
-    px(bx+6,y+1, 1, 6, lc);
-    // blade tips curve
-    px(bx-1,y+1,1,1,lc);
-    px(bx+7,y+1,1,1,lc2);
+  if(r2>0.45){
+    const bx=x+Math.floor(r2*8)+1;
+    const lc=lgt(base,28),lc2=lgt(base,18),lc3=lgt(base,36);
+    // 4 blades
+    px(bx,  y+1, 1, 6, lc);
+    px(bx+1,y,   1, 2, lc3); // tip highlight
+    px(bx+3,y+2, 1, 5, lc2);
+    px(bx+6,y+1, 1, 7, lc);
+    px(bx+7,y,   1, 2, lc3);
+    px(bx+9,y+3, 1, 4, lc2);
+    // ground-level dark base
+    gctx.fillStyle='rgba(0,0,0,0.08)';gctx.fillRect(bx,y+7,2,1);gctx.fillRect(bx+6,y+7,2,1);
   }
 
   // Flowers — 12% of tiles
@@ -1468,6 +1651,26 @@ function drawStone(tx,ty){
 }
 
 // ──────────────────────────────────────
+// SAND (desert) tile
+// ──────────────────────────────────────
+function drawSand(tx,ty){
+  const x=tx*TS,y=ty*TS,p=zpal(tx,ty);
+  const r=tRng(tx,ty,0),r2=tRng(tx,ty,1);
+  const base=p.g?p.g[Math.floor(r*p.g.length)]:'#c8a84a';
+  px(x,y,TS,TS,base);
+  // ripple lines (wind erosion)
+  if(r2>0.6){
+    gctx.fillStyle='rgba(255,255,255,0.12)';
+    gctx.fillRect(x+Math.floor(r2*10),y+3,TS-Math.floor(r2*4),1);
+    gctx.fillRect(x+Math.floor(r2*5),y+9,TS-Math.floor(r2*6),1);
+  }
+  // pebble
+  if(tRng(tx,ty,3)>0.85){gctx.fillStyle='rgba(0,0,0,0.15)';gctx.fillRect(x+Math.floor(r*12)+1,y+Math.floor(r2*10)+2,2,2);}
+  // edge shadow
+  gctx.fillStyle='rgba(0,0,0,0.07)';gctx.fillRect(x,y+TS-1,TS,1);gctx.fillRect(x+TS-1,y,1,TS);
+}
+
+// ──────────────────────────────────────
 // TREES — 8 zone variants, deeply detailed
 // ──────────────────────────────────────
 function drawTree(tx,ty){
@@ -1635,6 +1838,7 @@ function drawTiles(){
     else if(tile===T.CL)drawCloud(tx,ty);
     else if(tile===T.VD)drawVoid(tx,ty);
     else if(tile===T.S)drawStone(tx,ty);
+    else if(tile===T.SA)drawSand(tx,ty);
     else{px(tx*TS,ty*TS,TS,TS,'#1e2e10');}
   }
 }
@@ -1748,13 +1952,21 @@ function drawPlayer_r(){
   if(P.dead)return;
   const bob=P.anim%2===0?0:1;
   const r=P.race;
-  // 8-bit palette from race
+  // ── Clan-specific outfit colours ──
+  const CLAN_OUTFITS={
+    iron:  {shirt:'#6a7888',pants:'#3a4a58',boot:'#2a2a2a',armorOver:'#8a9aaa',badge:'⚔'},
+    arcane:{shirt:'#3a1a6a',pants:'#220044',boot:'#110022',armorOver:'#6644aa',badge:'🔮'},
+    shadow:{shirt:'#1a1a2a',pants:'#0e0e1a',boot:'#080808',armorOver:'#2a2a3a',badge:'🌑'},
+    flame: {shirt:'#8a2200',pants:'#4a1000',boot:'#2a0800',armorOver:'#cc3300',badge:'🔥'},
+    none:  {shirt:r.shirt||'#4a6a3a',pants:null,boot:'#2a1808',armorOver:null,badge:null},
+  };
+  const co=CLAN_OUTFITS[P.clan?.id]||CLAN_OUTFITS.none;
   const skinC=r.col||'#c8905a';
   const hairC=r.hair||'#3a1a08';
-  const shirtC=r.shirt||'#4a6a3a';
-  const pantsC=P.equip.legs?'#3a3a68':drk(shirtC,20);
-  const bootC='#2a1808';
-  const armorC=P.equip.chest?(P.equip.chest.fire?'#8a2200':P.equip.chest.def>15?'#3a4a58':'#556878'):null;
+  const shirtC=co.shirt;
+  const pantsC=co.pants||P.equip.legs?'#3a3a68':drk(shirtC,20);
+  const bootC=co.boot;
+  const armorC=co.armorOver||P.equip.chest?(P.equip.chest.fire?'#8a2200':P.equip.chest.def>15?'#3a4a58':'#556878'):null;
   const eyeC=r.eyeC||'#1a1008';
   const wpn=P.equip.weapon;
   drawCharSprite(P.x,P.y,bob,skinC,hairC,shirtC,pantsC,armorC,bootC,eyeC,P.w,P.facing,P.invincible,wpn?.e||null);
@@ -1767,15 +1979,26 @@ function drawPlayer_r(){
     gctx.fillRect(P.x-8+Math.floor(gameTime/4)%6,P.y+4,4,1);
   }
 
-  // Clan badge
-  if(P.clan?.id!=='none'){
-    gctx.font='4px monospace';gctx.fillStyle=P.clan.border||'rgba(255,210,80,.8)';gctx.textAlign='center';
-    gctx.fillText((P.clan.emoji||'')+' '+P.clan.n.slice(0,7),P.x,P.y-26);
-    gctx.textAlign='left';
-  }
-  // Race tag
-  gctx.font='4px monospace';gctx.fillStyle='rgba(180,140,60,.55)';gctx.textAlign='center';
+  // Player name + clan overhead badge
+  gctx.textAlign='center';
+  // Name
+  gctx.font='5px monospace';gctx.fillStyle='rgba(255,235,180,.95)';
+  gctx.fillText(P.name||'Hero',P.x,P.y-28);
+  // Race
+  gctx.font='4px monospace';gctx.fillStyle='rgba(180,140,60,.7)';
   gctx.fillText(r.emoji+' '+r.n,P.x,P.y-22);
+  // Clan — coloured pill
+  if(P.clan?.id!=='none'){
+    const ctxt=(P.clan.emoji||'')+' '+P.clan.n.slice(0,8);
+    const cw=ctxt.length*3.5+6;
+    gctx.fillStyle=P.clan.col||'rgba(40,20,10,.85)';
+    if(gctx.roundRect)gctx.roundRect(P.x-cw/2,P.y-35,cw,7,2);
+    else gctx.rect(P.x-cw/2,P.y-35,cw,7);
+    gctx.fill();
+    gctx.strokeStyle=P.clan.border||'#aaa';gctx.lineWidth=0.5;gctx.stroke();
+    gctx.fillStyle='#fff';gctx.font='4px monospace';
+    gctx.fillText(ctxt,P.x,P.y-30);
+  }
   gctx.textAlign='left';
 
   // Attack swing
@@ -1828,6 +2051,7 @@ function drawEnt(e){
   }
 
   // Boss pulsing ring
+  if(e.animal){notif(e.n+' killed!','info');}
   if(e.t==='boss'){
     const p2=Math.sin(gameTime*.07)*3;
     gctx.strokeStyle='rgba(255,60,60,0.6)';gctx.lineWidth=2.5;
@@ -1991,7 +2215,7 @@ function render(){
   // Tree base shadows (before entities)
   drawTreeShadows();
   // Game objects
-  drawEnts();drawNPCs_r();drawProjs_r();drawParts_r();drawFloats_r();drawPlayer_r();
+  drawEnts();drawNPCs_r();drawWanderers();drawProjs_r();drawParts_r();drawFloats_r();drawPlayer_r();
   // Trees on top (render over player when standing behind)
   drawTrees();
   // Atmospheric tint
@@ -2049,36 +2273,37 @@ function drawFloats_r(){
 }
 
 function drawMM(){
-  const s=100/WW;
-  mmctx.fillStyle='#050510';mmctx.fillRect(0,0,100,100);
+  const s=120/WW;
+  mmctx.fillStyle='#050510';mmctx.fillRect(0,0,120,120);
   ZONES.forEach(z=>{mmctx.fillStyle=z.col;mmctx.fillRect(z.x*s,z.y*s,z.w*s,z.h*s);});
   const mpx=P.x/TS*s,mpy=P.y/TS*s;
-  mmctx.fillStyle='#ffd27a';mmctx.fillRect(Math.max(0,Math.min(98,mpx-1)),Math.max(0,Math.min(98,mpy-1)),3,3);
+  mmctx.fillStyle='#ffd27a';mmctx.fillRect(Math.max(0,Math.min(118,mpx-1)),Math.max(0,Math.min(118,mpy-1)),3,3);
   entities.forEach(e=>{
     if(e.dead)return;const ex=e.x/TS*s,ey2=e.y/TS*s;
     mmctx.fillStyle=e.t==='boss'?'#ff4444':'#cc3333';
-    mmctx.fillRect(Math.max(0,Math.min(99,ex)),Math.max(0,Math.min(99,ey2)),e.t==='boss'?2:1,e.t==='boss'?2:1);
+    mmctx.fillRect(Math.max(0,Math.min(118,ex)),Math.max(0,Math.min(118,ey2)),e.t==='boss'?2:1,e.t==='boss'?2:1);
   });
 }
 
 // ── HUD ──
 function updHUD(){
   if(!P.maxHp)return;
-  document.getElementById('bHp').style.width=(P.hp/P.maxHp*100)+'%';
-  document.getElementById('vHp').textContent=Math.ceil(P.hp)+'/'+P.maxHp;
+  const hpBar=document.getElementById('bHp');if(hpBar)hpBar.style.width=Math.max(0,(P.hp/P.maxHp*100))+'%';
+  const hpVal=document.getElementById('vHp');if(hpVal)hpVal.textContent=Math.max(0,Math.ceil(P.hp))+'/'+P.maxHp;
   document.getElementById('bMp').style.width=(P.mp/P.maxMp*100)+'%';
   document.getElementById('vMp').textContent=Math.ceil(P.mp)+'/'+P.maxMp;
   document.getElementById('bXp').style.width=(P.xp/P.xpNext*100)+'%';
   document.getElementById('vLv').textContent='Lv'+P.level;
-  document.getElementById('bSt').style.width=(P.stamina/P.maxSt*100)+'%';
-  document.getElementById('vSt').textContent=Math.ceil(P.stamina);
+  const stEl=document.getElementById('bSt');if(stEl)stEl.style.width=(P.stamina/P.maxSt*100)+'%';
+  const stVEl=document.getElementById('vSt');if(stVEl)stVEl.textContent=Math.ceil(P.stamina);
   document.getElementById('pClan').textContent=(P.clan?.emoji||'—')+' '+(P.clan?.n?.slice(0,10)||'No Clan');
   document.getElementById('pGold').textContent='🪙 '+P.gold+'g';
   document.getElementById('pRace').textContent=(P.race?.emoji||'👤')+' '+(P.race?.n||'Warrior');
   const swimEl=document.getElementById('swimBar');
   if(swimEl)swimEl.style.display=P.swimming?'block':'none';
   const gp=document.getElementById('goalPill');
-  if(gp){const bk=P.bossKills||0;gp.textContent='🏆 '+bk+'/6 Bosses';gp.style.color=bk>=6?'#ffdd00':'#ffd27a';}
+  if(gp){const bk=P.bossKills||0;gp.textContent='🏆 '+bk+'/9 Bosses';gp.style.color=bk>=6?'#ffdd00':'#ffd27a';}
+  const pnEl=document.getElementById('pName');if(pnEl)pnEl.textContent=(P.name||'Hero')+' · '+(P.race?.n||'Human')+' · '+(P.clan?.id!=='none'?P.clan?.n:'No Clan');
   for(let i=0;i<5;i++){
     const hs=document.getElementById('hs'+i);if(!hs)continue;
     const si=P.hotbar[i];const item=si!=null?P.inv[si]:null;
@@ -2197,7 +2422,7 @@ function renderWM(){
   const c=document.getElementById('wmCv');if(!c)return;
   c.width=c.offsetWidth||700;c.height=c.offsetHeight||380;
   const cx=c.getContext('2d'),sw=c.width/WW,sh=c.height/WH;
-  cx.fillStyle='#08040c';cx.fillRect(0,0,c.width,c.height);
+  cx.fillStyle='#06030a';cx.fillRect(0,0,c.width,c.height);
   ZONES.forEach(z=>{
     cx.fillStyle=z.col;cx.fillRect(z.x*sw,z.y*sh,z.w*sw,z.h*sh);
     cx.strokeStyle='rgba(200,160,80,.2)';cx.lineWidth=1;cx.strokeRect(z.x*sw,z.y*sh,z.w*sw,z.h*sh);
@@ -2358,15 +2583,34 @@ function showVictory(){
 }
 
 // ── GAME START ──
-function startNew(){SS('sQuest');renderQuestList('questList');}
+function startNew(){
+  const nm=document.getElementById('nameInput')?.value?.trim();
+  window._heroName=nm&&nm.length>0?nm:'Hero';
+  SS('sQuest');renderQuestList('questList');
+}
+function resetStory(){
+  if(!confirm('Reset ALL progress? This cannot be undone!'))return;
+  try{localStorage.removeItem('kor_v3');localStorage.removeItem('kor_v5');}catch(e){}
+  notif('Story reset! Start fresh.','info');
+}
+function manualSave(){
+  try{
+    localStorage.setItem('kor_v5',JSON.stringify({
+      player:{...P,buffs:[],dead:false,invincible:false,raceId:P.race?.id,clanId:P.clan?.id,name:P.name},
+      quests,unlockedRaces,unlockedClans,hellTimeCounter,achievements
+    }));
+    notif('💾 Game Saved!','good');
+  }catch(e){notif('Save failed!','bad');}
+}
 
 function enterWorld(){
   closeAllP();SS(null);
   document.getElementById('hud').style.display='block';
-  genWorld();initPlayer();initQuests();spawnEntities();spawnNPCs();
+  genWorld();initPlayer();initQuests();spawnEntities();spawnNPCs();spawnWanderers();
+  P.name=window._heroName||'Hero';
   gameRunning=true;lastTs=performance.now();
   requestAnimationFrame(gameLoop);
-  notif('Welcome to Kingdom of Realms!','rare');
+  notif('Welcome, '+P.name+'!','rare');
   // Auto-start tutorial after short delay
   setTimeout(()=>{if(!tutorialDone){startTutorial();}},1200);
   setTimeout(()=>notif('Press E near NPCs to talk. Watch for the 💛 ! above their heads.','info'),4000);
@@ -2375,11 +2619,12 @@ function enterWorld(){
 
 function loadGame(){
   try{
-    const s=localStorage.getItem('kor_v3');
+    const s=localStorage.getItem('kor_v5');
     if(!s){notif('No save found.','bad');return;}
     const d=JSON.parse(s);
     SS(null);document.getElementById('hud').style.display='block';
     genWorld();spawnEntities();spawnNPCs();
+    genWorld();spawnEntities();spawnNPCs();spawnWanderers();
     Object.assign(P,d.player);
     P.buffs=[];P.dead=false;P.invincible=false;
     P.race=RACES[d.player.raceId]||RACES['warrior'];
