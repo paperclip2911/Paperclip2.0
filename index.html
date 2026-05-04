@@ -2,606 +2,977 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fly Corp</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:#0d1117;color:#e6edf3;font-family:'Segoe UI',sans-serif;overflow:hidden;user-select:none;}
-#app{width:100vw;height:100vh;display:flex;flex-direction:column;}
-#hud{display:flex;align-items:center;gap:12px;padding:8px 14px;background:rgba(13,17,23,0.92);border-bottom:1px solid #21262d;z-index:10;flex-shrink:0;}
-#hud .logo{font-size:15px;font-weight:700;color:#58a6ff;letter-spacing:1px;}
-.stat{display:flex;flex-direction:column;align-items:center;min-width:70px;}
-.stat-label{font-size:9px;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;}
-.stat-val{font-size:14px;font-weight:600;color:#e6edf3;}
-.stat-val.good{color:#3fb950;}
-.stat-val.warn{color:#d29922;}
-.stat-val.bad{color:#f85149;}
-#timer-bar{flex:1;height:6px;background:#21262d;border-radius:3px;overflow:hidden;}
-#timer-fill{height:100%;background:#58a6ff;transition:width .5s linear;border-radius:3px;}
-#btn-row{display:flex;gap:6px;margin-left:auto;}
-.btn{padding:5px 12px;border-radius:6px;border:1px solid #30363d;background:transparent;color:#e6edf3;font-size:11px;cursor:pointer;transition:background .15s;}
-.btn:hover{background:#21262d;}
-.btn.primary{background:#1f6feb;border-color:#1f6feb;}
-.btn.primary:hover{background:#388bfd;}
-#map-wrap{flex:1;position:relative;overflow:hidden;}
-#map{width:100%;height:100%;display:block;cursor:crosshair;}
-#sidebar{position:absolute;right:0;top:0;bottom:0;width:190px;background:rgba(13,17,23,0.93);border-left:1px solid #21262d;padding:10px;overflow-y:auto;z-index:5;}
-#sidebar h3{font-size:11px;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
-.route-item{font-size:10px;padding:4px 6px;margin-bottom:4px;background:#161b22;border-radius:4px;display:flex;justify-content:space-between;align-items:center;border:1px solid #21262d;}
-.route-item .del{color:#f85149;cursor:pointer;font-size:14px;line-height:1;padding:0 2px;}
-.city-tooltip{position:absolute;pointer-events:none;background:rgba(13,17,23,0.95);border:1px solid #30363d;border-radius:6px;padding:6px 10px;font-size:11px;z-index:20;white-space:nowrap;display:none;}
-#event-banner{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:#1f6feb;color:#fff;padding:8px 18px;border-radius:8px;font-size:12px;z-index:30;opacity:0;transition:opacity .3s;pointer-events:none;max-width:400px;text-align:center;}
-#overlay{position:absolute;inset:0;background:rgba(13,17,23,0.92);z-index:40;display:flex;align-items:center;justify-content:center;}
-#overlay-box{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:32px 40px;max-width:400px;text-align:center;}
-#overlay-box h2{font-size:24px;margin-bottom:8px;}
-#overlay-box p{font-size:13px;color:#8b949e;margin-bottom:20px;line-height:1.7;}
-.score{font-size:28px;font-weight:700;color:#58a6ff;margin:12px 0;}
-.instructions{font-size:12px;color:#8b949e;text-align:left;background:#0d1117;border-radius:8px;padding:12px;margin-bottom:16px;line-height:1.8;}
-.instructions b{color:#e6edf3;}
+html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:'Segoe UI',sans-serif;color:#fff;}
+#app{display:flex;flex-direction:column;width:100vw;height:100vh;}
+
+/* HUD */
+#hud{display:flex;align-items:center;gap:10px;padding:6px 12px;background:linear-gradient(90deg,#16213e,#0f3460);border-bottom:2px solid #e94560;flex-shrink:0;flex-wrap:wrap;}
+.logo{font-size:18px;font-weight:900;color:#fff;letter-spacing:2px;text-shadow:0 0 20px #e94560;}
+.logo span{color:#e94560;}
+.hstat{display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,0.07);border-radius:8px;padding:4px 10px;min-width:80px;}
+.hstat-label{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;}
+.hstat-val{font-size:15px;font-weight:700;}
+.green{color:#00ff88;}
+.yellow{color:#ffd700;}
+.red{color:#ff4466;}
+.white{color:#fff;}
+#timerbar-wrap{flex:1;min-width:80px;}
+#timerbar-bg{height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;}
+#timerbar{height:100%;border-radius:4px;transition:width .4s linear,background .4s;}
+.topbtn{padding:5px 14px;border-radius:8px;border:none;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.5px;}
+.topbtn.buy{background:#e94560;color:#fff;}
+.topbtn.buy:hover{background:#ff6b6b;}
+.topbtn.buy:disabled{background:#555;cursor:not-allowed;}
+
+/* MAP */
+#mapwrap{flex:1;position:relative;overflow:hidden;}
+#mapsvg{width:100%;height:100%;display:block;}
+.country{stroke:#0a0a1a;stroke-width:0.4;cursor:pointer;transition:filter .15s;}
+.country.locked{fill:#1e2a4a;stroke:#2a3a5e;}
+.country.unlocked{fill:#0f3460;stroke:#1a5276;}
+.country.unlocked:hover{filter:brightness(1.4);}
+.country.selected-route{stroke:#ffd700;stroke-width:1.5;}
+.city-dot{cursor:pointer;}
+.city-dot circle{transition:r .15s;}
+.city-dot:hover circle{r:7;}
+.route-line{pointer-events:none;}
+.plane-icon{pointer-events:none;font-size:12px;}
+
+/* SIDEBAR */
+#sidebar{position:absolute;right:0;top:0;bottom:0;width:200px;background:rgba(10,10,30,0.95);border-left:2px solid #e94560;padding:10px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
+#sidebar h3{font-size:10px;color:#e94560;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #e94560;padding-bottom:4px;}
+.route-entry{background:rgba(255,255,255,0.05);border-radius:6px;padding:5px 8px;font-size:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(255,255,255,0.08);}
+.route-del{color:#ff4466;cursor:pointer;font-size:16px;line-height:1;}
+.event-entry{font-size:10px;color:#aaa;line-height:1.6;border-left:2px solid #e94560;padding-left:6px;margin-bottom:3px;}
+
+/* TOOLTIP */
+#tip{position:fixed;pointer-events:none;background:rgba(10,10,30,0.97);border:1px solid #e94560;border-radius:8px;padding:8px 12px;font-size:11px;z-index:100;display:none;max-width:200px;}
+#tip b{color:#e94560;}
+
+/* OVERLAY */
+#overlay{position:fixed;inset:0;background:rgba(10,10,30,0.96);z-index:200;display:flex;align-items:center;justify-content:center;}
+#overlay-box{background:#16213e;border:2px solid #e94560;border-radius:16px;padding:36px 44px;max-width:460px;text-align:center;box-shadow:0 0 60px rgba(233,69,96,0.3);}
+#overlay-box h1{font-size:32px;font-weight:900;color:#e94560;letter-spacing:3px;margin-bottom:4px;}
+#overlay-box .tagline{color:#aaa;font-size:13px;margin-bottom:20px;}
+.how{background:rgba(255,255,255,0.05);border-radius:10px;padding:12px 16px;text-align:left;font-size:12px;color:#ccc;line-height:1.9;margin-bottom:20px;}
+.how b{color:#ffd700;}
+.startbtn{background:#e94560;color:#fff;border:none;padding:12px 36px;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:1px;}
+.startbtn:hover{background:#ff6b6b;transform:scale(1.03);}
+#result-score{font-size:28px;font-weight:700;color:#ffd700;margin:12px 0;}
+
+/* EVENT TOAST */
+#toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#e94560;color:#fff;padding:9px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;text-align:center;max-width:380px;}
+
+/* COUNTRY BUY POPUP */
+#buypop{position:fixed;z-index:150;background:#16213e;border:2px solid #e94560;border-radius:12px;padding:16px 20px;font-size:12px;display:none;min-width:200px;box-shadow:0 4px 30px rgba(233,69,96,0.4);}
+#buypop h4{color:#e94560;margin-bottom:8px;font-size:14px;}
+#buypop .pop-cost{color:#ffd700;font-size:16px;font-weight:700;margin-bottom:10px;}
+#buypop .pop-btns{display:flex;gap:8px;}
+#buypop .pop-btns button{flex:1;padding:6px;border-radius:6px;border:none;cursor:pointer;font-weight:700;font-size:12px;}
+#buypop .pop-btns .confirm{background:#e94560;color:#fff;}
+#buypop .pop-btns .cancel{background:#333;color:#fff;}
 </style>
 </head>
 <body>
 <div id="app">
   <div id="hud">
-    <div class="logo">✈ FLY CORP</div>
-    <div class="stat"><span class="stat-label">Cash</span><span class="stat-val good" id="h-cash">$10,000</span></div>
-    <div class="stat"><span class="stat-label">Revenue/s</span><span class="stat-val" id="h-rev">$0</span></div>
-    <div class="stat"><span class="stat-label">Passengers</span><span class="stat-val" id="h-pax">0</span></div>
-    <div class="stat"><span class="stat-label">Routes</span><span class="stat-val" id="h-routes">0</span></div>
-    <div class="stat"><span class="stat-label">Cities</span><span class="stat-val" id="h-cities">0/0</span></div>
-    <div id="timer-bar"><div id="timer-fill" style="width:100%"></div></div>
-    <div class="stat"><span class="stat-label">Next unlock</span><span class="stat-val warn" id="h-timer">6:00</span></div>
-    <div id="btn-row">
-      <button class="btn primary" id="btn-unlock">Unlock Region ($2,000)</button>
+    <div class="logo">FLY<span>CORP</span> ✈</div>
+    <div class="hstat"><span class="hstat-label">Cash</span><span class="hstat-val green" id="h-cash">$400</span></div>
+    <div class="hstat"><span class="hstat-label">Income/s</span><span class="hstat-val yellow" id="h-inc">$0</span></div>
+    <div class="hstat"><span class="hstat-label">Passengers</span><span class="hstat-val white" id="h-pax">0</span></div>
+    <div class="hstat"><span class="hstat-label">Routes</span><span class="hstat-val white" id="h-routes">0</span></div>
+    <div class="hstat"><span class="hstat-label">Countries</span><span class="hstat-val white" id="h-countries">1</span></div>
+    <div id="timerbar-wrap">
+      <div style="font-size:9px;color:#aaa;text-align:center;margin-bottom:2px;">UNLOCK TIMER <span id="h-timer" style="color:#ffd700">6:00</span></div>
+      <div id="timerbar-bg"><div id="timerbar" style="width:100%;background:#00ff88;"></div></div>
+    </div>
+    <button class="topbtn buy" id="btn-buy-country">Buy Country</button>
+  </div>
+  <div id="mapwrap">
+    <svg id="mapsvg" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="sidebar">
+      <h3>✈ Routes</h3>
+      <div id="route-list"></div>
+      <h3 style="margin-top:4px;">⚡ Events</h3>
+      <div id="event-list"></div>
     </div>
   </div>
-  <div id="map-wrap">
-    <canvas id="map"></canvas>
-    <div id="sidebar">
-      <h3>Routes</h3>
-      <div id="route-list"></div>
-      <div style="margin-top:10px;border-top:1px solid #21262d;padding-top:8px;">
-        <h3>Events</h3>
-        <div id="event-log" style="font-size:10px;color:#8b949e;line-height:1.7;"></div>
-      </div>
-    </div>
-    <div class="city-tooltip" id="tooltip"></div>
-    <div id="event-banner"></div>
+</div>
+
+<div id="tip"></div>
+<div id="toast"></div>
+
+<div id="buypop">
+  <h4 id="buypop-name">Country</h4>
+  <div class="pop-cost" id="buypop-cost">$0</div>
+  <div id="buypop-info" style="color:#aaa;font-size:11px;margin-bottom:8px;"></div>
+  <div class="pop-btns">
+    <button class="confirm" id="buypop-confirm">Buy ✓</button>
+    <button class="cancel" id="buypop-cancel">Cancel</button>
   </div>
 </div>
 
 <div id="overlay">
   <div id="overlay-box">
-    <h2>✈ FLY CORP</h2>
-    <div class="instructions">
+    <h1>FLYCORP</h1>
+    <div class="tagline">Build the world's greatest airline empire</div>
+    <div class="how">
       <b>How to play:</b><br>
-      • <b>Click a city</b> to select it (turns orange)<br>
-      • <b>Click another city</b> to open a route<br>
-      • Routes cost money based on distance<br>
-      • Earn revenue from passengers automatically<br>
-      • <b>Unlock new regions</b> before the timer hits 0<br>
-      • Survive random events and expand your empire!
+      • You start with <b>France</b> and <b>$400</b><br>
+      • <b>Click cities</b> to connect them with routes<br>
+      • Routes earn money from <b>passengers</b> automatically<br>
+      • <b>Buy new countries</b> to unlock more cities<br>
+      • Countries get <b>more expensive</b> as you expand<br>
+      • Unlock a new country every <b>6 minutes</b> or game over!
     </div>
-    <div class="score" id="overlay-score" style="display:none"></div>
-    <button class="btn primary" id="btn-start" style="font-size:14px;padding:10px 28px;">Start Game</button>
-    <div style="margin-top:10px;font-size:11px;color:#8b949e;">Mode: Discover the World — unlock all regions before time runs out!</div>
+    <div id="result-score" style="display:none"></div>
+    <button class="startbtn" id="btn-start">▶ START GAME</button>
   </div>
 </div>
 
 <script>
-const canvas = document.getElementById('map');
-const ctx = canvas.getContext('2d');
+// ─── WORLD COUNTRIES DATA ───────────────────────────────────────────────────
+// Each country: id, name, continent, baseCost, cities array [{name,x,y,pop}]
+// x,y in SVG 1000x500 space (equirectangular projection approximation)
 
-const ALL_CITIES = [
-  // North America
-  {id:'nyc',name:'New York',lat:40.7,lon:-74,pop:8,region:'NA'},
-  {id:'lax',name:'Los Angeles',lat:34,lon:-118,pop:7,region:'NA'},
-  {id:'chi',name:'Chicago',lat:41.8,lon:-87.6,pop:6,region:'NA'},
-  {id:'mia',name:'Miami',lat:25.7,lon:-80.2,pop:4,region:'NA'},
-  {id:'yvr',name:'Vancouver',lat:49.2,lon:-123,pop:3,region:'NA'},
-  {id:'mex',name:'Mexico City',lat:19.4,lon:-99.1,pop:9,region:'NA'},
-  {id:'yto',name:'Toronto',lat:43.6,lon:-79.4,pop:5,region:'NA'},
-  // South America
-  {id:'bog',name:'Bogotá',lat:4.7,lon:-74.1,pop:8,region:'SA'},
-  {id:'gru',name:'São Paulo',lat:-23.5,lon:-46.6,pop:12,region:'SA'},
-  {id:'eze',name:'Buenos Aires',lat:-34.6,lon:-58.4,pop:7,region:'SA'},
-  {id:'lim',name:'Lima',lat:-12,lon:-77,pop:9,region:'SA'},
-  {id:'scl',name:'Santiago',lat:-33.4,lon:-70.6,pop:6,region:'SA'},
-  // Europe
-  {id:'lhr',name:'London',lat:51.5,lon:-0.1,pop:9,region:'EU'},
-  {id:'cdg',name:'Paris',lat:48.8,lon:2.3,pop:8,region:'EU'},
-  {id:'fra',name:'Frankfurt',lat:50.1,lon:8.7,pop:5,region:'EU'},
-  {id:'ams',name:'Amsterdam',lat:52.3,lon:4.9,pop:4,region:'EU'},
-  {id:'mad',name:'Madrid',lat:40.4,lon:-3.7,pop:6,region:'EU'},
-  {id:'fco',name:'Rome',lat:41.9,lon:12.5,pop:6,region:'EU'},
-  {id:'ist',name:'Istanbul',lat:41,lon:28.9,pop:15,region:'EU'},
-  {id:'svo',name:'Moscow',lat:55.7,lon:37.6,pop:12,region:'EU'},
-  {id:'waw',name:'Warsaw',lat:52.2,lon:21,pop:4,region:'EU'},
-  {id:'ath',name:'Athens',lat:37.9,lon:23.7,pop:4,region:'EU'},
-  {id:'bcn',name:'Barcelona',lat:41.4,lon:2.2,pop:5,region:'EU'},
-  // Africa
-  {id:'jnb',name:'Johannesburg',lat:-26.2,lon:28,pop:9,region:'AF'},
-  {id:'cai',name:'Cairo',lat:30,lon:31.2,pop:20,region:'AF'},
-  {id:'los',name:'Lagos',lat:6.5,lon:3.4,pop:14,region:'AF'},
-  {id:'nbo',name:'Nairobi',lat:-1.3,lon:36.8,pop:4,region:'AF'},
-  {id:'cmn',name:'Casablanca',lat:33.6,lon:-7.6,pop:4,region:'AF'},
-  {id:'acc',name:'Accra',lat:5.6,lon:-0.2,pop:3,region:'AF'},
-  // Middle East
-  {id:'dxb',name:'Dubai',lat:25.2,lon:55.3,pop:3,region:'ME'},
-  {id:'doh',name:'Doha',lat:25.3,lon:51.5,pop:2,region:'ME'},
-  {id:'tlv',name:'Tel Aviv',lat:32,lon:34.8,pop:4,region:'ME'},
-  {id:'ruh',name:'Riyadh',lat:24.7,lon:46.7,pop:7,region:'ME'},
-  // Asia
-  {id:'del',name:'Delhi',lat:28.6,lon:77.2,pop:32,region:'AS'},
-  {id:'bom',name:'Mumbai',lat:19,lon:72.8,pop:20,region:'AS'},
-  {id:'bkk',name:'Bangkok',lat:13.7,lon:100.5,pop:10,region:'AS'},
-  {id:'sin',name:'Singapore',lat:1.3,lon:103.8,pop:6,region:'AS'},
-  {id:'hkg',name:'Hong Kong',lat:22.3,lon:114.2,pop:7,region:'AS'},
-  {id:'pek',name:'Beijing',lat:39.9,lon:116.4,pop:21,region:'AS'},
-  {id:'sha',name:'Shanghai',lat:31.2,lon:121.5,pop:26,region:'AS'},
-  {id:'tyo',name:'Tokyo',lat:35.7,lon:139.7,pop:14,region:'AS'},
-  {id:'icn',name:'Seoul',lat:37.5,lon:127,pop:10,region:'AS'},
-  {id:'kul',name:'Kuala Lumpur',lat:3.1,lon:101.7,pop:7,region:'AS'},
-  {id:'jkt',name:'Jakarta',lat:-6.2,lon:106.8,pop:34,region:'AS'},
-  {id:'cgk',name:'Karachi',lat:24.9,lon:67,pop:16,region:'AS'},
-  {id:'tpe',name:'Taipei',lat:25.1,lon:121.6,pop:7,region:'AS'},
-  // Oceania
-  {id:'syd',name:'Sydney',lat:-33.9,lon:151.2,pop:5,region:'OC'},
-  {id:'mel',name:'Melbourne',lat:-37.8,lon:145,pop:4,region:'OC'},
-  {id:'akl',name:'Auckland',lat:-36.8,lon:174.7,pop:2,region:'OC'},
+const COUNTRIES = [
+  // EUROPE
+  {id:'fr',name:'France',cont:'EU',base:0,cities:[
+    {n:'Paris',x:490,y:155,p:11},{n:'Lyon',x:495,y:168,p:5},{n:'Marseille',x:497,y:178,p:3}
+  ]},
+  {id:'de',name:'Germany',cont:'EU',base:120,cities:[
+    {n:'Berlin',x:510,y:145,p:4},{n:'Munich',x:512,y:155,p:3},{n:'Hamburg',x:507,y:138,p:2}
+  ]},
+  {id:'gb',name:'UK',cont:'EU',base:140,cities:[
+    {n:'London',x:477,y:145,p:9},{n:'Manchester',x:475,y:138,p:3}
+  ]},
+  {id:'es',name:'Spain',cont:'EU',base:130,cities:[
+    {n:'Madrid',x:480,y:170,p:7},{n:'Barcelona',x:490,y:168,p:5}
+  ]},
+  {id:'it',name:'Italy',cont:'EU',base:135,cities:[
+    {n:'Rome',x:510,y:172,p:4},{n:'Milan',x:508,y:162,p:5}
+  ]},
+  {id:'pt',name:'Portugal',cont:'EU',base:100,cities:[
+    {n:'Lisbon',x:472,y:170,p:3}
+  ]},
+  {id:'nl',name:'Netherlands',cont:'EU',base:120,cities:[
+    {n:'Amsterdam',x:492,y:140,p:2}
+  ]},
+  {id:'be',name:'Belgium',cont:'EU',base:110,cities:[
+    {n:'Brussels',x:489,y:144,p:2}
+  ]},
+  {id:'ch',name:'Switzerland',cont:'EU',base:130,cities:[
+    {n:'Zurich',x:500,y:158,p:1}
+  ]},
+  {id:'at',name:'Austria',cont:'EU',base:120,cities:[
+    {n:'Vienna',x:515,y:153,p:2}
+  ]},
+  {id:'pl',name:'Poland',cont:'EU',base:130,cities:[
+    {n:'Warsaw',x:522,y:140,p:3},{n:'Krakow',x:520,y:146,p:1}
+  ]},
+  {id:'se',name:'Sweden',cont:'EU',base:140,cities:[
+    {n:'Stockholm',x:510,y:120,p:2},{n:'Gothenburg',x:505,y:128,p:1}
+  ]},
+  {id:'no',name:'Norway',cont:'EU',base:145,cities:[
+    {n:'Oslo',x:504,y:122,p:1}
+  ]},
+  {id:'dk',name:'Denmark',cont:'EU',base:125,cities:[
+    {n:'Copenhagen',x:507,y:132,p:1}
+  ]},
+  {id:'fi',name:'Finland',cont:'EU',base:140,cities:[
+    {n:'Helsinki',x:522,y:118,p:1}
+  ]},
+  {id:'cz',name:'Czech Republic',cont:'EU',base:115,cities:[
+    {n:'Prague',x:513,y:148,p:1}
+  ]},
+  {id:'hu',name:'Hungary',cont:'EU',base:115,cities:[
+    {n:'Budapest',x:519,y:153,p:2}
+  ]},
+  {id:'ro',name:'Romania',cont:'EU',base:120,cities:[
+    {n:'Bucharest',x:527,y:158,p:2}
+  ]},
+  {id:'gr',name:'Greece',cont:'EU',base:130,cities:[
+    {n:'Athens',x:523,y:178,p:4}
+  ]},
+  {id:'rs',name:'Serbia',cont:'EU',base:110,cities:[
+    {n:'Belgrade',x:521,y:160,p:2}
+  ]},
+  {id:'ua',name:'Ukraine',cont:'EU',base:135,cities:[
+    {n:'Kyiv',x:535,y:143,p:3},{n:'Kharkiv',x:542,y:142,p:2}
+  ]},
+  {id:'ru',name:'Russia',cont:'EU',base:300,cities:[
+    {n:'Moscow',x:555,y:133,p:12},{n:'St Petersburg',x:540,y:122,p:5},{n:'Novosibirsk',x:650,y:120,p:2},{n:'Vladivostok',x:770,y:140,p:1}
+  ]},
+  {id:'tr',name:'Turkey',cont:'EU',base:200,cities:[
+    {n:'Istanbul',x:535,y:168,p:15},{n:'Ankara',x:545,y:166,p:5}
+  ]},
+
+  // AFRICA
+  {id:'ma',name:'Morocco',cont:'AF',base:160,cities:[
+    {n:'Casablanca',x:475,y:185,p:4},{n:'Rabat',x:474,y:183,p:2}
+  ]},
+  {id:'eg',name:'Egypt',cont:'AF',base:200,cities:[
+    {n:'Cairo',x:543,y:190,p:20},{n:'Alexandria',x:539,y:187,p:5}
+  ]},
+  {id:'ng',name:'Nigeria',cont:'AF',base:250,cities:[
+    {n:'Lagos',x:492,y:233,p:14},{n:'Abuja',x:495,y:225,p:4}
+  ]},
+  {id:'za',name:'South Africa',cont:'AF',base:280,cities:[
+    {n:'Johannesburg',x:527,y:300,p:9},{n:'Cape Town',x:521,y:310,p:5}
+  ]},
+  {id:'ke',name:'Kenya',cont:'AF',base:230,cities:[
+    {n:'Nairobi',x:548,y:247,p:4}
+  ]},
+  {id:'et',name:'Ethiopia',cont:'AF',base:220,cities:[
+    {n:'Addis Ababa',x:553,y:237,p:4}
+  ]},
+  {id:'gh',name:'Ghana',cont:'AF',base:190,cities:[
+    {n:'Accra',x:488,y:232,p:3}
+  ]},
+  {id:'tz',name:'Tanzania',cont:'AF',base:220,cities:[
+    {n:'Dar es Salaam',x:545,y:260,p:3}
+  ]},
+  {id:'ao',name:'Angola',cont:'AF',base:210,cities:[
+    {n:'Luanda',x:515,y:268,p:3}
+  ]},
+  {id:'dz',name:'Algeria',cont:'AF',base:190,cities:[
+    {n:'Algiers',x:488,y:180,p:3}
+  ]},
+  {id:'tn',name:'Tunisia',cont:'AF',base:170,cities:[
+    {n:'Tunis',x:499,y:178,p:2}
+  ]},
+  {id:'ci',name:"Côte d'Ivoire",cont:'AF',base:190,cities:[
+    {n:"Abidjan",x:484,y:232,p:5}
+  ]},
+  {id:'cd',name:'DR Congo',cont:'AF',base:230,cities:[
+    {n:'Kinshasa',x:519,y:258,p:14}
+  ]},
+  {id:'cm',name:'Cameroon',cont:'AF',base:200,cities:[
+    {n:'Yaoundé',x:505,y:235,p:3}
+  ]},
+  {id:'mz',name:'Mozambique',cont:'AF',base:210,cities:[
+    {n:'Maputo',x:539,y:292,p:2}
+  ]},
+  {id:'sn',name:'Senegal',cont:'AF',base:180,cities:[
+    {n:'Dakar',x:469,y:216,p:3}
+  ]},
+  {id:'sd',name:'Sudan',cont:'AF',base:210,cities:[
+    {n:'Khartoum',x:541,y:210,p:5}
+  ]},
+  {id:'ly',name:'Libya',cont:'AF',base:190,cities:[
+    {n:'Tripoli',x:503,y:183,p:3}
+  ]},
+  {id:'ug',name:'Uganda',cont:'AF',base:200,cities:[
+    {n:'Kampala',x:540,y:247,p:4}
+  ]},
+  {id:'zm',name:'Zambia',cont:'AF',base:205,cities:[
+    {n:'Lusaka',x:530,y:278,p:3}
+  ]},
+
+  // MIDDLE EAST
+  {id:'sa',name:'Saudi Arabia',cont:'ME',base:300,cities:[
+    {n:'Riyadh',x:565,y:198,p:7},{n:'Jeddah',x:556,y:202,p:5}
+  ]},
+  {id:'ae',name:'UAE',cont:'ME',base:280,cities:[
+    {n:'Dubai',x:578,y:200,p:3},{n:'Abu Dhabi',x:576,y:202,p:2}
+  ]},
+  {id:'il',name:'Israel',cont:'ME',base:220,cities:[
+    {n:'Tel Aviv',x:545,y:182,p:4}
+  ]},
+  {id:'ir',name:'Iran',cont:'ME',base:260,cities:[
+    {n:'Tehran',x:577,y:170,p:9}
+  ]},
+  {id:'iq',name:'Iraq',cont:'ME',base:240,cities:[
+    {n:'Baghdad',x:562,y:178,p:8}
+  ]},
+  {id:'jo',name:'Jordan',cont:'ME',base:200,cities:[
+    {n:'Amman',x:548,y:182,p:2}
+  ]},
+  {id:'lb',name:'Lebanon',cont:'ME',base:190,cities:[
+    {n:'Beirut',x:545,y:178,p:2}
+  ]},
+  {id:'qa',name:'Qatar',cont:'ME',base:250,cities:[
+    {n:'Doha',x:573,y:200,p:3}
+  ]},
+  {id:'kw',name:'Kuwait',cont:'ME',base:240,cities:[
+    {n:'Kuwait City',x:568,y:193,p:3}
+  ]},
+  {id:'om',name:'Oman',cont:'ME',base:230,cities:[
+    {n:'Muscat',x:582,y:202,p:2}
+  ]},
+  {id:'ye',name:'Yemen',cont:'ME',base:220,cities:[
+    {n:'Sanaa',x:561,y:212,p:3}
+  ]},
+  {id:'sy',name:'Syria',cont:'ME',base:210,cities:[
+    {n:'Damascus',x:547,y:175,p:2}
+  ]},
+  {id:'af',name:'Afghanistan',cont:'ME',base:240,cities:[
+    {n:'Kabul',x:601,y:168,p:4}
+  ]},
+
+  // ASIA
+  {id:'in',name:'India',cont:'AS',base:400,cities:[
+    {n:'Delhi',x:625,y:185,p:32},{n:'Mumbai',x:617,y:198,p:20},{n:'Bangalore',x:622,y:208,p:12},{n:'Chennai',x:625,y:210,p:8},{n:'Kolkata',x:640,y:192,p:14}
+  ]},
+  {id:'cn',name:'China',cont:'AS',base:500,cities:[
+    {n:'Beijing',x:693,y:158,p:21},{n:'Shanghai',x:705,y:170,p:26},{n:'Guangzhou',x:701,y:182,p:15},{n:'Chengdu',x:685,y:172,p:8},{n:'Wuhan',x:699,y:170,p:8}
+  ]},
+  {id:'jp',name:'Japan',cont:'AS',base:380,cities:[
+    {n:'Tokyo',x:730,y:162,p:14},{n:'Osaka',x:728,y:167,p:9},{n:'Nagoya',x:729,y:165,p:3}
+  ]},
+  {id:'kr',name:'South Korea',cont:'AS',base:320,cities:[
+    {n:'Seoul',x:718,y:160,p:10},{n:'Busan',x:720,y:165,p:4}
+  ]},
+  {id:'id',name:'Indonesia',cont:'AS',base:380,cities:[
+    {n:'Jakarta',x:690,y:240,p:34},{n:'Surabaya',x:697,y:244,p:3},{n:'Medan',x:677,y:225,p:2}
+  ]},
+  {id:'pk',name:'Pakistan',cont:'AS',base:300,cities:[
+    {n:'Karachi',x:607,y:190,p:16},{n:'Lahore',x:615,y:179,p:13}
+  ]},
+  {id:'bd',name:'Bangladesh',cont:'AS',base:260,cities:[
+    {n:'Dhaka',x:643,y:194,p:21}
+  ]},
+  {id:'vn',name:'Vietnam',cont:'AS',base:280,cities:[
+    {n:'Ho Chi Minh',x:697,y:213,p:9},{n:'Hanoi',x:695,y:203,p:5}
+  ]},
+  {id:'th',name:'Thailand',cont:'AS',base:280,cities:[
+    {n:'Bangkok',x:689,y:212,p:10},{n:'Chiang Mai',x:686,y:204,p:1}
+  ]},
+  {id:'my',name:'Malaysia',cont:'AS',base:270,cities:[
+    {n:'Kuala Lumpur',x:688,y:228,p:7}
+  ]},
+  {id:'ph',name:'Philippines',cont:'AS',base:270,cities:[
+    {n:'Manila',x:713,y:212,p:13},{n:'Cebu',x:717,y:218,p:3}
+  ]},
+  {id:'sg',name:'Singapore',cont:'AS',base:250,cities:[
+    {n:'Singapore',x:689,y:234,p:6}
+  ]},
+  {id:'mm',name:'Myanmar',cont:'AS',base:250,cities:[
+    {n:'Yangon',x:672,y:206,p:7}
+  ]},
+  {id:'kh',name:'Cambodia',cont:'AS',base:230,cities:[
+    {n:'Phnom Penh',x:694,y:214,p:2}
+  ]},
+  {id:'np',name:'Nepal',cont:'AS',base:220,cities:[
+    {n:'Kathmandu',x:634,y:184,p:1}
+  ]},
+  {id:'lk',name:'Sri Lanka',cont:'AS',base:220,cities:[
+    {n:'Colombo',x:624,y:218,p:4}
+  ]},
+  {id:'kz',name:'Kazakhstan',cont:'AS',base:280,cities:[
+    {n:'Almaty',x:617,y:148,p:2},{n:'Astana',x:613,y:137,p:1}
+  ]},
+  {id:'uz',name:'Uzbekistan',cont:'AS',base:250,cities:[
+    {n:'Tashkent',x:607,y:155,p:2}
+  ]},
+  {id:'mn',name:'Mongolia',cont:'AS',base:240,cities:[
+    {n:'Ulaanbaatar',x:680,y:140,p:1}
+  ]},
+  {id:'tw',name:'Taiwan',cont:'AS',base:260,cities:[
+    {n:'Taipei',x:710,y:174,p:7}
+  ]},
+  {id:'hk',name:'Hong Kong',cont:'AS',base:240,cities:[
+    {n:'Hong Kong',x:703,y:183,p:7}
+  ]},
+
+  // AMERICAS
+  {id:'us',name:'USA',cont:'AM',base:600,cities:[
+    {n:'New York',x:225,y:162,p:8},{n:'Los Angeles',x:155,y:170,p:7},{n:'Chicago',x:210,y:155,p:6},{n:'Houston',x:198,y:175,p:5},{n:'Miami',x:218,y:183,p:4},{n:'Dallas',x:194,y:172,p:4},{n:'Seattle',x:148,y:145,p:3},{n:'Atlanta',x:214,y:172,p:3}
+  ]},
+  {id:'ca',name:'Canada',cont:'AM',base:400,cities:[
+    {n:'Toronto',x:218,y:148,p:6},{n:'Vancouver',x:149,y:140,p:3},{n:'Montreal',x:227,y:145,p:4},{n:'Calgary',x:163,y:138,p:2}
+  ]},
+  {id:'mx',name:'Mexico',cont:'AM',base:280,cities:[
+    {n:'Mexico City',x:185,y:195,p:9},{n:'Guadalajara',x:178,y:196,p:5},{n:'Monterrey',x:190,y:186,p:4}
+  ]},
+  {id:'br',name:'Brazil',cont:'AM',base:420,cities:[
+    {n:'São Paulo',x:286,y:292,p:12},{n:'Rio de Janeiro',x:291,y:295,p:7},{n:'Brasília',x:285,y:278,p:3},{n:'Salvador',x:297,y:270,p:4},{n:'Manaus',x:264,y:245,p:2}
+  ]},
+  {id:'ar',name:'Argentina',cont:'AM',base:300,cities:[
+    {n:'Buenos Aires',x:271,y:330,p:15},{n:'Córdoba',x:265,y:320,p:2}
+  ]},
+  {id:'co',name:'Colombia',cont:'AM',base:250,cities:[
+    {n:'Bogotá',x:240,y:227,p:11},{n:'Medellín',x:237,y:228,p:4}
+  ]},
+  {id:'cl',name:'Chile',cont:'AM',base:260,cities:[
+    {n:'Santiago',x:257,y:318,p:7}
+  ]},
+  {id:'pe',name:'Peru',cont:'AM',base:240,cities:[
+    {n:'Lima',x:238,y:270,p:11}
+  ]},
+  {id:'ve',name:'Venezuela',cont:'AM',base:230,cities:[
+    {n:'Caracas',x:253,y:215,p:3}
+  ]},
+  {id:'ec',name:'Ecuador',cont:'AM',base:210,cities:[
+    {n:'Quito',x:233,y:242,p:3},{n:'Guayaquil',x:231,y:248,p:3}
+  ]},
+  {id:'bo',name:'Bolivia',cont:'AM',base:200,cities:[
+    {n:'La Paz',x:255,y:285,p:2}
+  ]},
+  {id:'py',name:'Paraguay',cont:'AM',base:190,cities:[
+    {n:'Asunción',x:266,y:308,p:3}
+  ]},
+  {id:'uy',name:'Uruguay',cont:'AM',base:190,cities:[
+    {n:'Montevideo',x:271,y:322,p:2}
+  ]},
+  {id:'cu',name:'Cuba',cont:'AM',base:210,cities:[
+    {n:'Havana',x:215,y:195,p:2}
+  ]},
+  {id:'gt',name:'Guatemala',cont:'AM',base:190,cities:[
+    {n:'Guatemala City',x:196,y:205,p:3}
+  ]},
+  {id:'cr',name:'Costa Rica',cont:'AM',base:185,cities:[
+    {n:'San José',x:203,y:214,p:2}
+  ]},
+  {id:'do',name:'Dominican Rep.',cont:'AM',base:185,cities:[
+    {n:'Santo Domingo',x:232,y:200,p:3}
+  ]},
+
+  // OCEANIA
+  {id:'au',name:'Australia',cont:'OC',base:500,cities:[
+    {n:'Sydney',x:782,y:308,p:5},{n:'Melbourne',x:775,y:314,p:5},{n:'Brisbane',x:790,y:300,p:3},{n:'Perth',x:751,y:308,p:2},{n:'Adelaide',x:767,y:310,p:2}
+  ]},
+  {id:'nz',name:'New Zealand',cont:'OC',base:350,cities:[
+    {n:'Auckland',x:808,y:325,p:2},{n:'Wellington',x:810,y:332,p:1}
+  ]},
+  {id:'pg',name:'Papua New Guinea',cont:'OC',base:260,cities:[
+    {n:'Port Moresby',x:762,y:255,p:1}
+  ]},
+
+  // CENTRAL ASIA / CAUCASUS
+  {id:'ge',name:'Georgia',cont:'EU',base:175,cities:[
+    {n:'Tbilisi',x:558,y:163,p:1}
+  ]},
+  {id:'az',name:'Azerbaijan',cont:'EU',base:180,cities:[
+    {n:'Baku',x:565,y:162,p:2}
+  ]},
+  {id:'am',name:'Armenia',cont:'EU',base:170,cities:[
+    {n:'Yerevan',x:557,y:165,p:1}
+  ]},
+  {id:'by',name:'Belarus',cont:'EU',base:165,cities:[
+    {n:'Minsk',x:528,y:134,p:2}
+  ]},
+  {id:'sk',name:'Slovakia',cont:'EU',base:110,cities:[
+    {n:'Bratislava',x:517,y:150,p:1}
+  ]},
+  {id:'hr',name:'Croatia',cont:'EU',base:115,cities:[
+    {n:'Zagreb',x:514,y:157,p:1}
+  ]},
+  {id:'bg',name:'Bulgaria',cont:'EU',base:115,cities:[
+    {n:'Sofia',x:524,y:162,p:2}
+  ]},
+  {id:'mk',name:'North Macedonia',cont:'EU',base:105,cities:[
+    {n:'Skopje',x:522,y:164,p:1}
+  ]},
+  {id:'al',name:'Albania',cont:'EU',base:105,cities:[
+    {n:'Tirana',x:519,y:166,p:1}
+  ]},
+  {id:'ba',name:'Bosnia',cont:'EU',base:108,cities:[
+    {n:'Sarajevo',x:518,y:160,p:1}
+  ]},
+  {id:'si',name:'Slovenia',cont:'EU',base:108,cities:[
+    {n:'Ljubljana',x:512,y:155,p:1}
+  ]},
+  {id:'lt',name:'Lithuania',cont:'EU',base:112,cities:[
+    {n:'Vilnius',x:524,y:132,p:1}
+  ]},
+  {id:'lv',name:'Latvia',cont:'EU',base:112,cities:[
+    {n:'Riga',x:523,y:126,p:1}
+  ]},
+  {id:'ee',name:'Estonia',cont:'EU',base:112,cities:[
+    {n:'Tallinn',x:523,y:120,p:1}
+  ]},
+  {id:'is',name:'Iceland',cont:'EU',base:150,cities:[
+    {n:'Reykjavik',x:453,y:110,p:1}
+  ]},
+  {id:'ie',name:'Ireland',cont:'EU',base:120,cities:[
+    {n:'Dublin',x:469,y:138,p:2}
+  ]},
 ];
 
-const REGIONS = {
-  'NA': {name:'North America', unlockCost:2000},
-  'SA': {name:'South America', unlockCost:2500},
-  'EU': {name:'Europe', unlockCost:2000},
-  'AF': {name:'Africa', unlockCost:3000},
-  'ME': {name:'Middle East', unlockCost:2500},
-  'AS': {name:'Asia', unlockCost:3500},
-  'OC': {name:'Oceania', unlockCost:4000},
-};
+// ─── GAME STATE ─────────────────────────────────────────────────────────────
+let G = {};
 
-const EVENTS = [
-  {msg:'☕ Passenger spilled coffee — lawsuit! Lost $500', effect:g=>g.cash-=500},
-  {msg:'📈 Investor backing! +$3,000', effect:g=>g.cash+=3000},
-  {msg:'🌩 Storm delays — revenue paused for 10s', effect:g=>g.stormTimer=10},
-  {msg:'🎉 Tourism boom! Revenue +50% for 15s', effect:g=>g.boomTimer=15},
-  {msg:'🔧 Maintenance bonus — +$1,000', effect:g=>g.cash+=1000},
-  {msg:'🤝 Partnership deal! +$2,500', effect:g=>g.cash+=2500},
-  {msg:'🦠 Viral outbreak — lost $800', effect:g=>g.cash-=800},
-  {msg:'🏆 Award for best airline! +$1,500', effect:g=>g.cash+=1500},
-];
-
-let state = {
-  running: false, cash: 10000, totalPax: 0, revPerSec: 0,
-  unlockedRegions: new Set(['NA','EU']),
-  routes: [], planes: [], selectedCity: null,
-  discoverTimer: 360, discoverMax: 360,
-  stormTimer: 0, boomTimer: 0,
-  nextEventIn: 20 + Math.random()*20,
-};
-
-function project(lat, lon) {
-  const W = canvas.width - 190, H = canvas.height;
-  const x = ((lon + 180) / 360) * W;
-  const latR = lat * Math.PI / 180;
-  const mercN = Math.log(Math.tan(Math.PI/4 + latR/2));
-  const y = (1 - (mercN / Math.PI + 1) / 2) * H * 0.94 + H * 0.03;
-  return { x: Math.max(0, Math.min(W, x)), y: Math.max(0, Math.min(H, y)) };
+function initState() {
+  G = {
+    running: false,
+    cash: 400,
+    totalPax: 0,
+    incomePerSec: 0,
+    unlockedCountries: new Set(['fr']),
+    countriesBought: 1,
+    routes: [],
+    planes: [],
+    selectedCity: null,
+    discoverTimer: 360,
+    discoverMax: 360,
+    stormTimer: 0,
+    boomTimer: 0,
+    nextEvent: 30 + Math.random()*20,
+    pendingBuy: null,
+  };
 }
 
-function visibleCities() {
-  return ALL_CITIES.filter(c => state.unlockedRegions.has(c.region));
+// ─── COST SCALING ───────────────────────────────────────────────────────────
+function countryCost(country) {
+  const n = G.countriesBought;
+  const scale = 1 + (n * n * 0.08);
+  return Math.round(country.base * scale);
 }
 
-function cityRadius(c) { return 3 + Math.sqrt(c.pop) * 0.7; }
-
-function formatMoney(n) {
-  if (n >= 1000000) return '$' + (n/1000000).toFixed(1) + 'M';
-  if (n >= 1000) return '$' + (n/1000).toFixed(1) + 'k';
-  return '$' + Math.round(n);
+function routeCost(a, b) {
+  const dx = a.x - b.x, dy = a.y - b.y;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  const n = G.routes.length;
+  const scale = 1 + n * 0.12;
+  return Math.max(50, Math.round(dist * 1.2 * scale));
 }
 
-function drawMap() {
-  const W = canvas.width - 190, H = canvas.height;
-  ctx.fillStyle = '#0d1520';
-  ctx.fillRect(0, 0, W, H);
+// ─── SVG MAP SETUP ──────────────────────────────────────────────────────────
+const svg = document.getElementById('mapsvg');
 
-  // Simplified continent shapes
-  const continents = [
-    // North America
-    [[0.04,0.08],[0.22,0.05],[0.28,0.1],[0.3,0.2],[0.28,0.35],[0.2,0.42],[0.15,0.38],[0.1,0.3],[0.05,0.22]],
-    // South America
-    [[0.2,0.43],[0.3,0.42],[0.32,0.55],[0.28,0.72],[0.2,0.78],[0.16,0.7],[0.17,0.55]],
-    // Europe
-    [[0.43,0.07],[0.57,0.06],[0.61,0.13],[0.58,0.22],[0.52,0.23],[0.46,0.2],[0.44,0.14]],
-    // Africa
-    [[0.44,0.22],[0.58,0.22],[0.62,0.35],[0.59,0.56],[0.52,0.65],[0.45,0.6],[0.42,0.45],[0.43,0.32]],
-    // Asia (large)
-    [[0.56,0.06],[0.96,0.06],[0.99,0.26],[0.91,0.43],[0.76,0.49],[0.65,0.41],[0.6,0.26],[0.58,0.14]],
-    // Oceania
-    [[0.82,0.58],[0.95,0.56],[0.97,0.69],[0.9,0.73],[0.82,0.7],[0.8,0.63]],
-  ];
+// Background
+const bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+bg.setAttribute('width','1000'); bg.setAttribute('height','500');
+bg.setAttribute('fill','#0a0e1a'); svg.appendChild(bg);
 
-  ctx.fillStyle = '#161d27';
-  continents.forEach(pts => {
-    ctx.beginPath();
-    pts.forEach((p, i) => {
-      i === 0 ? ctx.moveTo(p[0]*W, p[1]*H) : ctx.lineTo(p[0]*W, p[1]*H);
-    });
-    ctx.closePath();
-    ctx.fill();
-  });
-
-  // Subtle grid
-  ctx.strokeStyle = 'rgba(255,255,255,0.03)';
-  ctx.lineWidth = 0.5;
-  for (let la = -60; la <= 60; la += 30) {
-    const {y} = project(la, 0);
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-  }
-  for (let lo = -180; lo <= 180; lo += 60) {
-    const x = (lo+180)/360 * W;
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-  }
+// Grid lines
+for (let i=0;i<10;i++) {
+  const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+  l.setAttribute('x1',i*100);l.setAttribute('y1',0);l.setAttribute('x2',i*100);l.setAttribute('y2',500);
+  l.setAttribute('stroke','#ffffff08');l.setAttribute('stroke-width','0.5');svg.appendChild(l);
+}
+for (let i=0;i<5;i++) {
+  const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+  l.setAttribute('x1',0);l.setAttribute('y1',i*100);l.setAttribute('x2',1000);l.setAttribute('y2',i*100);
+  l.setAttribute('stroke','#ffffff08');l.setAttribute('stroke-width','0.5');svg.appendChild(l);
 }
 
-function drawRoutes() {
-  state.routes.forEach(r => {
-    const a = project(r.a.lat, r.a.lon);
-    const b = project(r.b.lat, r.b.lon);
-    const mx = (a.x+b.x)/2, my = (a.y+b.y)/2 - 35;
-    ctx.beginPath();
-    ctx.moveTo(a.x, a.y);
-    ctx.quadraticCurveTo(mx, my, b.x, b.y);
-    ctx.strokeStyle = 'rgba(88,166,255,0.4)';
-    ctx.lineWidth = 1.2;
-    ctx.setLineDash([5, 5]);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  });
-}
+// Layers
+const routeLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
+routeLayer.id = 'route-layer'; svg.appendChild(routeLayer);
+const planeLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
+planeLayer.id = 'plane-layer'; svg.appendChild(planeLayer);
+const cityLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
+cityLayer.id = 'city-layer'; svg.appendChild(cityLayer);
 
-function drawCities() {
-  visibleCities().forEach(c => {
-    const {x, y} = project(c.lat, c.lon);
-    const r = cityRadius(c);
-    const isSelected = state.selectedCity && state.selectedCity.id === c.id;
-    // Glow halo
-    const g = ctx.createRadialGradient(x, y, 0, x, y, r*3.5);
-    g.addColorStop(0, isSelected ? 'rgba(255,166,87,0.3)' : 'rgba(88,166,255,0.2)');
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(x, y, r*3.5, 0, Math.PI*2); ctx.fill();
-    // Dot
-    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
-    ctx.fillStyle = isSelected ? '#ffa657' : '#58a6ff';
-    ctx.fill();
-    ctx.strokeStyle = isSelected ? '#ffcb87' : '#79c0ff';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    // Label
-    if (c.pop >= 6 || isSelected) {
-      ctx.font = '10px Segoe UI';
-      ctx.textAlign = 'center';
-      ctx.fillStyle = 'rgba(230,237,243,0.85)';
-      ctx.fillText(c.name, x, y - r - 4);
+// Country blobs (circles to represent country regions on the map)
+const countryLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
+countryLayer.id = 'country-layer';
+svg.insertBefore(countryLayer, routeLayer);
+
+function drawCountryBlobs() {
+  countryLayer.innerHTML = '';
+  COUNTRIES.forEach(c => {
+    const unlocked = G.unlockedCountries.has(c.id);
+    // Draw circle blobs per city cluster
+    const centerX = c.cities.reduce((s,ci)=>s+ci.x,0)/c.cities.length;
+    const centerY = c.cities.reduce((s,ci)=>s+ci.y,0)/c.cities.length;
+    const r = 8 + c.cities.length * 3;
+    const el = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    el.setAttribute('cx',centerX); el.setAttribute('cy',centerY); el.setAttribute('r',r);
+    el.setAttribute('fill', unlocked ? getContColor(c.cont) : '#1e2a4a');
+    el.setAttribute('fill-opacity', unlocked ? '0.35' : '0.5');
+    el.setAttribute('stroke', unlocked ? getContColorBright(c.cont) : '#2a3a5e');
+    el.setAttribute('stroke-width','0.7');
+    el.setAttribute('stroke-opacity','0.8');
+    if (!unlocked) {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', () => promptBuy(c));
+      el.addEventListener('mouseenter', (e) => showTip(e, `<b>${c.name}</b><br>Cost: <span style="color:#ffd700">${formatM(countryCost(c))}</span><br><span style="color:#aaa">Click to unlock</span>`));
+      el.addEventListener('mouseleave', hideTip);
+    }
+    countryLayer.appendChild(el);
+    // Label for locked countries
+    if (!unlocked) {
+      const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x',centerX); t.setAttribute('y',centerY+1);
+      t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','middle');
+      t.setAttribute('font-size','6'); t.setAttribute('fill','#5a7ab8');
+      t.setAttribute('pointer-events','none');
+      t.textContent = c.name.length>10?c.name.substring(0,9)+'…':c.name;
+      countryLayer.appendChild(t);
     }
   });
 }
 
-function drawPlanes() {
-  state.planes.forEach(pl => {
-    const a = project(pl.route.a.lat, pl.route.a.lon);
-    const b = project(pl.route.b.lat, pl.route.b.lon);
-    const t = pl.dir === 1 ? pl.t : 1 - pl.t;
-    const mx = (a.x+b.x)/2, my = (a.y+b.y)/2 - 35;
-    const px = Math.pow(1-t,2)*a.x + 2*(1-t)*t*mx + Math.pow(t,2)*b.x;
-    const py = Math.pow(1-t,2)*a.y + 2*(1-t)*t*my + Math.pow(t,2)*b.y;
-    const dx = 2*(1-t)*(mx-a.x) + 2*t*(b.x-mx);
-    const dy = 2*(1-t)*(my-a.y) + 2*t*(b.y-my);
-    const angle = Math.atan2(dy, dx);
-    ctx.save();
-    ctx.translate(px, py);
-    ctx.rotate(angle);
-    ctx.fillStyle = '#e6edf3';
-    ctx.beginPath();
-    ctx.moveTo(6,0); ctx.lineTo(-4,3.5); ctx.lineTo(-2,0); ctx.lineTo(-4,-3.5);
-    ctx.closePath(); ctx.fill();
-    ctx.restore();
+const CONT_COLORS = {EU:'#3b82f6',AF:'#f59e0b',AS:'#ec4899',AM:'#10b981',ME:'#8b5cf6',OC:'#06b6d4'};
+const CONT_COLORS_BRIGHT = {EU:'#60a5fa',AF:'#fbbf24',AS:'#f472b6',AM:'#34d399',ME:'#a78bfa',OC:'#22d3ee'};
+function getContColor(c){return CONT_COLORS[c]||'#3b82f6';}
+function getContColorBright(c){return CONT_COLORS_BRIGHT[c]||'#60a5fa';}
+
+// ─── CITY DOTS ──────────────────────────────────────────────────────────────
+function rebuildCities() {
+  cityLayer.innerHTML = '';
+  COUNTRIES.forEach(country => {
+    if (!G.unlockedCountries.has(country.id)) return;
+    country.cities.forEach(city => {
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      g.classList.add('city-dot');
+      g.dataset.cityId = country.id+'_'+city.n;
+      const isSelected = G.selectedCity && G.selectedCity.country===country.id && G.selectedCity.name===city.n;
+
+      // Pulse ring
+      const ring = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      ring.setAttribute('cx',city.x); ring.setAttribute('cy',city.y); ring.setAttribute('r', 5+city.p*0.3);
+      ring.setAttribute('fill','none'); ring.setAttribute('stroke', isSelected?'#ffd700': getContColorBright(country.cont));
+      ring.setAttribute('stroke-width','0.8'); ring.setAttribute('opacity','0.4');
+      g.appendChild(ring);
+
+      const c2 = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c2.setAttribute('cx',city.x); c2.setAttribute('cy',city.y);
+      c2.setAttribute('r', isSelected ? 6 : 3.5 + Math.log(city.p)*0.6);
+      c2.setAttribute('fill', isSelected ? '#ffd700' : getContColorBright(country.cont));
+      c2.setAttribute('stroke','#fff'); c2.setAttribute('stroke-width','0.5');
+      g.appendChild(c2);
+
+      // Label for bigger cities
+      if (city.p >= 4 || isSelected) {
+        const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+        t.setAttribute('x',city.x+5); t.setAttribute('y',city.y-4);
+        t.setAttribute('font-size','5.5'); t.setAttribute('fill','#e0e0ff'); t.setAttribute('pointer-events','none');
+        t.textContent = city.n;
+        g.appendChild(t);
+      }
+
+      g.addEventListener('click', () => handleCityClick(country, city));
+      g.addEventListener('mouseenter', (e) => {
+        const routeCount = G.routes.filter(r=>
+          (r.ac===country.id&&r.an===city.n)||(r.bc===country.id&&r.bn===city.n)
+        ).length;
+        let tip = `<b>${city.n}</b> (${country.name})<br>Pop: ${city.p}M | Routes: ${routeCount}`;
+        if (G.selectedCity && !(G.selectedCity.country===country.id&&G.selectedCity.name===city.n)) {
+          const sc = G.selectedCity;
+          const sc_city = COUNTRIES.find(c=>c.id===sc.country).cities.find(c=>c.n===sc.name);
+          tip += `<br><span style="color:#00ff88">Route cost: ${formatM(routeCost(sc_city, city))}</span>`;
+        }
+        showTip(e, tip);
+      });
+      g.addEventListener('mouseleave', hideTip);
+      cityLayer.appendChild(g);
+    });
   });
 }
 
-function drawLockedRegions() {
-  const W = canvas.width - 190, H = canvas.height;
-  Object.keys(REGIONS).forEach(rid => {
-    if (state.unlockedRegions.has(rid)) return;
-    const cities = ALL_CITIES.filter(c => c.region === rid);
-    if (!cities.length) return;
-    const pts = cities.map(c => project(c.lat, c.lon));
-    const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
-    const pad = 35;
-    const x1 = Math.max(0, Math.min(...xs) - pad);
-    const y1 = Math.max(0, Math.min(...ys) - pad);
-    const x2 = Math.min(W, Math.max(...xs) + pad);
-    const y2 = Math.min(H, Math.max(...ys) + pad);
-    ctx.fillStyle = 'rgba(22,27,34,0.6)';
-    ctx.strokeStyle = 'rgba(88,166,255,0.25)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([6, 4]);
-    ctx.beginPath(); ctx.rect(x1, y1, x2-x1, y2-y1); ctx.fill(); ctx.stroke();
-    ctx.setLineDash([]);
-    const cx = (x1+x2)/2, cy = (y1+y2)/2;
-    ctx.font = 'bold 11px Segoe UI';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = 'rgba(139,148,158,0.85)';
-    ctx.fillText('🔒 ' + REGIONS[rid].name, cx, cy - 6);
-    ctx.font = '10px Segoe UI';
-    ctx.fillStyle = 'rgba(139,148,158,0.6)';
-    ctx.fillText(formatMoney(REGIONS[rid].unlockCost), cx, cy + 10);
+// ─── ROUTES & PLANES ────────────────────────────────────────────────────────
+function rebuildRoutes() {
+  routeLayer.innerHTML = '';
+  planeLayer.innerHTML = '';
+  G.routes.forEach((r, i) => {
+    const ca = COUNTRIES.find(c=>c.id===r.ac);
+    const cb = COUNTRIES.find(c=>c.id===r.bc);
+    if (!ca||!cb) return;
+    const a = ca.cities.find(c=>c.n===r.an);
+    const b = cb.cities.find(c=>c.n===r.bn);
+    if (!a||!b) return;
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',a.x); line.setAttribute('y1',a.y);
+    line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
+    line.setAttribute('stroke','#00ff88'); line.setAttribute('stroke-width','0.8');
+    line.setAttribute('opacity','0.6'); line.setAttribute('stroke-dasharray','3 3');
+    routeLayer.appendChild(line);
+
+    // Plane element
+    const pt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    pt.setAttribute('font-size','8'); pt.setAttribute('text-anchor','middle');
+    pt.setAttribute('dominant-baseline','middle'); pt.setAttribute('fill','#fff');
+    pt.setAttribute('pointer-events','none');
+    pt.textContent = '✈'; pt.dataset.ri = i;
+    planeLayer.appendChild(pt);
+  });
+  updateRouteSidebar();
+}
+
+function movePlanes(dt) {
+  G.planes.forEach((pl, i) => {
+    pl.t += pl.speed * dt;
+    if (pl.t >= 1) { pl.t -= 1; }
+    const r = G.routes[i];
+    if (!r) return;
+    const ca = COUNTRIES.find(c=>c.id===r.ac);
+    const cb = COUNTRIES.find(c=>c.id===r.bc);
+    if (!ca||!cb) return;
+    const a = ca.cities.find(c=>c.n===r.an);
+    const b = cb.cities.find(c=>c.n===r.bn);
+    if (!a||!b) return;
+    const t = pl.t < 0.5 ? pl.t*2 : (1 - pl.t)*2;
+    const x = a.x + (b.x-a.x)*t;
+    const y = a.y + (b.y-a.y)*t;
+    const pt = planeLayer.querySelector(`text[data-ri="${i}"]`);
+    if (pt) { pt.setAttribute('x',x); pt.setAttribute('y',y); }
   });
 }
 
-function render() {
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-  drawMap();
-  drawRoutes();
-  drawLockedRegions();
-  drawCities();
-  drawPlanes();
+// ─── CITY CLICK HANDLER ─────────────────────────────────────────────────────
+function handleCityClick(country, city) {
+  if (!G.running) return;
+  if (!G.selectedCity) {
+    G.selectedCity = {country: country.id, name: city.n};
+    rebuildCities();
+    showToast('📍 '+city.n+' selected — click destination city');
+  } else {
+    if (G.selectedCity.country===country.id && G.selectedCity.name===city.n) {
+      G.selectedCity = null; rebuildCities(); return;
+    }
+    const exists = G.routes.find(r=>
+      (r.ac===G.selectedCity.country&&r.an===G.selectedCity.name&&r.bc===country.id&&r.bn===city.n)||
+      (r.bc===G.selectedCity.country&&r.bn===G.selectedCity.name&&r.ac===country.id&&r.an===city.n)
+    );
+    if (exists) { showToast('⚠ Route already exists!'); G.selectedCity=null; rebuildCities(); return; }
+    const scC = COUNTRIES.find(c=>c.id===G.selectedCity.country);
+    const scCity = scC.cities.find(c=>c.n===G.selectedCity.name);
+    const cost = routeCost(scCity, city);
+    if (G.cash < cost) {
+      showToast('💸 Need '+formatM(cost)+' to open this route'); G.selectedCity=null; rebuildCities(); return;
+    }
+    G.cash -= cost;
+    G.routes.push({ac:G.selectedCity.country, an:G.selectedCity.name, bc:country.id, bn:city.n});
+    G.planes.push({t:Math.random(), speed:0.03+Math.random()*0.04});
+    G.selectedCity = null;
+    rebuildCities();
+    rebuildRoutes();
+    showToast('✈ Route: '+scCity.n+' → '+city.n+' ('+formatM(cost)+')');
+    addEventLog('✈ '+scCity.n+' → '+city.n);
+  }
 }
 
-function updateHUD() {
-  const $ = id => document.getElementById(id);
-  $('h-cash').textContent = formatMoney(state.cash);
-  $('h-cash').className = 'stat-val ' + (state.cash > 5000 ? 'good' : state.cash > 1000 ? 'warn' : 'bad');
-  $('h-rev').textContent = formatMoney(state.revPerSec) + '/s';
-  $('h-pax').textContent = state.totalPax.toLocaleString();
-  $('h-routes').textContent = state.routes.length;
-  $('h-cities').textContent = visibleCities().length + '/' + ALL_CITIES.length;
-  const t = Math.max(0, Math.round(state.discoverTimer));
-  const m = Math.floor(t/60), s = t % 60;
-  $('h-timer').textContent = m + ':' + (s < 10 ? '0' : '') + s;
-  $('h-timer').className = 'stat-val ' + (t > 120 ? 'good' : t > 60 ? 'warn' : 'bad');
-  $('timer-fill').style.width = (t / state.discoverMax * 100) + '%';
-  $('timer-fill').style.background = t > 120 ? '#3fb950' : t > 60 ? '#d29922' : '#f85149';
+// ─── BUY COUNTRY ────────────────────────────────────────────────────────────
+function promptBuy(country) {
+  if (!G.running) return;
+  G.pendingBuy = country;
+  const cost = countryCost(country);
+  document.getElementById('buypop-name').textContent = country.name;
+  document.getElementById('buypop-cost').textContent = formatM(cost);
+  document.getElementById('buypop-info').textContent =
+    country.cities.length+' cities | '+country.cont+' | Pop: '+country.cities.reduce((s,c)=>s+c.p,0)+'M';
+  const pop = document.getElementById('buypop');
+  pop.style.display = 'block';
+  pop.style.left = '50%'; pop.style.top = '50%';
+  pop.style.transform = 'translate(-50%,-50%)';
 }
 
-function updateRouteList() {
+document.getElementById('buypop-confirm').onclick = () => {
+  if (!G.pendingBuy) return;
+  const cost = countryCost(G.pendingBuy);
+  if (G.cash < cost) { showToast('💸 Not enough cash! Need '+formatM(cost)); closeBuyPop(); return; }
+  G.cash -= cost;
+  G.unlockedCountries.add(G.pendingBuy.id);
+  G.countriesBought++;
+  showToast('🌍 Unlocked: '+G.pendingBuy.name+'!');
+  addEventLog('🌍 Unlocked '+G.pendingBuy.name);
+  G.discoverTimer = G.discoverMax;
+  closeBuyPop();
+  drawCountryBlobs();
+  rebuildCities();
+  updateCountryBtn();
+};
+document.getElementById('buypop-cancel').onclick = closeBuyPop;
+function closeBuyPop() { document.getElementById('buypop').style.display='none'; G.pendingBuy=null; }
+
+document.getElementById('btn-buy-country').onclick = () => {
+  // Find cheapest unlocked neighbor or just cheapest
+  const locked = COUNTRIES.filter(c=>!G.unlockedCountries.has(c.id));
+  if (!locked.length) { showToast('🌍 All countries unlocked!'); return; }
+  locked.sort((a,b)=>countryCost(a)-countryCost(b));
+  promptBuy(locked[0]);
+};
+
+function updateCountryBtn() {
+  const locked = COUNTRIES.filter(c=>!G.unlockedCountries.has(c.id));
+  const btn = document.getElementById('btn-buy-country');
+  if (!locked.length) { btn.textContent='All Unlocked!'; btn.disabled=true; return; }
+  locked.sort((a,b)=>countryCost(a)-countryCost(b));
+  btn.textContent = 'Buy Country (from '+formatM(countryCost(locked[0]))+')';
+}
+
+// ─── ROUTE SIDEBAR ──────────────────────────────────────────────────────────
+function updateRouteSidebar() {
   const el = document.getElementById('route-list');
   el.innerHTML = '';
-  state.routes.forEach((r, i) => {
+  G.routes.forEach((r,i)=>{
     const div = document.createElement('div');
-    div.className = 'route-item';
-    div.innerHTML = `<span>${r.a.name.substring(0,9)} → ${r.b.name.substring(0,9)}</span><span class="del" data-i="${i}">×</span>`;
+    div.className = 'route-entry';
+    div.innerHTML = `<span>${r.an.substring(0,7)}→${r.bn.substring(0,7)}</span><span class="route-del" data-i="${i}">×</span>`;
     el.appendChild(div);
   });
-  el.querySelectorAll('.del').forEach(d => {
-    d.onclick = e => {
-      const i = +e.target.dataset.i;
-      state.routes.splice(i, 1);
-      state.planes = state.planes.filter(p => p.routeIdx !== i);
-      state.planes.forEach(p => { if (p.routeIdx > i) p.routeIdx--; });
-      updateRouteList();
+  el.querySelectorAll('.route-del').forEach(d=>{
+    d.onclick=e=>{
+      const i=+e.target.dataset.i;
+      G.routes.splice(i,1); G.planes.splice(i,1);
+      rebuildRoutes();
     };
   });
 }
 
-function addEvent(msg) {
-  const el = document.getElementById('event-log');
-  const div = document.createElement('div');
-  div.textContent = msg;
-  el.insertBefore(div, el.firstChild);
-  while (el.children.length > 6) el.removeChild(el.lastChild);
-  const b = document.getElementById('event-banner');
-  b.textContent = msg;
-  b.style.opacity = '1';
-  setTimeout(() => b.style.opacity = '0', 3500);
+// ─── EVENTS ─────────────────────────────────────────────────────────────────
+const EVENTS = [
+  {msg:'☕ Spilled coffee lawsuit! -$200', fn:()=>G.cash=Math.max(0,G.cash-200)},
+  {msg:'📈 Investor backing! +$500', fn:()=>G.cash+=500},
+  {msg:'🌩 Storm grounds flights — 8s pause', fn:()=>G.stormTimer=8},
+  {msg:'🎉 Tourism boom! +60% revenue 12s', fn:()=>G.boomTimer=12},
+  {msg:'🔧 Maintenance refund! +$300', fn:()=>G.cash+=300},
+  {msg:'🤝 Deal signed! +$800', fn:()=>G.cash+=800},
+  {msg:'🦠 Outbreak penalty! -$400', fn:()=>G.cash=Math.max(0,G.cash-400)},
+  {msg:'🏆 Best airline award! +$600', fn:()=>G.cash+=600},
+  {msg:'⛽ Fuel price drop! +30% revenue 10s', fn:()=>G.boomTimer=Math.max(G.boomTimer,10)},
+  {msg:'📰 Bad press — -$150', fn:()=>G.cash=Math.max(0,G.cash-150)},
+];
+
+function addEventLog(msg) {
+  const el = document.getElementById('event-list');
+  const d = document.createElement('div');
+  d.className = 'event-entry'; d.textContent = msg;
+  el.insertBefore(d, el.firstChild);
+  while (el.children.length>8) el.removeChild(el.lastChild);
 }
 
-function updateUnlockBtn() {
-  const locked = Object.keys(REGIONS).filter(r => !state.unlockedRegions.has(r));
-  const btn = document.getElementById('btn-unlock');
-  if (!locked.length) { btn.textContent = '🌍 All Regions Unlocked!'; return; }
-  locked.sort((a,b) => REGIONS[a].unlockCost - REGIONS[b].unlockCost);
-  const rid = locked[0];
-  btn.textContent = 'Unlock ' + REGIONS[rid].name + ' (' + formatMoney(REGIONS[rid].unlockCost) + ')';
+// ─── TOAST ──────────────────────────────────────────────────────────────────
+let toastTO = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.opacity = '1';
+  if (toastTO) clearTimeout(toastTO);
+  toastTO = setTimeout(()=>t.style.opacity='0', 3200);
 }
 
-function endGame(win) {
-  state.running = false;
-  const ov = document.getElementById('overlay');
-  const box = document.getElementById('overlay-box');
-  ov.style.display = 'flex';
-  box.querySelector('h2').textContent = win ? '🏆 You Connected the World!' : '✈ Game Over';
-  box.querySelector('.instructions').style.display = 'none';
-  box.querySelector('p').textContent = win
-    ? 'Amazing! You built a global airline empire.'
-    : 'Time ran out. Build more routes to earn money faster and unlock regions in time!';
-  const sc = document.getElementById('overlay-score');
-  sc.style.display = 'block';
-  sc.textContent = 'Passengers: ' + state.totalPax.toLocaleString() + ' | Cash: ' + formatMoney(state.cash);
-  document.getElementById('btn-start').textContent = '▶ Play Again';
+// ─── TOOLTIP ────────────────────────────────────────────────────────────────
+function showTip(e, html) {
+  const t = document.getElementById('tip');
+  t.innerHTML = html; t.style.display = 'block';
+  t.style.left = (e.clientX+14)+'px'; t.style.top = (e.clientY-36)+'px';
+}
+function hideTip() { document.getElementById('tip').style.display='none'; }
+document.getElementById('mapsvg').addEventListener('mousemove', e => {
+  const t = document.getElementById('tip');
+  if (t.style.display==='block') { t.style.left=(e.clientX+14)+'px'; t.style.top=(e.clientY-36)+'px'; }
+});
+
+// ─── HUD UPDATE ─────────────────────────────────────────────────────────────
+function updateHUD() {
+  const $=id=>document.getElementById(id);
+  $('h-cash').textContent = formatM(G.cash);
+  $('h-cash').className = 'hstat-val '+(G.cash>1000?'green':G.cash>300?'yellow':'red');
+  $('h-inc').textContent = formatM(G.incomePerSec)+'/s';
+  $('h-pax').textContent = G.totalPax.toLocaleString();
+  $('h-routes').textContent = G.routes.length;
+  $('h-countries').textContent = G.unlockedCountries.size+'/'+COUNTRIES.length;
+  const t = Math.max(0, Math.round(G.discoverTimer));
+  const m = Math.floor(t/60), s = t%60;
+  $('h-timer').textContent = m+':'+(s<10?'0':'')+s;
+  $('h-timer').style.color = t>120?'#00ff88':t>60?'#ffd700':'#ff4466';
+  const pct = t/G.discoverMax*100;
+  $('timerbar').style.width = pct+'%';
+  $('timerbar').style.background = t>120?'#00ff88':t>60?'#ffd700':'#ff4466';
 }
 
-function startGame() {
-  state = {
-    running: true, cash: 10000, totalPax: 0, revPerSec: 0,
-    unlockedRegions: new Set(['NA','EU']),
-    routes: [], planes: [], selectedCity: null,
-    discoverTimer: 360, discoverMax: 360,
-    stormTimer: 0, boomTimer: 0,
-    nextEventIn: 20 + Math.random()*20,
-  };
-  document.getElementById('overlay').style.display = 'none';
-  const instr = document.querySelector('.instructions');
-  if (instr) instr.style.display = 'block';
-  document.getElementById('overlay-score').style.display = 'none';
-  document.querySelector('#overlay-box p').textContent = '';
-  updateRouteList();
-  document.getElementById('event-log').innerHTML = '';
-  updateUnlockBtn();
-  lastTime = null;
-  addEvent('✈ Welcome! Click cities to build routes.');
+// ─── INCOME CALC ────────────────────────────────────────────────────────────
+function calcIncome() {
+  if (!G.routes.length || G.stormTimer>0) return 0;
+  const mult = G.boomTimer>0 ? 1.6 : 1;
+  return G.routes.reduce((sum, r)=>{
+    const ca=COUNTRIES.find(c=>c.id===r.ac), cb=COUNTRIES.find(c=>c.id===r.bc);
+    if (!ca||!cb) return sum;
+    const a=ca.cities.find(c=>c.n===r.an), b=cb.cities.find(c=>c.n===r.bn);
+    if (!a||!b) return sum;
+    const dx=a.x-b.x, dy=a.y-b.y;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    return sum + (a.p+b.p) * dist * 0.008 * mult;
+  }, 0);
 }
 
-let lastTime = null;
+// ─── GAME LOOP ──────────────────────────────────────────────────────────────
+let lastTs = null, rafId = null;
 function gameLoop(ts) {
-  if (!state.running) { requestAnimationFrame(gameLoop); return; }
-  const dt = lastTime ? Math.min((ts - lastTime) / 1000, 0.1) : 0;
-  lastTime = ts;
+  if (!G.running) { rafId=requestAnimationFrame(gameLoop); return; }
+  const dt = lastTs ? Math.min((ts-lastTs)/1000, 0.12) : 0;
+  lastTs = ts;
 
-  // Discover timer
-  state.discoverTimer -= dt;
-  if (state.discoverTimer <= 0) {
-    const allUnlocked = Object.keys(REGIONS).every(r => state.unlockedRegions.has(r));
+  // Timer
+  G.discoverTimer -= dt;
+  if (G.discoverTimer <= 0) {
+    const allUnlocked = COUNTRIES.every(c=>G.unlockedCountries.has(c.id));
     if (allUnlocked) { endGame(true); return; }
-    const locked = Object.keys(REGIONS).filter(r => !state.unlockedRegions.has(r));
-    locked.sort((a,b) => REGIONS[a].unlockCost - REGIONS[b].unlockCost);
-    const cheapest = REGIONS[locked[0]].unlockCost;
-    if (state.cash < cheapest) { endGame(false); return; }
-    state.discoverTimer = state.discoverMax;
-    addEvent('⏰ Timer reset! Unlock the next region!');
+    const locked = COUNTRIES.filter(c=>!G.unlockedCountries.has(c.id));
+    locked.sort((a,b)=>countryCost(a)-countryCost(b));
+    const cheapest = countryCost(locked[0]);
+    if (G.cash < cheapest && G.incomePerSec < 1) { endGame(false); return; }
+    G.discoverTimer = G.discoverMax;
+    showToast('⏰ Buy a new country before time runs out!');
   }
 
-  // Revenue
-  if (state.routes.length > 0 && state.stormTimer <= 0) {
-    const mult = state.boomTimer > 0 ? 1.5 : 1;
-    const rev = state.routes.reduce((s, r) => {
-      const dist = Math.hypot(r.a.lat - r.b.lat, r.a.lon - r.b.lon);
-      return s + (r.a.pop + r.b.pop) * dist * 0.006 * mult;
-    }, 0);
-    state.revPerSec = rev;
-    state.cash += rev * dt;
-    state.totalPax += Math.round(rev * dt * 0.4);
-  } else if (state.stormTimer > 0) {
-    state.revPerSec = 0;
+  // Income
+  G.incomePerSec = calcIncome();
+  G.cash += G.incomePerSec * dt;
+  G.totalPax += Math.round(G.incomePerSec * dt * 0.5);
+
+  // Timers
+  if (G.stormTimer>0) G.stormTimer-=dt;
+  if (G.boomTimer>0) G.boomTimer-=dt;
+
+  // Events
+  G.nextEvent -= dt;
+  if (G.nextEvent<=0) {
+    const ev=EVENTS[Math.floor(Math.random()*EVENTS.length)];
+    ev.fn();
+    showToast(ev.msg);
+    addEventLog(ev.msg);
+    G.nextEvent = 28 + Math.random()*32;
   }
 
-  if (state.stormTimer > 0) state.stormTimer -= dt;
-  if (state.boomTimer > 0) state.boomTimer -= dt;
-
-  // Random events
-  state.nextEventIn -= dt;
-  if (state.nextEventIn <= 0) {
-    const ev = EVENTS[Math.floor(Math.random() * EVENTS.length)];
-    ev.effect(state);
-    addEvent(ev.msg);
-    state.nextEventIn = 25 + Math.random() * 35;
-    updateUnlockBtn();
-  }
-
-  // Move planes
-  state.planes.forEach(pl => {
-    pl.t += pl.speed * dt;
-    if (pl.t >= 1) { pl.t = 0; pl.dir *= -1; }
-  });
-
-  if (state.cash < 0) state.cash = 0;
+  movePlanes(dt);
   updateHUD();
-  render();
-  requestAnimationFrame(gameLoop);
+  rafId = requestAnimationFrame(gameLoop);
 }
 
-// Canvas click — build routes
-canvas.addEventListener('click', e => {
-  if (!state.running) return;
-  const rect = canvas.getBoundingClientRect();
-  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-  const vis = visibleCities();
-  let hit = null;
-  vis.forEach(c => {
-    const {x, y} = project(c.lat, c.lon);
-    if (Math.hypot(mx-x, my-y) < cityRadius(c) + 10) hit = c;
-  });
-  if (hit) {
-    if (!state.selectedCity) {
-      state.selectedCity = hit;
-      addEvent('📍 Selected: ' + hit.name + ' — now click another city');
-    } else if (state.selectedCity.id !== hit.id) {
-      const exists = state.routes.find(r =>
-        (r.a.id === state.selectedCity.id && r.b.id === hit.id) ||
-        (r.b.id === state.selectedCity.id && r.a.id === hit.id)
-      );
-      if (exists) {
-        addEvent('⚠ Route already exists!');
-      } else {
-        const dist = Math.hypot(state.selectedCity.lat - hit.lat, state.selectedCity.lon - hit.lon);
-        const cost = Math.round(400 + dist * 12);
-        if (state.cash >= cost) {
-          state.cash -= cost;
-          const route = {a: state.selectedCity, b: hit};
-          const idx = state.routes.length;
-          state.routes.push(route);
-          state.planes.push({route, routeIdx: idx, t: Math.random(), dir: 1, speed: 0.035 + Math.random()*0.04});
-          updateRouteList();
-          updateUnlockBtn();
-          addEvent('✈ Route opened: ' + state.selectedCity.name + ' → ' + hit.name + ' (' + formatMoney(cost) + ')');
-        } else {
-          addEvent('💸 Need ' + formatMoney(Math.round(400 + dist * 12)) + ' to open this route');
-        }
-      }
-      state.selectedCity = null;
-    } else {
-      state.selectedCity = null;
-    }
-  } else {
-    state.selectedCity = null;
-  }
-});
+// ─── END GAME ───────────────────────────────────────────────────────────────
+function endGame(win) {
+  G.running = false;
+  const ov=document.getElementById('overlay');
+  const box=document.getElementById('overlay-box');
+  ov.style.display='flex';
+  box.querySelector('h1').textContent = win?'🏆 WORLD CONNECTED!':'✈ GAME OVER';
+  box.querySelector('.tagline').textContent = win?'You built a global airline empire!':'The timer ran out. Earn more money faster!';
+  box.querySelector('.how').style.display='none';
+  const sc=document.getElementById('result-score');
+  sc.style.display='block';
+  sc.textContent='Passengers: '+G.totalPax.toLocaleString()+' | Cash: '+formatM(G.cash)+' | Countries: '+G.unlockedCountries.size;
+  document.getElementById('btn-start').textContent='▶ PLAY AGAIN';
+}
 
-// Tooltip on hover
-canvas.addEventListener('mousemove', e => {
-  if (!state.running) return;
-  const rect = canvas.getBoundingClientRect();
-  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-  const vis = visibleCities();
-  let hit = null;
-  vis.forEach(c => {
-    const {x, y} = project(c.lat, c.lon);
-    if (Math.hypot(mx-x, my-y) < cityRadius(c) + 10) hit = c;
-  });
-  const tt = document.getElementById('tooltip');
-  if (hit) {
-    tt.style.display = 'block';
-    tt.style.left = (e.clientX - rect.left + 16) + 'px';
-    tt.style.top = (e.clientY - rect.top - 38) + 'px';
-    const routeCount = state.routes.filter(r => r.a.id === hit.id || r.b.id === hit.id).length;
-    let html = `<b>${hit.name}</b> &nbsp; Pop: ${hit.pop}M<br>Region: ${REGIONS[hit.region]?.name} &nbsp; Routes: ${routeCount}`;
-    if (state.selectedCity && state.selectedCity.id !== hit.id) {
-      const dist = Math.hypot(state.selectedCity.lat - hit.lat, state.selectedCity.lon - hit.lon);
-      const cost = Math.round(400 + dist * 12);
-      html += `<br><span style="color:#3fb950">Route cost: ${formatMoney(cost)}</span>`;
-    }
-    tt.innerHTML = html;
-  } else {
-    tt.style.display = 'none';
-  }
-});
-
-// Unlock region button
-document.getElementById('btn-unlock').addEventListener('click', () => {
-  if (!state.running) return;
-  const locked = Object.keys(REGIONS).filter(r => !state.unlockedRegions.has(r));
-  if (!locked.length) { addEvent('🌍 All regions already unlocked!'); return; }
-  locked.sort((a,b) => REGIONS[a].unlockCost - REGIONS[b].unlockCost);
-  const rid = locked[0];
-  const cost = REGIONS[rid].unlockCost;
-  if (state.cash >= cost) {
-    state.cash -= cost;
-    state.unlockedRegions.add(rid);
-    state.discoverTimer = state.discoverMax;
-    addEvent('🌍 Unlocked: ' + REGIONS[rid].name + '!');
-    updateUnlockBtn();
-  } else {
-    addEvent('💸 Need ' + formatMoney(cost) + ' to unlock ' + REGIONS[rid].name);
-  }
-});
+// ─── START GAME ─────────────────────────────────────────────────────────────
+function startGame() {
+  initState();
+  G.running = true;
+  document.getElementById('overlay').style.display='none';
+  document.getElementById('result-score').style.display='none';
+  document.querySelector('#overlay-box .how').style.display='block';
+  document.getElementById('route-list').innerHTML='';
+  document.getElementById('event-list').innerHTML='';
+  drawCountryBlobs();
+  rebuildCities();
+  rebuildRoutes();
+  updateCountryBtn();
+  lastTs = null;
+  showToast('✈ Welcome to FLY CORP! Click cities in France to start building routes!');
+  addEventLog('🎮 Game started in France!');
+}
 
 document.getElementById('btn-start').addEventListener('click', startGame);
-window.addEventListener('resize', render);
-render();
+
+// ─── UTILS ──────────────────────────────────────────────────────────────────
+function formatM(n) {
+  if (n>=1e9) return '$'+(n/1e9).toFixed(1)+'B';
+  if (n>=1e6) return '$'+(n/1e6).toFixed(1)+'M';
+  if (n>=1e3) return '$'+(n/1e3).toFixed(1)+'k';
+  return '$'+Math.round(n);
+}
+
+// Start loop
+initState();
+drawCountryBlobs();
 requestAnimationFrame(gameLoop);
 </script>
 </body>
