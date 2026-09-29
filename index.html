@@ -286,7 +286,7 @@ const GEAR=[
   {id:'lap1',n:'Better laptop',lv:[120],d:'+1 max energy. Fewer freezes.'},
   {id:'energy',n:'Ergonomic setup',lv:[140,420,1200],d:'+1 max energy per level. Your back says thanks.'},
   {id:'slots',n:'More store slots',lv:[90,240,600,1400,3200,7500,16000],d:'+1 product listing slot per level.'},
-  {id:'batch',n:'Packing station',lv:[80,260,800],d:'+3 orders per packing session per level.'},
+  {id:'batch',n:'Packing station',lv:[80,260,800],d:'+1 day of delivery buffer per level before orders are considered late.'},
   {id:'hw',n:'Hardware wallet',lv:[95],d:'Cuts hack and phishing losses.'},
   {id:'vpn',n:'VPN and password manager',lv:[40],d:'+1 effective Security.'},
   {id:'brand',n:'Logo and brand kit',lv:[180],d:'Reputation grows 20% faster.'},
@@ -362,7 +362,7 @@ const NEWS=[
 const NEWS_FLAVOR=['Nothing moved today, which is its own kind of news.','Crypto Twitter argued about a font for six hours.','A man in a mask promises "the next big thing".','Someone lost a wallet and, honestly, we all felt it.','Gas fees are down. Nobody notices.'];
 
 const ROLES={
-  fulfil:{n:'Fulfillment clerk',ic:'📦',base:38,d:'Ships up to 3 orders a day per skill level, no energy needed.'},
+  fulfil:{n:'Fulfillment clerk',ic:'📦',base:38,d:'Ships orders and restocks low inventory automatically, no energy needed.'},
   support:{n:'Support agent',ic:'🎧',base:44,d:'Answers buyer chats you leave unopened. Better agents close more sales.'},
   scout:{n:'Product scout',ic:'🔭',base:46,d:'Finds new product leads for you every few days.'},
   growth:{n:'Growth marketer',ic:'📈',base:52,d:'Adds buzz every single day.'},
@@ -831,7 +831,7 @@ function completeSale(th,prod,price){
   if(qty<=0){ endChat(th,'lost','Out of stock right when they said yes. Brutal.'); return; }
   prod.stock-=qty; prod.sold+=qty;
   const total=+(price*qty).toFixed(2);
-  const promised=S.day+ (hasGear('gateway')?ri(1,2):ri(1,3));
+  const promised=S.day+ (hasGear('gateway')?ri(1,2):ri(1,3)) + gearLevel('batch');
   S.orders.push({id:++S.lastOrdId,buyer:th.buyer.handle,item:prod.name,qty,price:total,age:0,promised,prodId:prod.id});
   S.rep+=0.3*qty; S.hype=clamp(S.hype+1,0,100);
   S.stats.chats++;
@@ -849,19 +849,15 @@ function endChat(th,stage,note){
 /* ================= fulfillment ================= */
 function packOrder(orderId){
   const o=S.orders.find(x=>x.id===orderId); if(!o||o.packed) return;
-  if(S.energy<1){toast('No energy to pack.');return;}
-  S.energy-=1;
   o.packed=true;
   addLog(`Packed order #${o.id} (${o.item}) for @${o.buyer}.`);
   render();
 }
-function batchPack(n){
-  let done=0;
-  const cap=3+gearLevel('batch')*3;
+function batchPack(){
   const avail=S.orders.filter(o=>!o.packed);
-  for(const o of avail){ if(done>=cap||S.energy<1) break; o.packed=true; S.energy-=1; done++; }
-  if(done) addLog(`Packed ${done} order${done>1?'s':''} in a batch session.`);
-  else toast('Nothing to pack, or no energy.');
+  avail.forEach(o=>o.packed=true);
+  if(avail.length) addLog(`Packed all ${avail.length} open order${avail.length>1?'s':''}.`);
+  else toast('Nothing to pack right now.');
   render();
 }
 function processOrdersEndOfDay(){
@@ -925,6 +921,7 @@ function effSkill(e){ return e.skill + (e.trait==='genius'?1:0); }
 function runStaffDaily(){
   if(!S.co||!S.co.staff.length) return;
   let payroll=0, log=[];
+  let restocked=[];
   S.co.staff.forEach(e=>{
     payroll+=e.wage; e.days++;
     const sk=effSkill(e);
@@ -933,6 +930,19 @@ function runStaffDaily(){
       const mistake = e.trait==='sloppy'&&chance(.12);
       for(let i=0;i<n;i++){ const o=S.orders.filter(o=>!o.packed)[0]; if(o) o.packed=true; }
       if(mistake) S.rep-=1;
+      // warehouse duties: keep shelves stocked
+      const reserve=Math.max(60,payroll*2);
+      S.products.forEach(p=>{
+        const lowBar=2+Math.floor(sk/2);
+        if(p.stock<lowBar){
+          const qty=Math.max(4,sk*2);
+          const cost=+(p.cost*qty).toFixed(2);
+          if(S.cash-cost>=reserve){
+            S.cash-=cost; p.stock+=qty;
+            restocked.push(`${qty}x "${p.name}"`);
+          }
+        }
+      });
     } else if(e.role==='support'){
       const open=S.inbox.filter(t=>!t.done);
       let n=Math.min(Math.ceil(sk/2),open.length);
@@ -956,6 +966,7 @@ function runStaffDaily(){
   if(S.cash<payroll){ S.co.morale=clamp(S.co.morale-10,0,100); log.push('Payroll came up short. Morale dropped hard.'); }
   else addCash(-payroll);
   if(payroll) addLog(`Paid payroll: ${money(payroll)}.`+(log.length?' '+log.join(' '):''));
+  if(restocked.length) addLog(`Warehouse restocked: ${restocked.join(', ')}.`);
   if(S.co.morale<25 && chance(.1)){
     const q=S.co.staff[ri(0,S.co.staff.length-1)];
     if(q){ S.co.staff=S.co.staff.filter(e=>e.id!==q.id); addLog(`${q.name} quit. Morale was too low.`); }
@@ -1137,8 +1148,8 @@ function taxRate(){
 }
 function endDay(){
   if(S.energy>0 && !confirm2()) { /* no-op, handled by UI confirm before calling */ }
-  const res=processOrdersEndOfDay();
   runStaffDaily();
+  const res=processOrdersEndOfDay();
   snapshotDailyCoinPrices();
   const n=dailyNews();
   const r=rent();
@@ -1148,9 +1159,8 @@ function endDay(){
   addStress(3 - (S.stress>70?0:0));
   S.stress=clamp(S.stress-2+ (S.orders.filter(o=>!o.packed).length*0.6),0,S.maxStress);
   S.hype=clamp(S.hype-4,0,100);
-  // expire old inbox threads
-  S.inbox=S.inbox.filter(t=>!t.done || (S.day-((t.closedDay)||S.day))<3);
-  S.inbox.forEach(t=>{ if(t.done&&!t.closedDay) t.closedDay=S.day; });
+  // buyer chat logs clear themselves out at the end of each day
+  S.inbox=S.inbox.filter(t=>!t.done);
   // stress consequence
   if(S.stress>=95 && chance(.35)){
     addLog('You crash for a full day. Nothing gets done.'); S.energy=0; S.flags.forcedRest=true;
@@ -1478,8 +1488,8 @@ function renderChatModal(th){
 function viewOrders(){
   const box=document.createElement('div');
   box.appendChild(el(`<div class="card"><h3>Fulfillment</h3>
-    <p class="small mute">Pack before the promised day or reputation takes a hit. Packing costs 1 energy per order unless automated.</p>
-    <div class="acts"><button class="btn act pri" id="batch"><b>📦 Batch pack</b><span>Pack up to ${3+gearLevel('batch')*3} at once</span></button></div>
+    <p class="small mute">Packing is free and instant — ship before the promised day or reputation takes a hit.</p>
+    <div class="acts"><button class="btn act pri" id="batch"><b>📦 Pack all orders</b><span>No energy cost</span></button></div>
   </div>`));
   if(!S.orders.length){ box.appendChild(el(`<p class="hint">No open orders. Go make some sales.</p>`)); }
   else {
