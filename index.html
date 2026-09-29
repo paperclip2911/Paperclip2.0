@@ -1,682 +1,1626 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🍄 Mycelium Empire</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Drop &amp; HODL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0d0a08; --panel: rgba(26,18,8,0.95); --panel2: rgba(34,24,10,0.9);
-  --border: #3d2a10; --border2: #5a3f18; --spore: #c8ff00; --spore2: #88bb00;
-  --glow: #00ffaa; --glow2: #00cc88; --amber: #ffaa22; --amber2: #ff7700;
-  --purple: #cc44ff; --text: #e8d5a0; --text2: #9a7a44; --red: #ff4444;
+:root{
+  --bg:#dde5e9; --panel:#f5f8f9; --panel2:#e6edf0; --ink:#0f1c2b; --mute:#526478; --line:#bccad2;
+  --acc:#f5c400; --onacc:#1a1500; --info:#0b5f80; --good:#0c7a52; --bad:#c22a2a; --warn:#94600a;
+  --disp:'Big Shoulders Display','Oswald','Arial Narrow',Impact,sans-serif;
+  --text:'Newsreader',Georgia,'Times New Roman',serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-html, body { width:100%; min-height:100vh; background:var(--bg); color:var(--text); font-family:'Crimson Text',Georgia,serif; overflow-x:hidden; cursor:default; }
-body::before { content:''; position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse at 20% 80%,rgba(0,255,100,0.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(200,100,0,0.05) 0%,transparent 50%),radial-gradient(ellipse at 50% 50%,rgba(0,200,100,0.03) 0%,transparent 70%); pointer-events:none !important; }
-canvas#roots { position:fixed; inset:0; z-index:0; pointer-events:none !important; opacity:0.4; }
-.wrap { position:relative; z-index:1; display:grid; grid-template-columns:260px 1fr 300px; min-height:100vh; }
-@media(max-width:960px){ .wrap{grid-template-columns:1fr;} .sidebar-left,.sidebar-right{display:none;} }
-.topbar { grid-column:1/-1; background:linear-gradient(180deg,#0a0805 0%,rgba(10,8,5,0.97) 100%); border-bottom:2px solid var(--border2); padding:12px 24px; display:flex; align-items:center; gap:20px; position:sticky; top:0; z-index:200; box-shadow:0 4px 30px rgba(0,0,0,0.8); }
-.game-logo { font-family:'Cinzel',serif; font-size:20px; font-weight:900; color:var(--spore); text-shadow:0 0 20px rgba(200,255,0,0.5); white-space:nowrap; letter-spacing:1px; }
-.top-stat { background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; padding:5px 14px; text-align:center; }
-.top-stat .lbl { font-size:10px; color:var(--text2); letter-spacing:1px; text-transform:uppercase; display:block; }
-.top-stat .val { font-family:'Cinzel',serif; font-size:14px; color:var(--spore); }
-.ascend-btn { margin-left:auto; padding:8px 20px; border-radius:6px; border:2px solid var(--purple); background:rgba(136,0,204,0.12); color:var(--purple); font-family:'Cinzel',serif; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; white-space:nowrap; letter-spacing:1px; }
-.ascend-btn:hover:not(:disabled) { background:rgba(136,0,204,0.3); }
-.ascend-btn:disabled { opacity:0.3; cursor:not-allowed; }
-.open-shop-btn { padding:7px 16px; border-radius:6px; border:2px solid var(--amber2); background:rgba(255,120,0,0.1); color:var(--amber); font-family:'Cinzel',serif; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s; white-space:nowrap; letter-spacing:1px; }
-.open-shop-btn:hover { background:rgba(255,120,0,0.25); }
-.shop-cd { font-size:9px; display:block; color:var(--text2); margin-top:1px; }
-.boosts-bar { grid-column:1/-1; background:rgba(10,8,5,0.85); border-bottom:1px solid var(--border); padding:5px 20px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; min-height:34px; }
-.boost-chip { background:rgba(0,255,170,0.08); border:1px solid var(--glow2); border-radius:20px; padding:3px 10px; font-size:11px; color:var(--glow); display:flex; align-items:center; gap:5px; font-family:'Cinzel',serif; }
-.boost-chip-timer { color:var(--text2); font-size:10px; }
-.boosts-label { font-size:10px; color:var(--text2); letter-spacing:1px; text-transform:uppercase; margin-right:4px; }
-.sidebar-left { border-right:1px solid var(--border); padding:16px; overflow-y:auto; background:linear-gradient(180deg,rgba(20,14,5,0.8) 0%,rgba(16,11,4,0.9) 100%); }
-.main { display:flex; flex-direction:column; align-items:center; padding:24px 20px 80px; overflow-y:auto; gap:18px; }
-.sidebar-right { border-left:1px solid var(--border); padding:16px; overflow-y:auto; background:linear-gradient(180deg,rgba(20,14,5,0.8) 0%,rgba(16,11,4,0.9) 100%); }
-.sec-head { font-family:'Cinzel',serif; font-size:11px; letter-spacing:2px; color:var(--text2); text-transform:uppercase; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
-.shroom-stage { position:relative; width:220px; height:220px; cursor:pointer; user-select:none; }
-.shroom-ground { position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:180px; height:30px; background:radial-gradient(ellipse,#3a2508 0%,transparent 70%); border-radius:50%; }
-.shroom-stem { position:absolute; bottom:30px; left:50%; transform:translateX(-50%); width:28px; height:90px; background:linear-gradient(180deg,#d4c080 0%,#a89050 50%,#8a7040 100%); border-radius:14px 14px 8px 8px; box-shadow:inset -4px 0 8px rgba(0,0,0,0.3),inset 2px 0 6px rgba(255,255,255,0.1); }
-.shroom-stem::after { content:''; position:absolute; top:40%; left:0; right:0; height:4px; background:rgba(255,255,255,0.15); border-radius:2px; }
-.shroom-cap { position:absolute; bottom:110px; left:50%; transform:translateX(-50%); width:160px; height:100px; border-radius:80px 80px 10px 10px; background:radial-gradient(ellipse at 35% 35%,#ff4422,#cc1100 50%,#881100); box-shadow:0 0 30px rgba(255,68,0,0.4),0 0 60px rgba(255,68,0,0.15),inset -15px -10px 30px rgba(0,0,0,0.4),inset 8px 6px 20px rgba(255,150,100,0.2); transition:transform 0.05s,box-shadow 0.08s; }
-.shroom-cap:hover { box-shadow:0 0 50px rgba(255,68,0,0.6),inset -15px -10px 30px rgba(0,0,0,0.4); }
-.spot { position:absolute; background:rgba(255,255,255,0.7); border-radius:50%; box-shadow:0 0 6px rgba(255,255,255,0.5); }
-.shroom-gills { position:absolute; bottom:108px; left:50%; transform:translateX(-50%); width:160px; height:18px; background:linear-gradient(180deg,#cc9966 0%,#aa7744 100%); border-radius:0 0 8px 8px; overflow:hidden; }
-.gill-line { position:absolute; width:1px; height:100%; background:rgba(0,0,0,0.3); top:0; }
-.spore-particle { position:absolute; width:4px; height:4px; border-radius:50%; background:var(--spore); box-shadow:0 0 6px var(--spore); pointer-events:none; animation:sporeFloat 3s ease-in infinite; opacity:0; }
-@keyframes sporeFloat { 0%{opacity:0;transform:translateY(0) scale(1);} 20%{opacity:0.8;} 100%{opacity:0;transform:translateY(-120px) translateX(var(--drift)) scale(0.3);} }
-.res-panel { background:var(--panel); border:1px solid var(--border2); border-radius:12px; padding:20px 24px; text-align:center; width:100%; max-width:400px; box-shadow:0 0 40px rgba(0,0,0,0.5); }
-.spore-count { font-family:'Cinzel',serif; font-size:42px; font-weight:900; color:var(--spore); text-shadow:0 0 30px rgba(200,255,0,0.5); line-height:1; }
-.spore-label { font-size:14px; color:var(--text2); margin-top:4px; font-style:italic; }
-.auto-rate { font-size:15px; color:var(--glow); margin-top:10px; font-weight:600; }
-.click-rate { font-size:12px; color:var(--text2); margin-top:3px; }
-.stage-panel { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px 20px; width:100%; max-width:400px; }
-.stage-name { font-family:'Cinzel',serif; font-size:16px; color:var(--amber); margin-bottom:6px; }
-.stage-bar-bg { height:8px; background:rgba(255,255,255,0.06); border-radius:4px; overflow:hidden; margin-bottom:5px; }
-.stage-bar-fill { height:100%; background:linear-gradient(90deg,var(--spore2),var(--spore)); border-radius:4px; transition:width 0.5s; box-shadow:0 0 8px rgba(200,255,0,0.4); }
-.stage-desc { font-size:12px; color:var(--text2); font-style:italic; }
-.log-panel { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px; width:100%; max-width:400px; }
-.upg-card { background:var(--panel2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:8px; cursor:pointer; transition:all 0.15s; position:relative; overflow:hidden; }
-.upg-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--spore); opacity:0; transition:opacity 0.2s; }
-.upg-card.affordable::before { opacity:1; }
-.upg-card.affordable { border-color:var(--border2); }
-.upg-card:hover:not(.bought) { transform:translateX(4px); border-color:var(--amber); }
-.upg-card.bought { opacity:0.45; cursor:default; }
-.upg-card.bought::after { content:'✓'; position:absolute; right:10px; top:50%; transform:translateY(-50%); color:var(--glow); font-size:16px; font-weight:900; }
-.upg-icon { font-size:20px; float:left; margin-right:8px; line-height:1.2; }
-.upg-name { font-family:'Cinzel',serif; font-size:12px; color:var(--text); }
-.upg-desc { font-size:11px; color:var(--text2); margin-top:2px; font-style:italic; }
-.upg-cost { font-size:11px; color:var(--amber); margin-top:3px; font-family:'Cinzel',serif; }
-.bld-card { background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px; cursor:pointer; transition:all 0.15s; }
-.bld-card:hover:not(.locked) { border-color:var(--glow2); background:rgba(0,200,100,0.04); }
-.bld-card.affordable { border-color:var(--glow); box-shadow:0 0 15px rgba(0,255,170,0.08); }
-.bld-card.locked { opacity:0.3; cursor:not-allowed; filter:saturate(0); }
-.bld-top { display:flex; align-items:center; gap:10px; }
-.bld-icon { font-size:26px; flex-shrink:0; }
-.bld-info { flex:1; }
-.bld-name { font-family:'Cinzel',serif; font-size:13px; color:var(--text); }
-.bld-desc { font-size:11px; color:var(--text2); margin-top:2px; font-style:italic; }
-.bld-bottom { display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
-.bld-count { font-family:'Cinzel',serif; font-size:24px; font-weight:900; color:var(--glow); }
-.bld-cost { font-family:'Cinzel',serif; font-size:11px; color:var(--amber); }
-.bld-cps { font-size:11px; color:var(--glow2); }
-.bld-prog { height:2px; background:rgba(0,255,170,0.1); border-radius:1px; margin-top:6px; overflow:hidden; }
-.bld-prog-fill { height:100%; background:var(--glow2); border-radius:1px; transition:width 0.4s; }
-.ach-card { display:flex; gap:8px; align-items:flex-start; background:var(--panel2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; margin-bottom:6px; transition:all 0.3s; }
-.ach-card.unlocked { border-color:var(--amber2); background:rgba(255,150,0,0.05); }
-.ach-card.locked { opacity:0.3; filter:saturate(0.2); }
-.ach-icon { font-size:18px; flex-shrink:0; }
-.ach-name { font-family:'Cinzel',serif; font-size:11px; color:var(--text); }
-.ach-desc { font-size:10px; color:var(--text2); font-style:italic; }
-@keyframes floatUp { 0%{opacity:1;transform:translateY(0) scale(1);} 70%{opacity:1;transform:translateY(-70px) scale(1.1);} 100%{opacity:0;transform:translateY(-100px) scale(0.8);} }
-@keyframes eventSlide { from{opacity:0;transform:translateX(-50%) translateY(-20px) scale(0.95)} to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)} }
-.gold-shroom { position:fixed; font-size:44px; cursor:pointer; z-index:500; animation:shroomBounce 0.6s ease-in-out infinite alternate; filter:drop-shadow(0 0 20px #ffaa22) drop-shadow(0 0 8px #ffff00); user-select:none; }
-@keyframes shroomBounce { from{transform:scale(1) rotate(-8deg);} to{transform:scale(1.2) rotate(8deg);} }
-.notif { position:fixed; bottom:24px; right:24px; background:var(--panel); border:2px solid var(--amber2); border-radius:10px; padding:12px 18px; font-size:13px; font-weight:600; z-index:1000; max-width:280px; animation:notifSlide 0.4s ease; box-shadow:0 0 30px rgba(255,150,0,0.2); color:var(--text); }
-@keyframes notifSlide { from{transform:translateX(110%)} to{transform:translateX(0)} }
-.ascend-panel { background:rgba(136,0,204,0.06); border:1px solid rgba(136,0,204,0.25); border-radius:10px; padding:12px; margin-top:10px; font-size:11px; color:var(--text2); font-style:italic; line-height:1.6; }
-.ascend-panel strong { color:var(--purple); font-style:normal; }
-.ticker { position:fixed; bottom:0; left:0; right:0; background:rgba(10,8,5,0.96); border-top:1px solid var(--border); padding:6px 20px; font-size:12px; color:var(--text2); font-style:italic; z-index:100; white-space:nowrap; overflow:hidden; }
-.ticker-inner { display:inline-block; animation:tickerScroll 40s linear infinite; }
-@keyframes tickerScroll { from{transform:translateX(100vw)} to{transform:translateX(-100%)} }
-::-webkit-scrollbar { width:4px; }
-::-webkit-scrollbar-track { background:transparent; }
-::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
-.shop-overlay { position:fixed; inset:0; z-index:800; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; animation:fadeIn 0.2s ease; }
-@keyframes fadeIn { from{opacity:0} to{opacity:1} }
-.shop-box { background:linear-gradient(180deg,#1a1008 0%,#0f0a04 100%); border:2px solid var(--amber2); border-radius:16px; padding:24px 28px; width:520px; max-width:95vw; box-shadow:0 0 60px rgba(255,120,0,0.25); position:relative; }
-.shop-title { font-family:'Cinzel',serif; font-size:20px; font-weight:900; color:var(--amber); text-align:center; margin-bottom:4px; text-shadow:0 0 20px rgba(255,170,0,0.5); }
-.shop-timer { text-align:center; font-size:12px; color:var(--text2); font-style:italic; margin-bottom:16px; }
-.shop-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.shop-item { background:rgba(255,255,255,0.03); border:1px solid var(--border2); border-radius:10px; padding:12px; cursor:pointer; transition:all 0.15s; position:relative; overflow:hidden; }
-.shop-item:hover:not(.sold) { border-color:var(--amber); background:rgba(255,170,0,0.06); transform:translateY(-2px); }
-.shop-item.sold { opacity:0.4; cursor:default; }
-.shop-item.sold::after { content:'VENDU'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-15deg); font-family:'Cinzel',serif; font-size:22px; font-weight:900; color:var(--red); opacity:0.8; }
-.shop-item-rarity { font-size:9px; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
-.shop-item-icon { font-size:28px; margin-bottom:6px; }
-.shop-item-name { font-family:'Cinzel',serif; font-size:13px; color:var(--text); margin-bottom:3px; }
-.shop-item-desc { font-size:11px; color:var(--text2); font-style:italic; margin-bottom:8px; }
-.shop-item-cost { font-family:'Cinzel',serif; font-size:12px; }
-.shop-close { position:absolute; top:14px; right:16px; background:none; border:none; color:var(--text2); font-size:22px; cursor:pointer; line-height:1; }
-.shop-close:hover { color:var(--text); }
-.shop-btn { display:block; width:100%; margin-top:14px; padding:10px; border-radius:8px; border:2px solid var(--amber2); background:rgba(255,120,0,0.1); color:var(--amber); font-family:'Cinzel',serif; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s; }
-.shop-btn:hover { background:rgba(255,120,0,0.25); }
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a121b; --panel:#122030; --panel2:#182a3d; --ink:#e7eef3; --mute:#8aa0b3; --line:#27405a;
+    --acc:#ffcf1f; --onacc:#1a1400; --info:#5cc0e8; --good:#45d19c; --bad:#ff7a6b; --warn:#f0b955;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a121b; --panel:#122030; --panel2:#182a3d; --ink:#e7eef3; --mute:#8aa0b3; --line:#27405a;
+  --acc:#ffcf1f; --onacc:#1a1400; --info:#5cc0e8; --good:#45d19c; --bad:#ff7a6b; --warn:#f0b955;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 var(--text)}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--info);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 12px 96px}
+[hidden]{display:none!important}
+
+/* HUD */
+.hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--panel);border-bottom:3px solid var(--ink);margin:0 -12px;padding:8px 12px}
+.hud-top{display:flex;align-items:center;gap:10px}
+.dayn{font:800 32px/1 var(--disp)}
+.actn{font:italic 15px/1.2 var(--text);color:var(--mute);flex:1;min-width:0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);margin-top:6px;row-gap:6px}
+.st{padding:0 10px;border-left:1px solid var(--line)}
+.st:first-child{border-left:0;padding-left:0}
+.st small{display:block;font-size:13px;color:var(--mute);line-height:1.1}
+.st b{font:700 23px/1.1 var(--disp)}
+.pips{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px}
+.pip{width:12px;height:12px;border:2px solid var(--ink);border-radius:1px;transition:background .2s}
+.pip.on{background:var(--acc)}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
+.mini small{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);line-height:1.2}
+.bar{height:6px;background:var(--line);border-radius:1px;overflow:hidden;margin-top:2px}
+.bar i{display:block;height:100%;background:var(--info)}
+.bar.g i{background:var(--good)}.bar.r i{background:var(--bad)}.bar.y i{background:var(--warn)}
+@media(max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}.st:nth-child(3){border-left:0;padding-left:0}}
+
+/* tabs */
+.tabs{display:flex;overflow-x:auto;background:var(--panel2);border-bottom:1px solid var(--line);margin:0 -12px 12px;padding:0 12px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;padding:8px 14px 6px;border:0;background:none;font:700 18px/1.2 var(--disp);letter-spacing:.02em;color:var(--mute);border-bottom:4px solid transparent;cursor:pointer;min-height:44px}
+.tab.on{color:var(--ink);border-bottom-color:var(--acc)}
+.badge{display:inline-block;min-width:20px;padding:0 6px;margin-left:5px;border-radius:10px;background:var(--ink);color:var(--panel);font:700 14px/20px var(--disp);text-align:center}
+
+/* cards */
+.card{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--ink);border-radius:2px 2px 10px 10px;padding:14px 16px;margin:0 0 12px}
+.card>h3,.h{font:700 23px/1.15 var(--disp);margin:0 0 8px;letter-spacing:.01em}
+.card p{margin:.3em 0}
+.g2{display:grid;gap:12px;grid-template-columns:1fr;align-items:start}
+@media(min-width:860px){.g2{grid-template-columns:1fr 1fr}}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sp{flex:1}
+.mute{color:var(--mute)}.good{color:var(--good)}.bad{color:var(--bad)}.warn{color:var(--warn)}.info{color:var(--info)}
+.num{font-family:var(--disp);font-weight:700;letter-spacing:.01em}
+.small{font-size:14.5px;line-height:1.4}
+.rt{text-align:right}
+.tag{display:inline-block;font:600 14px/1.3 var(--disp);padding:0 7px;border:1px solid currentColor;border-radius:2px;margin:0 4px 2px 0;white-space:nowrap}
+.li{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line)}
+.li:first-of-type{border-top:0}
+.li>div:first-child{min-width:0}
+.hint{font-style:italic;color:var(--mute);font-size:15px}
+
+/* buttons */
+.btn{appearance:none;border:1.5px solid var(--ink);background:var(--panel);color:var(--ink);padding:8px 14px;border-radius:3px;font:600 18px/1.15 var(--disp);letter-spacing:.02em;cursor:pointer;min-height:44px;text-align:center}
+.btn:hover:not(:disabled){background:var(--panel2)}
+.btn.pri{background:var(--acc);color:var(--onacc)}
+.btn.pri:hover:not(:disabled){filter:brightness(.95);background:var(--acc)}
+.btn.dark{background:var(--ink);color:var(--panel)}
+.btn.sm{min-height:38px;padding:4px 10px;font-size:16px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.acts{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:8px}
+.act{text-align:left;display:flex;flex-direction:column;gap:2px;padding:10px 12px;min-height:88px}
+.act b{font:700 21px/1.1 var(--disp)}
+.act span{font:400 14.5px/1.3 var(--text);color:var(--mute)}
+.act .cost{font:700 16px var(--disp);color:var(--info)}
+.endday{position:relative;display:block;width:100%;margin-top:14px;padding:22px 16px 14px;font:800 28px/1 var(--disp);background:var(--acc);color:var(--onacc);border:1.5px solid var(--ink);border-radius:3px;cursor:pointer}
+.endday::before{content:"";position:absolute;left:0;right:0;top:0;height:9px;background:repeating-linear-gradient(-45deg,var(--ink) 0 9px,var(--acc) 9px 18px)}
+.endday small{display:block;font:400 15px var(--text);margin-top:4px}
+input[type=text],textarea{width:100%;padding:11px 12px;font:600 21px var(--disp);border:1.5px solid var(--ink);background:var(--panel);color:var(--ink);border-radius:3px}
+textarea{font:13px/1.3 ui-monospace,Menlo,Consolas,monospace;min-height:110px}
+
+/* overlay + scenes */
+.ov{position:fixed;inset:0;z-index:50;background:rgba(6,12,20,.62);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--panel);width:100%;max-width:720px;max-height:94%;overflow:auto;border-top:7px solid var(--acc);border-radius:14px 14px 0 0;padding:20px 20px calc(22px + env(safe-area-inset-bottom,0px));animation:up .18s ease-out}
+@media(min-width:740px){.ov{align-items:center}.sheet{border-radius:10px;max-height:90%}}
+@keyframes up{from{transform:translateY(22px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.story h2{font:800 36px/1 var(--disp);margin:0 0 12px;letter-spacing:.005em}
+.story p{font-size:19px;line-height:1.6;margin:0 0 14px;max-width:62ch}
+.story .res{border-left:4px solid var(--acc);padding:2px 0 2px 12px;margin:0 0 14px}
+.fxl{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
+.ch{display:block;width:100%;text-align:left;margin:8px 0;padding:12px 14px;border:1.5px solid var(--ink);background:var(--panel);border-radius:3px;cursor:pointer;font:700 20px/1.15 var(--disp);letter-spacing:.01em}
+.ch small{display:block;font:400 15px/1.35 var(--text);color:var(--mute);margin-top:3px;letter-spacing:0}
+.ch:hover:not(:disabled){background:var(--acc);color:var(--onacc)}
+.ch:hover:not(:disabled) small{color:inherit}
+.ch:disabled{opacity:.42;cursor:not-allowed}
+
+/* chat */
+.buyer{display:flex;gap:12px;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.avatar{width:52px;height:52px;flex:none;display:grid;place-items:center;font-size:28px;background:var(--panel2);border:1.5px solid var(--ink);border-radius:3px}
+.msg{max-width:88%;padding:8px 12px;border-radius:12px;margin:8px 0;font-size:17px;line-height:1.45;width:fit-content}
+.msg.b{background:var(--panel2);border:1px solid var(--line);border-top-left-radius:2px}
+.msg.y{background:var(--ink);color:var(--panel);margin-left:auto;border-top-right-radius:2px}
+.msg.n{background:none;color:var(--mute);font-style:italic;padding:2px 0;max-width:100%}
+
+/* market */
+.spark{width:100%;height:46px;display:block}
+.coin{padding:12px 0;border-top:1px solid var(--line)}
+.coin:first-of-type{border-top:0}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 12px}
+.kv dt{color:var(--mute)}.kv dd{margin:0;text-align:right;font-weight:600}
+
+/* toasts */
+#toasts{position:fixed;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;gap:6px;z-index:70;pointer-events:none;padding:0 12px}
+.toast{background:var(--ink);color:var(--panel);padding:8px 14px;border-radius:3px;font:600 18px/1.2 var(--disp);max-width:520px;text-align:center;animation:up .15s ease-out}
+
+/* splash */
+.splash{max-width:560px;margin:6vh auto 0}
+.label{border:3px solid var(--ink);background:var(--panel);padding:0}
+.label .top{display:flex;border-bottom:3px solid var(--ink)}
+.label .top div{padding:8px 14px;font-size:15px;line-height:1.3;flex:1}
+.label .top div+div{border-left:3px solid var(--ink)}
+.label .top b{display:block;font:700 19px/1.2 var(--disp)}
+.label .mid{padding:18px 16px 10px}
+.title{font:800 clamp(64px,17vw,112px)/.86 var(--disp);letter-spacing:-.01em;margin:0}
+.barcode{height:54px;margin:12px 0 4px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 5px,var(--ink) 5px 6px,transparent 6px 9px,var(--ink) 9px 12px,transparent 12px 14px,var(--ink) 14px 15px,transparent 15px 19px)}
 </style>
 </head>
 <body>
-<canvas id="roots"></canvas>
-<div class="wrap">
-  <div class="topbar">
-    <div class="game-logo">🍄 Mycelium Empire</div>
-    <div class="top-stat"><span class="lbl">Spores</span><span class="val" id="tSpores">0</span></div>
-    <div class="top-stat"><span class="lbl">Par Sec</span><span class="val" id="tSPS">0</span></div>
-    <div class="top-stat"><span class="lbl">Harvest x</span><span class="val" id="tMult">1.00</span></div>
-    <div class="top-stat"><span class="lbl">Total</span><span class="val" id="tLife">0</span></div>
-    <button class="open-shop-btn" onclick="openShop()">🏪 Marche<span class="shop-cd" id="shopCdTxt">Nouveau dans 5:00</span></button>
-    <button class="ascend-btn" id="ascBtn" disabled onclick="doAscend()">🌀 Ascend</button>
-  </div>
-  <div class="boosts-bar" id="boostsBar">
-    <span class="boosts-label">Actifs:</span>
-    <span style="color:var(--text2);font-size:11px;font-style:italic" id="noBoosts">Aucun boost actif</span>
-  </div>
-  <div class="sidebar-left">
-    <div class="sec-head">🔬 Recherche</div>
-    <div id="upgList"></div>
-    <div class="sec-head" style="margin-top:12px">🏅 Decouvertes</div>
-    <div id="achList"></div>
-    <div class="ascend-panel">
-      <strong>🌀 Ascension</strong><br>
-      Atteins <strong>1 Quadrillion spores</strong> pour Ascender.<br>
-      Sacrifie tout pour un multiplicateur permanent <strong id="ascMultPrev">x1.60</strong>.<br>
-      Chaque Ascension se cumule pour toujours.
-    </div>
-  </div>
-  <div class="main">
-    <div class="res-panel">
-      <div class="spore-count" id="sporeCount">0</div>
-      <div class="spore-label">Spores</div>
-      <div class="auto-rate">🍄 <span id="spsDisplay">0</span> spores / seconde</div>
-      <div class="click-rate">👆 <span id="spcDisplay">1</span> par clic</div>
-    </div>
-    <div class="shroom-stage" id="shroomStage" onclick="onClickShroom(event)">
-      <div class="spore-particle" style="left:40%;bottom:115px;animation-delay:0s;--drift:-20px"></div>
-      <div class="spore-particle" style="left:50%;bottom:118px;animation-delay:0.8s;--drift:10px"></div>
-      <div class="spore-particle" style="left:60%;bottom:115px;animation-delay:1.5s;--drift:-5px"></div>
-      <div class="spore-particle" style="left:45%;bottom:112px;animation-delay:2.2s;--drift:25px"></div>
-      <div class="spore-particle" style="left:55%;bottom:116px;animation-delay:0.4s;--drift:-30px"></div>
-      <div class="shroom-gills">
-        <div class="gill-line" style="left:10%"></div><div class="gill-line" style="left:20%"></div>
-        <div class="gill-line" style="left:30%"></div><div class="gill-line" style="left:40%"></div>
-        <div class="gill-line" style="left:50%"></div><div class="gill-line" style="left:60%"></div>
-        <div class="gill-line" style="left:70%"></div><div class="gill-line" style="left:80%"></div>
-        <div class="gill-line" style="left:90%"></div>
-      </div>
-      <div class="shroom-cap" id="shroomCap">
-        <div class="spot" style="width:22px;height:16px;top:20%;left:20%"></div>
-        <div class="spot" style="width:14px;height:11px;top:15%;left:55%"></div>
-        <div class="spot" style="width:18px;height:13px;top:40%;left:65%"></div>
-        <div class="spot" style="width:10px;height:8px;top:50%;left:30%"></div>
-        <div class="spot" style="width:8px;height:6px;top:25%;left:38%"></div>
-      </div>
-      <div class="shroom-stem"></div>
-      <div class="shroom-ground"></div>
-    </div>
-    <div class="stage-panel">
-      <div class="stage-name" id="stageName">🌱 Spore Solitaire</div>
-      <div class="stage-bar-bg"><div class="stage-bar-fill" id="stageBar" style="width:0%"></div></div>
-      <div class="stage-desc" id="stageDesc">La foret attend ton empire...</div>
-    </div>
-    <div class="log-panel">
-      <div class="sec-head">📜 Chronique</div>
-      <div id="logDiv" style="max-height:130px;overflow-y:auto"></div>
-    </div>
-  </div>
-  <div class="sidebar-right">
-    <div class="sec-head">🏗️ Colonies</div>
-    <div id="bldList"></div>
-  </div>
+<div id="app" class="wrap">
+  <div id="splash"></div>
+  <header id="hud" class="hud" hidden></header>
+  <nav id="tabs" class="tabs" hidden></nav>
+  <main id="view"></main>
 </div>
-<div class="ticker"><div class="ticker-inner" id="tickerText">🍄 La foret s eveille... ton empire commence par un seul clic.</div></div>
-<div class="shop-overlay" id="shopOverlay" style="display:none">
-  <div class="shop-box">
-    <button class="shop-close" onclick="closeShop()">✕</button>
-    <div class="shop-title">🏪 Marche des Spores</div>
-    <div class="shop-timer" id="shopTimerTxt">Se renouvelle dans 5:00</div>
-    <div class="shop-grid" id="shopGrid"></div>
-    <button class="shop-btn" onclick="closeShop()">Fermer</button>
-  </div>
-</div>
-
+<div id="modal" class="ov" hidden></div>
+<div id="toasts" aria-live="polite"></div>
 <script>
-const rc=document.getElementById('roots'),rx=rc.getContext('2d');
-function resizeRoots(){rc.width=window.innerWidth;rc.height=window.innerHeight;}
-resizeRoots();window.addEventListener('resize',resizeRoots);
-const RN=[];
-for(let i=0;i<60;i++)RN.push({x:Math.random()*9999,y:Math.random()*9999,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,p:Math.random()*Math.PI*2});
-function drawRoots(){
-  rx.clearRect(0,0,rc.width,rc.height);
-  RN.forEach(n=>{n.x=(n.x+n.vx+rc.width*2)%(rc.width*2)-rc.width*0.5;n.y=(n.y+n.vy+rc.height*2)%(rc.height*2)-rc.height*0.5;n.p+=0.02;});
-  for(let i=0;i<RN.length;i++)for(let j=i+1;j<RN.length;j++){
-    const dx=RN[i].x-RN[j].x,dy=RN[i].y-RN[j].y,d=Math.sqrt(dx*dx+dy*dy);
-    if(d<180){const a=(1-d/180)*0.25*(0.5+0.5*Math.sin(RN[i].p));rx.beginPath();rx.moveTo(RN[i].x,RN[i].y);rx.quadraticCurveTo((RN[i].x+RN[j].x)/2+dy*0.2,(RN[i].y+RN[j].y)/2-dx*0.2,RN[j].x,RN[j].y);rx.strokeStyle='rgba(100,220,80,'+a+')';rx.lineWidth=0.8;rx.stroke();}
+'use strict';
+/* ================= helpers ================= */
+const $=id=>document.getElementById(id);
+const rnd=Math.random;
+const ri=(a,b)=>Math.floor(a+rnd()*(b-a+1));
+const rf=(a,b)=>a+rnd()*(b-a);
+const pick=a=>a[Math.floor(rnd()*a.length)];
+const chance=p=>rnd()<p;
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const gauss=()=>{let u=0,v=0;while(!u)u=rnd();while(!v)v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+const poisson=l=>{if(l<=0)return 0;const L=Math.exp(-l);let k=0,p=1;do{k++;p*=rnd();}while(p>L&&k<60);return k-1;};
+function wpick(items,wf){let t=0;const ws=items.map(i=>{const w=Math.max(0,wf(i));t+=w;return w;});if(t<=0)return items[0];let r=rnd()*t;for(let i=0;i<items.length;i++){r-=ws[i];if(r<=0)return items[i];}return items[items.length-1];}
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>{const neg=n<0;n=Math.abs(n);let s;if(n>=1e6)s=(n/1e6).toFixed(2)+'M';else if(n>=1000)s=Math.round(n).toLocaleString('en-US');else s=n.toFixed(2);return(neg?'-$':'$')+s;};
+const cnum=n=>{const a=Math.abs(n);return a>=1000?Math.round(n).toLocaleString('en-US'):a>=1?n.toFixed(2):a>=0.01?n.toFixed(4):n.toFixed(6);};
+const pfmt=p=>p>=100?'$'+Math.round(p).toLocaleString('en-US'):p>=1?'$'+p.toFixed(2):'$'+p.toFixed(4);
+const sgn=n=>(n>0?'+':n<0?'−':'')+Math.abs(n);
+const pct=n=>(n>=0?'+':'−')+Math.abs(n*100).toFixed(1)+'%';
+function fill(t,c){return String(t).replace(/\{(\w+)\}/g,(m,k)=>c&&c[k]!==undefined?c[k]:m);}
+function toast(t){const box=$('toasts');if(!box||!box.appendChild||typeof document.createElement!=='function')return;const d=document.createElement('div');d.className='toast';d.textContent=t;box.appendChild(d);setTimeout(()=>{try{d.remove();}catch(e){}},2600);}
+/* ================= static data ================= */
+const FIRST=['Amara','Luca','Mei','Diego','Fatima','Kofi','Yuki','Ravi','Ingrid','Tomasz','Chidi','Sofia','Omar','Priya','Jonas','Lucia','Hassan','Anya','Mateo','Nia','Bao','Camila','Dmitri','Esther','Farid','Greta','Hiro','Isabel','Jamal','Kavya','Leila','Marcus','Noor','Olga','Pablo','Quinn','Rosa','Sven','Tariq','Uma','Viktor','Wanjiru','Ximena','Yusuf','Zainab','Aiko','Bruno','Carmen','Deepak','Elif','Felix','Gabi','Hana','Idris','Julia','Khalid','Lena','Malik','Nadia','Oscar','Paloma','Rafael','Sana','Theo','Ulises','Vera','Wei','Yara','Zane','Beatriz','Callum','Dalia','Emeka','Freya','Gustavo','Ivan','Jasmine','Kwame','Lars','Minh','Nikolai','Ola','Petra','Reza','Siti','Tobias','Vikram','Willa','Xavier','Yasmin','Zoltan'];
+const LAST=['Okafor','Tanaka','Silva','Novak','Haddad','Petrov','Nguyen','Garcia','Kowalski','Mensah','Lindqvist','Rahman','Fernandez','Bauer','Sato','Ivanov','Costa','Abadi','Murphy','Kim','Rossi','Adeyemi','Chen','Dubois','Hassan','Jensen','Kaplan','Lopez','Mbeki','Nasser','Olsen','Patel','Quispe','Reyes','Schmidt','Tran','Ueda','Varga','Wong','Yilmaz','Zhou','Abara','Brandt','Cruz','Dlamini','Eriksen','Farah','Gomez','Hoang','Ito'];
+const H1=['moon','pixel','sat','block','hodl','chain','gas','ape','lambo','node','byte','ghost','salt','pepper','turbo','rusty','neon','sleepy','cosmic','tiny','quiet','spicy','lucky','frozen'];
+const H2=['rat','wizard','fox','lord','goblin','monk','gremlin','pilot','panda','yeti','llama','bard','cactus','otter','crab','moth','owl','toad','sloth','walrus'];
+const genHandle=()=>{const s=rnd();return s<.4?pick(H1)+'_'+pick(H2)+ri(1,99):s<.7?'xX'+pick(H1)+pick(H2)+'Xx':pick(H2)+ri(100,9999);};
+const JOBS=['barista','freelance illustrator','night-shift nurse','warehouse lead','PhD student','food truck owner','accountant','indie game dev','wedding photographer','bus driver','high-school teacher','tattoo artist','retired sailor','call-center rep','urban beekeeper','fitness coach','locksmith','translator','ferry mechanic','app tester','florist','radio host','hotel night clerk','pastry chef'];
+const QUIRKS=['Ends every message with "anyway."','Owns eleven hardware wallets and trusts none.','Says they only buy dips. Has never bought a dip.','Types with one finger, allegedly.','Signs messages like formal letters.','On their third "final" crypto comeback.','Keeps a spreadsheet for everything, including this.','Lost a wallet in a couch once. Still angry.','Asks about the weather before every purchase.','Collects rare bottle caps and rare tokens.','Treats every order like a heist movie.','Is always, somehow, at an airport.','Gets suspicious when things go smoothly.','Calls everyone "chief".','Only buys things on Tuesdays.','Has a cat named Satoshi. The cat is unimpressed.'];
+const STYLES=[['plain',4],['lower',2],['emoji',2],['formal',1],['terse',1],['rambly',1],['caps',.4]];
+const CORPS=['Northgate Freight','Lumen Labs','Harbor & Finch','PolarWorks','Cedar Ridge Capital','Tandem Robotics','Pinecone Media','Ardent Bank','Kiln Studios','Meridian Foods'];
+
+const COINS={
+  VLT:{n:'Vaultstable',p0:1,vol:.0012,drift:0,d:'A stablecoin. Boring on purpose.'},
+  IRN:{n:'Ironcoin',p0:2400,vol:.032,drift:.0005,d:'The blue chip. Slow and stubborn.'},
+  PBL:{n:'Pebble',p0:18,vol:.055,drift:.0003,d:'Mid-cap with an active dev team and worse habits.'},
+  MCH:{n:'Mooncheese',p0:.042,vol:.13,drift:-.0006,d:'A meme coin. Numbers go up and down for no reason.'},
+};
+const COIN_W={VLT:.34,IRN:.26,PBL:.22,MCH:.18};
+
+const CATS={
+  cold:{n:'Cold storage',ic:'🔐',nouns:['seed-phrase steel plate','wallet sleeve','fireproof pouch','tamper-evident seals','micro safe','metal backup kit','stealth wallet case','faraday pouch']},
+  merch:{n:'Merch',ic:'👕',nouns:['hoodie','beanie','sticker pack','enamel pin set','coffee mug','tote bag','phone case','desk mat','crew socks','poster tube']},
+  rig:{n:'Mining gear',ic:'⛏️',nouns:['rig fan','GPU riser','open-air frame','power supply','thermal paste kit','rack shelf','noise dampener','cable organizer','PCIe adapter']},
+  gadget:{n:'Gadgets',ic:'🔌',nouns:['mechanical keypad','LED light strip','smart plug','portable monitor','USB hub','webcam cover','wireless charger','desk lamp','ergonomic mouse']},
+  game:{n:'Collectibles',ic:'🎮',nouns:['physical coin','arcade stick','card box','figurine','retro console','dice set','puzzle box','pixel art frame']},
+  privacy:{n:'Privacy gear',ic:'🕶️',nouns:['RFID wallet','screen privacy filter','mic blocker','signal-blocking pouch','travel router','privacy laptop sleeve']},
+};
+const MODS=['Genesis','Satoshi-style','Midnight','Titan','Pocket','Pro','Ultra','Retro','Stealth','Founder\'s','Diamond-hands','Bull-run','Bear-proof','Minimalist','Overclocked','Vault','Nomad','Galaxy','Rugged','Zen','Alpha','Bunker','Hodler\'s','Block-party'];
+const TMOD=[[],[],['Signature','Studio','Executive'],['Imperial','Sovereign','Platinum','Obsidian']];
+const SUFX=['','','','',' MK II',' v2',' X',' Lite',' Max',' (2-pack)',' Kit',' Deluxe'];
+const TIERCOST=[[3,20],[16,90],[70,380],[300,1600]];
+const TIERMK=[[1.7,3.2],[1.6,2.7],[1.5,2.4],[1.4,2.1]];
+const TD=[1,.62,.38,.22];
+
+const SUP_A=['Shenzhen','Guangzhou','Istanbul','Dubai','Rotterdam','Seoul','Bangkok','Mumbai','Lisbon','Monterrey','Warsaw','Ho Chi Minh','Kuala Lumpur','Lagos','Gdansk','Izmir'];
+const SUP_B=['BrightWave','GoldenLotus','NorthStar','OmniTrade','PixelForge','BlueHarbor','Zenith','Redwood','Lumen','IronBridge','Harbor Light','SilverLeaf','Quartz','Tidewater','Kestrel-Free','Copperline'];
+const SUP_C=['Trading','Wholesale','Exports','Supply Co.','Distribution','Logistics','Manufacturing'];
+const SUP_FLAGS=['Website looks copied from another store','Only accepts crypto up front','All reviews were posted on the same day','Product photos are stock images','Contact email is a free webmail address','Refuses to give a phone number','Company registration is "pending"'];
+
+const SK={
+  sourcing:{n:'Sourcing',ic:'📦',d:'Cheaper suppliers, clearer product research.'},
+  marketing:{n:'Marketing',ic:'📣',d:'Promotions hit harder. Upsells land more often.'},
+  haggle:{n:'Negotiation',ic:'🤝',d:'Win price talks and big deals.'},
+  trading:{n:'Trading',ic:'📈',d:'Lower exchange fees and a better read on markets.'},
+  security:{n:'Security',ic:'🛡️',d:'Spot scams, survive hacks.'},
+  care:{n:'Customer care',ic:'💬',d:'Calm upset buyers, win repeat customers.'},
+  tech:{n:'Tech',ic:'💻',d:'Automation, better storefronts, fewer glitches.'},
+  law:{n:'Compliance',ic:'⚖️',d:'Lower taxes, calmer regulators.'},
+};
+const COURSES={
+  sourcing:['Reading a supplier audit','Freight terms without tears','Spotting fake factories'],
+  marketing:['Hooks that stop the scroll','Ad spend without the panic','Community, not spam'],
+  haggle:['Anchoring and other dark arts','Saying no with a smile','Bulk deals and bad coffee'],
+  trading:['Order books for humans','Risk sizing for the sleep-deprived','Reading news that lies'],
+  security:['Phishing, live fire drill','Hardware wallets in depth','Social engineering 101'],
+  care:['De-escalation workshop','Writing kind refunds','Support tone that sells'],
+  tech:['Shell scripts that save hours','Storefront speed tuning','Automating the boring parts'],
+  law:['Consumer law in plain words','Crypto tax basics','Contracts you can survive'],
+};
+const xpNeed=l=>30+l*24;
+
+const STORES=[
+  {n:'Marketplace stall',traffic:1,tier:2,slots:0,c:0,up:0},
+  {n:'Branded web store',traffic:1.9,tier:3,slots:2,c:1500,up:6},
+  {n:'Pro storefront',traffic:3.4,tier:3,slots:4,c:9000,up:26},
+  {n:'Global platform',traffic:6,tier:4,slots:8,c:60000,up:95},
+];
+const HQS=[
+  {n:'Kitchen table',cap:1,c:0,up:0},
+  {n:'Co-working desk',cap:4,c:1200,up:30},
+  {n:'Small office',cap:10,c:9000,up:120},
+  {n:'Headquarters floor',cap:24,c:60000,up:420},
+];
+
+const GEAR=[
+  {id:'lap1',n:'Better laptop',lv:[120],d:'+1 max energy. Fewer freezes.'},
+  {id:'energy',n:'Ergonomic setup',lv:[140,420,1200],d:'+1 max energy per level. Your back says thanks.'},
+  {id:'slots',n:'More store slots',lv:[90,240,600,1400,3200,7500,16000],d:'+1 product listing slot per level.'},
+  {id:'batch',n:'Packing station',lv:[80,260,800],d:'+3 orders per packing session per level.'},
+  {id:'hw',n:'Hardware wallet',lv:[95],d:'Cuts hack and phishing losses.'},
+  {id:'vpn',n:'VPN and password manager',lv:[40],d:'+1 effective Security.'},
+  {id:'brand',n:'Logo and brand kit',lv:[180],d:'Reputation grows 20% faster.'},
+  {id:'dir',n:'Supplier directory',lv:[150],d:'Research finds one more lead. Supplier flags are visible.'},
+  {id:'theme',n:'Store theme',lv:[60,300,900],d:'+6% traffic per level.'},
+  {id:'chair',n:'Standing desk and chair',lv:[200],d:'Stress builds 25% slower.'},
+  {id:'auto',n:'Order autopilot',lv:[400],d:'Fulfills up to 6 orders a day on its own.',req:s=>lv('tech')>=3,reqt:'Needs Tech 3'},
+  {id:'bot',n:'Auto-reply bot',lv:[350],d:'Handles 2 chats a day while you sleep. Not a great closer.',req:s=>lv('tech')>=4,reqt:'Needs Tech 4'},
+  {id:'gateway',n:'Payment gateway',lv:[600],d:'Lower exchange fees, small conversion bump.',req:s=>S.act>=2,reqt:'Unlocks in Act 2'},
+];
+
+const PATHS={
+  garage:{n:'The garage hustler',ic:'🛠️',cash:120,rep:6,sk:{sourcing:3,haggle:2},d:'You grew up flipping thrift-store finds. Suppliers charge you 5% less.',perk:'Supplier costs -5%'},
+  clout:{n:'The clout kid',ic:'📱',cash:45,rep:12,sk:{marketing:3,care:2},d:'Three thousand followers and no plan. Promotions hit 30% harder.',perk:'Promotions +30%'},
+  goblin:{n:'The code goblin',ic:'🧑‍💻',cash:85,rep:5,sk:{tech:3,security:2},d:'You can automate anything except your sleep schedule. Scams have a harder time with you.',perk:'Tech starts high, scam sense'},
+  teller:{n:'The laid-off teller',ic:'🏦',cash:220,rep:5,sk:{trading:3,law:2,haggle:1},d:'Bank layoff, small severance, real numbers sense. Exchange fees are lower for you.',perk:'Exchange fees -0.4%'},
+};
+
+const PROMOS=[
+  {id:'forum',n:'Forum posts',ic:'💬',e:1,c:0,b:[6,11],d:'Free and small. Mods might notice.',un:0,risk:.06},
+  {id:'meme',n:'Meme campaign',ic:'🖼️',e:1,c:8,b:[8,16],d:'Cheap. Quality varies wildly.',un:0,risk:.04},
+  {id:'ads',n:'Paid ads',ic:'🎯',e:1,c:35,b:[15,25],d:'Reliable if you can afford it.',un:2,risk:0},
+  {id:'dm',n:'Cold DMs',ic:'📨',e:2,c:0,b:[16,28],d:'Hits hard. Annoys some people.',un:3,risk:.3},
+  {id:'collab',n:'Influencer collab',ic:'🌟',e:1,c:140,b:[28,46],d:'Big spike, big invoice.',un:4,risk:.02},
+  {id:'stream',n:'Sponsor a stream',ic:'📺',e:1,c:420,b:[48,78],d:'Loud and pricey.',un:6,risk:.02},
+  {id:'pr',n:'PR push',ic:'🗞️',e:1,c:1800,b:[85,140],d:'Company-scale reach.',un:7,risk:0,co:true},
+];
+const GIGS=[
+  {t:'Write product descriptions for {cl}',sk:'marketing',pay:[14,26]},
+  {t:'Fix a broken spreadsheet for {cl}',sk:'tech',pay:[16,30]},
+  {t:'Moderate {cl}\'s Discord for a shift',sk:'care',pay:[12,22]},
+  {t:'Do a bike-courier shift for {cl}',sk:null,pay:[15,24],stress:6},
+  {t:'Translate a whitepaper for {cl}',sk:'law',pay:[18,34]},
+  {t:'Flip a thrifted find to {cl}',sk:'haggle',pay:[10,38]},
+  {t:'Audit a wallet setup for {cl}',sk:'security',pay:[18,36]},
+  {t:'Price-check a supplier list for {cl}',sk:'sourcing',pay:[14,28]},
+  {t:'Run a market-watch errand for {cl}',sk:'trading',pay:[16,32]},
+  {t:'Tutor a nervous newbie on wallets for {cl}',sk:'care',pay:[14,24]},
+];
+const CLIENTS=['a local bakery','a tiny fintech','a podcast host','an art collective','a friend of a friend','a laundromat chain','a nervous startup','a "serial founder"','a vintage-camera shop','a hostel owner','a church newsletter','a very loud gym'];
+const GIG_END=['They tipped you in cookies.','The client paid in exposure, then remembered to also pay.','You finished early and nobody noticed.','It went sideways, but you still got paid.','The client asked for "one tiny revision". It was eleven.','You learned a new swear word in another language.','A stranger on the bus complimented your hoodie.','The coffee was terrible. The check cleared, though.'];
+const REST_TXT=['You sleep like a parcel in a quiet warehouse.','You walk around the block. The block, for once, has no opinions.','You cook real food and eat it sitting down. Radical.','You turn off notifications. The universe does not end.','A nap, a shower and a rerun. Dignity restored.','You call a friend and talk about anything except gas fees.','You stare at the ceiling and let the numbers settle.','You water the plant that has survived all your startups.'];
+
+const SUB_NEWS_EX=['Krakonos','BitBazaar','CoinHaus','Nimbus Exchange','Hodlr','LedgerLane','PolarX'];
+const CELEB=['billionaire Rex Halloran','streamer NoScopeNate','rapper Lil Ledger','tech mogul Astrid Vance','chef-turned-trader Dario Fonte','podcaster Big Gwen','actor Miles Tennant'];
+const CNTRY=['Norvia','the Kestani Republic','Bolivara','Zhelmark','the Emirate of Qaram','Lusitana','Tarn','Ostrava-on-Sea'];
+const NEWS=[
+  {t:'{ex} freezes withdrawals "for maintenance." Traders are not amused.',coin:'ALL',amt:-.02,d:3},
+  {t:'{celeb} posts a photo of a cheese wheel. Mooncheese traders lose their minds.',coin:'MCH',amt:.07,d:3},
+  {t:'{country} bans crypto mining overnight. Rig gear buyers panic-shop.',cat:'rig',m:1.5,d:6,coin:'IRN',amt:-.015},
+  {t:'Analysts call Ironcoin "structurally undervalued". The analysts own Ironcoin.',coin:'IRN',amt:.02,d:4},
+  {t:'A Pebble developer pushes a bug to mainnet. It is fixed within hours, mostly.',coin:'PBL',amt:-.04,d:2},
+  {t:'A hardware wallet maker recalls a batch. Cold storage demand spikes.',cat:'cold',m:1.6,d:6},
+  {t:'Retro gaming is trending again after a viral livestream.',cat:'game',m:1.4,d:6},
+  {t:'{country} publishes a clear crypto framework. Markets exhale.',coin:'ALL',amt:.012,d:5},
+  {t:'A phishing wave hits wallet users. Privacy gear flies off shelves.',cat:'privacy',m:1.5,d:5},
+  {t:'{celeb} sells all their Pebble live on stream. PBL wobbles.',coin:'PBL',amt:-.05,d:3},
+  {t:'Vaultstable dips to $0.97 before recovering. Nerves fray.',coin:'VLT',amt:-.01,d:1},
+  {t:'Tariff cuts lower shipping costs. Dropshippers rejoice.',cat:'ALL',m:1.15,d:6},
+  {t:'Fashion blogs declare "hodl chic" the look of the season.',cat:'merch',m:1.5,d:7},
+  {t:'A GPU shortage returns. Mining gear is suddenly precious.',cat:'rig',m:1.6,d:8},
+  {t:'A review channel crowns the mechanical keypad "desk pet of the year".',cat:'gadget',m:1.5,d:6},
+  {t:'{ex} loses $80 million in a hack. Self-custody fans smirk.',coin:'ALL',amt:-.025,d:4,cat:'cold',m:1.4},
+  {t:'A cold snap in {country} slows ports. Parcels arrive days late.',ship:2,d:5},
+  {t:'Airdrop season. Wallet users everywhere are yelling about "eligibility".',coin:'PBL',amt:.03,d:4},
+  {t:'Regulators in {country} publish 400 pages of guidance. Nobody reads it.',coin:'ALL',amt:-.006,d:3},
+  {t:'Mooncheese devs vanish. The Discord is now 90% grief poetry.',coin:'MCH',amt:-.09,d:4},
+  {t:'A fund quietly buys Ironcoin. Someone leaked it to the wrong group chat.',coin:'IRN',amt:.03,d:5},
+  {t:'Holiday shopping starts early. Gift buyers are everywhere.',cat:'ALL',m:1.3,d:8},
+  {t:'A meme of a dog in a wallet sleeve goes wildly viral.',cat:'cold',m:1.3,d:5},
+  {t:'Stablecoin auditors delay their report again. Vaultstable holders write nervous posts.',coin:'VLT',amt:-.004,d:3},
+];
+const NEWS_FLAVOR=['Nothing moved today, which is its own kind of news.','Crypto Twitter argued about a font for six hours.','A man in a mask promises "the next big thing".','Someone lost a wallet and, honestly, we all felt it.','Gas fees are down. Nobody notices.'];
+
+const ROLES={
+  fulfil:{n:'Fulfillment clerk',ic:'📦',base:38,d:'Ships up to 3 orders a day per skill level, no energy needed.'},
+  support:{n:'Support agent',ic:'🎧',base:44,d:'Answers buyer chats you leave unopened. Better agents close more sales.'},
+  scout:{n:'Product scout',ic:'🔭',base:46,d:'Finds new product leads for you every few days.'},
+  growth:{n:'Growth marketer',ic:'📈',base:52,d:'Adds buzz every single day.'},
+  books:{n:'Accountant',ic:'🧾',base:58,d:'Cuts your tax bill and catches billing errors.'},
+  sec:{n:'Security lead',ic:'🔒',base:64,d:'Blocks scams and cuts hack losses.'},
+  dev:{n:'Developer',ic:'🛠️',base:70,d:'Raises store conversion. Needed for the bigger storefronts.'},
+};
+const TRAITS=[
+  {k:'loyal',n:'Loyal',d:'Rarely quits.'},{k:'genius',n:'Genius',d:'Skill counts +1.'},{k:'sloppy',n:'Sloppy',d:'Makes costly mistakes now and then.'},
+  {k:'gossip',n:'Gossip',d:'Drags morale up and down.'},{k:'ambitious',n:'Ambitious',d:'Will ask for raises.'},{k:'calm',n:'Calm',d:'Nothing rattles them.'},
+];
+const ACHS=[
+  {id:'first',n:'First sale',d:'Deliver your first order.',ck:()=>S.stats.done>=1},
+  {id:'o25',n:'Twenty-five parcels',d:'Deliver 25 orders.',ck:()=>S.stats.done>=25},
+  {id:'o100',n:'A hundred and counting',d:'Deliver 100 orders.',ck:()=>S.stats.done>=100},
+  {id:'o1000',n:'Warehouse of the mind',d:'Deliver 1,000 orders.',ck:()=>S.stats.done>=1000},
+  {id:'scam',n:'Not today',d:'Catch a scammer in the act.',ck:()=>S.stats.scamsCaught>=1},
+  {id:'burn',n:'Tuition paid',d:'Get burned by a scam.',ck:()=>S.stats.scamsHit>=1},
+  {id:'k1',n:'Four figures',d:'Reach $1,000 net worth.',ck:()=>nw()>=1000},
+  {id:'k10',n:'Five figures',d:'Reach $10,000 net worth.',ck:()=>nw()>=10000},
+  {id:'k100',n:'Six figures',d:'Reach $100,000 net worth.',ck:()=>nw()>=100000},
+  {id:'rep50',n:'Known name',d:'Hit 50 reputation.',ck:()=>S.rep>=50},
+  {id:'chat50',n:'Chatterbox',d:'Finish 50 buyer chats.',ck:()=>S.stats.chats>=50},
+  {id:'lvl5',n:'Getting good',d:'Raise any skill to 5.',ck:()=>Object.values(S.sk).some(x=>x.l>=5)},
+  {id:'lvl10',n:'Master of one',d:'Raise any skill to 10.',ck:()=>Object.values(S.sk).some(x=>x.l>=10)},
+  {id:'co',n:'Incorporated',d:'Form your company.',ck:()=>!!S.co},
+  {id:'staff5',n:'A real payroll',d:'Employ five people.',ck:()=>S.co&&S.co.staff.length>=5},
+  {id:'act3',n:'Empire builder',d:'Reach Act 3.',ck:()=>S.act>=3},
+  {id:'d100',n:'Hundred days',d:'Survive 100 days.',ck:()=>S.day>=100},
+  {id:'d250',n:'Long haul',d:'Survive 250 days.',ck:()=>S.day>=250},
+  {id:'rug',n:'Rug survivor',d:'Hold Mooncheese through a crash and live.',ck:()=>!!S.flags.rugSurvived},
+];
+/* ================= state ================= */
+let S=null;
+const SKKEYS=Object.keys(SK);
+function newState(pathKey){
+  const p=PATHS[pathKey];
+  const sk={}; SKKEYS.forEach(k=>sk[k]={l:1,xp:0});
+  Object.entries(p.sk).forEach(([k,v])=>sk[k].l=v);
+  return {
+    v:1, path:pathKey, day:1, act:1, phase:'work', // work -> end -> (event) -> next day
+    energy:5, maxEnergy:5, stress:10, maxStress:100,
+    cash:p.cash, rep:p.rep, hype:0,
+    sk, gear:{}, gearLv:{},
+    store:0, hq:0,
+    products:[], // {id,cat,name,tier,cost,price,stock,sold,age}
+    inbox:[], // buyer chat threads: {id,buyer,msgs:[],state:'open'|'won'|'lost'|'scam',productId,offer,stage}
+    orders:[], // fulfillment queue {id,buyer,item,qty,price,age,promised}
+    coins:{}, // sym: qty
+    coinHist:{},
+    news:[],
+    log:[],
+    flags:{},
+    stats:{done:0,scamsCaught:0,scamsHit:0,chats:0,earned:0,spent:0,promosRun:0,gigs:0,best:0},
+    achieved:{},
+    co:null, // {name,staff:[],payroll,...}
+    gigsToday:0,
+    lastCoinId:0, lastProdId:0, lastOrdId:0, lastBuyerId:0,
+    nextSupplierScan:0,
+    storyFlags:{},
+    pendingEvent:null,
+    dailyDone:false,
+    leads:[],
+    gig:null,
+  };
+}
+function lv(skKey){return S.sk[skKey].l + (S.co? staffBonus(skKey):0);}
+function staffBonus(skKey){
+  if(!S.co) return 0;
+  let b=0;
+  S.co.staff.forEach(e=>{ if(e.role==='dev'&&skKey==='tech') b+=Math.floor(e.skill/3); });
+  return b;
+}
+function nw(){ // net worth
+  let v=S.cash;
+  Object.entries(S.coins).forEach(([sym,q])=>{ v+=q*curPrice(sym); });
+  S.products.forEach(p=>v+=p.stock*p.cost*0.5);
+  return Math.round(v);
+}
+function gearLevel(id){return S.gearLv[id]||0;}
+function gearCost(id){const g=GEAR.find(x=>x.id===id);const l=gearLevel(id);return g.lv[l];}
+function gearMaxed(id){const g=GEAR.find(x=>x.id===id);return gearLevel(id)>=g.lv.length;}
+function hasGear(id){return gearLevel(id)>0;}
+function addLog(t){S.log.unshift({day:S.day,t});if(S.log.length>250)S.log.pop();}
+function addCash(n,reason){S.cash+=n; if(n>0)S.stats.earned+=n; else S.stats.spent+=-n; }
+function gainXP(skKey,amt){
+  const o=S.sk[skKey]; o.xp+=amt;
+  let leveled=false;
+  while(o.xp>=xpNeed(o.l)){o.xp-=xpNeed(o.l); o.l++; leveled=true;}
+  if(leveled) toast(SK[skKey].ic+' '+SK[skKey].n+' → level '+o.l);
+}
+function addStress(n){S.stress=clamp(S.stress+n*(hasGear('chair')?0.75:1),0,S.maxStress);}
+function energyMax(){let m=S.maxEnergy; if(hasGear('lap1'))m+=1; m+=gearLevel('energy'); return m;}
+function slotsMax(){const base=STORES[S.store].slots+2; return base+gearLevel('slots');}
+function traffic(){
+  let t=STORES[S.store].traffic;
+  t*=1+gearLevel('theme')*0.06;
+  t*=1+Math.min(S.rep,150)/220;
+  t*=1+S.hype/140;
+  return t;
+}
+/* ================= coin market ================= */
+function initMarket(){
+  Object.entries(COINS).forEach(([sym,c])=>{
+    S.coinHist[sym]=[c.p0];
+    S.flags['p_'+sym]=c.p0;
+  });
+}
+function curPrice(sym){return S.flags['p_'+sym];}
+function stepMarket(){
+  Object.entries(COINS).forEach(([sym,c])=>{
+    let p=curPrice(sym);
+    let drift=c.drift;
+    let shock=0;
+    (S.pendingMarketMods||[]).forEach(m=>{ if(m.coin===sym||m.coin==='ALL') shock+=m.amt; });
+    const chg=drift+gauss()*c.vol+shock;
+    p=Math.max(c===COINS.VLT?0.9:p*0.02, p*(1+chg));
+    if(sym==='VLT') p=clamp(p,0.94,1.06);
+    S.flags['p_'+sym]=p;
+    const h=S.coinHist[sym]; h.push(p); if(h.length>60)h.shift();
+  });
+  S.pendingMarketMods=[];
+}
+function applyNewsMarket(ev){
+  S.pendingMarketMods=S.pendingMarketMods||[];
+  if(ev.coin&&ev.amt) S.pendingMarketMods.push({coin:ev.coin,amt:ev.amt});
+}
+function sparkline(hist,w=220,h=44){
+  if(hist.length<2) return '';
+  const mn=Math.min(...hist),mx=Math.max(...hist);
+  const rng=(mx-mn)||1;
+  const step=w/(hist.length-1);
+  const pts=hist.map((v,i)=>`${(i*step).toFixed(1)},${(h-((v-mn)/rng)*h*0.86-h*0.07).toFixed(1)}`).join(' ');
+  const up=hist[hist.length-1]>=hist[0];
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${up?'var(--good)':'var(--bad)'}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+}
+function buyCoin(sym,usd){
+  const fee=tradeFee();
+  const spend=Math.min(usd,S.cash);
+  if(spend<=0) return;
+  const p=curPrice(sym);
+  const net=spend*(1-fee);
+  const q=net/p;
+  S.coins[sym]=(S.coins[sym]||0)+q;
+  addCash(-spend);
+  gainXP('trading',Math.max(1,Math.round(spend/40)));
+  addLog(`Bought ${cnum(q)} ${sym} for ${money(spend)}.`);
+}
+function sellCoin(sym,qty){
+  qty=Math.min(qty,S.coins[sym]||0);
+  if(qty<=0) return;
+  const fee=tradeFee();
+  const p=curPrice(sym);
+  const gross=qty*p;
+  const net=gross*(1-fee);
+  S.coins[sym]-=qty; if(S.coins[sym]<1e-9) delete S.coins[sym];
+  addCash(net);
+  gainXP('trading',Math.max(1,Math.round(gross/40)));
+  addLog(`Sold ${cnum(qty)} ${sym} for ${money(net)}.`);
+}
+function tradeFee(){
+  let f=0.012 - lv('trading')*0.0006;
+  if(S.path==='teller') f-=0.004;
+  if(hasGear('gateway')) f-=0.003;
+  return clamp(f,0.001,0.03);
+}
+/* ================= products & suppliers ================= */
+function genProduct(tierBias=0){
+  const catKeys=Object.keys(CATS);
+  let tier=clamp(ri(0,2)+tierBias+(S.act>=2?ri(0,1):0)+(S.act>=3?ri(0,1):0),0,3);
+  const cat=pick(catKeys);
+  const C=CATS[cat];
+  const noun=pick(C.nouns);
+  const mod=tier>0&&chance(.7)?pick(MODS)+' ':'';
+  const tm=TMOD[tier].length&&chance(.5)?pick(TMOD[tier])+' ':'';
+  const sfx=pick(SUFX);
+  const name=(tm||mod?(tm||mod):'')+cap(noun)+sfx;
+  const [cmin,cmax]=TIERCOST[tier];
+  const cost=+rf(cmin,cmax).toFixed(2);
+  const [mmin,mmax]=TIERMK[tier];
+  const sourceMk=rf(mmin,mmax);
+  const demand=TD[tier]*rf(.75,1.3);
+  const supplier=genSupplier(tier);
+  return {id:++S.lastProdId,cat,tier,name,cost,supplier,baseDemand:demand,sourceMk};
+}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+function genSupplier(tier){
+  const flagChance=clamp(.22-lv('sourcing')*0.018-(S.act-1)*0.01,0.02,.3);
+  const nFlags= chance(flagChance)? ri(1, tier>=2?3:2) : 0;
+  const flags=shuffle(SUP_FLAGS).slice(0,nFlags);
+  const scam = nFlags>=2 && chance(.55);
+  return {
+    name:pick(SUP_A)+' '+pick(SUP_B)+' '+pick(SUP_C),
+    flags, scam,
+    reliability: scam? rf(.1,.3): rf(.62,.98),
+  };
+}
+function researchCost(){return Math.max(1,3-Math.floor(lv('sourcing')/4));}
+function priceSuggest(p){
+  let mk=p.sourceMk;
+  mk*= 1+lv('haggle')*0.01;
+  return +(p.cost*mk).toFixed(2);
+}
+function listProduct(p,price,cost){
+  if(S.products.length>=slotsMax()){toast('No open store slots.');return false;}
+  const initCost=cost;
+  if(S.cash<initCost){toast('Not enough cash to stock it.');return false;}
+  addCash(-initCost);
+  S.products.push({id:p.id,cat:p.cat,tier:p.tier,name:p.name,cost:p.cost,price,stock:Math.round(initCost/p.cost),sold:0,age:0,supplier:p.supplier,baseDemand:p.baseDemand,flagged:p.supplier.flags.length>0});
+  addLog(`Listed "${p.name}" at ${money(price)}.`);
+  gainXP('sourcing',2);
+  return true;
+}
+function restockCost(prod,qty){return +(prod.cost*qty).toFixed(2);}
+function restock(prodId,qty){
+  const p=S.products.find(x=>x.id===prodId); if(!p)return;
+  const c=restockCost(p,qty);
+  if(S.cash<c){toast('Not enough cash.');return;}
+  addCash(-c); p.stock+=qty;
+  addLog(`Restocked ${qty}x "${p.name}".`);
+}
+function delistProduct(prodId){
+  const i=S.products.findIndex(x=>x.id===prodId); if(i<0)return;
+  const p=S.products[i];
+  const refund=p.stock*p.cost*0.4;
+  addCash(refund);
+  addLog(`Delisted "${p.name}", recovered ${money(refund)}.`);
+  S.products.splice(i,1);
+}
+/* category demand multiplier from active news */
+function categoryMult(cat){
+  let m=1;
+  S.news.forEach(n=>{ if(n.expires>=S.day && (n.cat===cat||n.cat==='ALL')) m*=n.m||1; });
+  return m;
+}
+/* ================= buyers & chat ================= */
+function genBuyer(){
+  const handle=genHandle();
+  const job=pick(JOBS);
+  const quirk=pick(QUIRKS);
+  const style=wpick(STYLES,x=>x[1])[0];
+  const scammer = chance(clamp(.05 - lv('security')*0.004 + (S.act-1)*0.01,0.01,.22));
+  const patience = ri(2,5) - (scammer?0:0);
+  const budgetMood = pick(['tight','normal','normal','normal','flush']);
+  return {id:++S.lastBuyerId, handle, job, quirk, style, scammer, patience,
+    mood: chance(.15)?'grumpy':chance(.15)?'excited':'normal',
+    budgetMood, repeat:false};
+}
+function styleWrap(s,style){
+  switch(style){
+    case 'lower': return s.toLowerCase();
+    case 'caps': return s.toUpperCase();
+    case 'emoji': return s+' '+pick(['🙏','😅','🔥','👀','🙌','💀','✨','😬']);
+    case 'formal': return s.replace(/^\w/,c=>c.toUpperCase());
+    case 'terse': return s.split(' ').slice(0,Math.max(3,Math.floor(s.split(' ').length*0.6))).join(' ');
+    default: return s;
   }
-  requestAnimationFrame(drawRoots);
 }
-drawRoots();
-
-function fmt(n){
-  if(n<1e3)return Math.floor(n).toLocaleString();
-  const S=['','K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc'];
-  let i=0,v=n;while(v>=1000&&i<S.length-1){v/=1000;i++;}
-  return v.toFixed(i>0?2:0)+' '+S[i];
-}
-
-let G={spores:0,lifetime:0,totalClicks:0,ascendCount:0,ascendMult:1,bld:{},upg:{},ach:{},time:0,shielded:false};
-
-const BUILDINGS=[
-  {id:'spore',  name:'Spore Pod',       icon:'🫧',base:12,     cps:0.1,  desc:'Libere des spores en continu.',          unlock:0},
-  {id:'mycel',  name:'Mycelium Thread', icon:'🕸️',base:80,     cps:0.4,  desc:'Les filaments absorbent les nutriments.', unlock:40},
-  {id:'fairy',  name:'Fairy Ring',      icon:'💫',base:450,    cps:1.8,  desc:'Les anneaux anciens canalisent la magie.',unlock:200},
-  {id:'truffle',name:'Truffle Network', icon:'🌰',base:2500,   cps:8,    desc:'Les reseaux de truffes cultivent le sol.',unlock:1000},
-  {id:'giant',  name:'Giant Shroom',    icon:'🍄',base:12000,  cps:35,   desc:'Un champignon colossal plein de puissance.',unlock:5000},
-  {id:'cave',   name:'Cave Colony',     icon:'🦇',base:65000,  cps:150,  desc:'Les grottes profondes cultivent des fungi.',unlock:25000},
-  {id:'spire',  name:'Fungal Spire',    icon:'🗼',base:350000, cps:600,  desc:'Une fleche repand des spores au loin.',   unlock:120000},
-  {id:'forest', name:'Enchanted Forest',icon:'🌲',base:1800000,cps:2500, desc:'Une foret entiere sous controle myco.',  unlock:600000},
-  {id:'world',  name:'World Root',      icon:'🌍',base:9000000,cps:10000,desc:'Le mycelium enveloppe la planete.',       unlock:3000000},
-  {id:'beyond', name:'Spore Dimension', icon:'🌀',base:4e8,    cps:60000,desc:'Une dimension de pur champignon.',        unlock:1e8},
+const OPENERS=[
+  'hey, is the {item} still available?','yo is the {item} in stock??','Hi — checking if you still have the {item}.',
+  'is this legit? asking about the {item}','saw your {item}, tell me more','does the {item} actually work as shown',
+  'can you ship the {item} to me fast?','hey!! need the {item} for a gift, in stock?','is {item} original or knockoff, be honest',
+  'quick q — {item} bulk discount if i take a few?','been eyeing the {item} for weeks lol','my friend said your store is solid, {item} still up?'
+];
+const HAGGLE_LINES=[
+  'can you do {p} instead','best price is what exactly? not {p}','ill take it right now for {p}, deal?',
+  'other stores have it for less tbh','{p} feels steep ngl','can we meet at {p}',
+  'throw in free shipping and its a deal at {p}'
+];
+const ACCEPT_LINES=['deal, sending payment now','alright you got me, buying it','say less, im in','ok ok fine, purchasing','bet. buying now','done, let\'s go'];
+const DECLINE_LINES=['nah im good, thanks anyway','gonna pass on this one','ill keep looking, sorry','too much for me rn','maybe next time'];
+const SCAM_LINES=[
+  'can you just ship it and ill pay once it arrives?','my payment app is "glitching", can you send first?',
+  'i already paid, check again? (i didn\'t)','send to this OTHER wallet, mine is "locked"',
+  'can we do this off-platform, ill venmo my "cousin" who handles it'
 ];
 
-const UPGRADES=[
-  {id:'c1',name:'Doigts Calleux',     icon:'🖐️',cost:80,     eff:'x2 puissance clic',    type:'click',mult:2,  req:()=>G.lifetime>=40},
-  {id:'c2',name:'Gants de Spores',    icon:'🧤',cost:1500,   eff:'x3 puissance clic',    type:'click',mult:3,  req:()=>G.lifetime>=800},
-  {id:'c3',name:'Injection Enzyme',   icon:'💉',cost:40000,  eff:'x5 puissance clic',    type:'click',mult:5,  req:()=>G.lifetime>=20000},
-  {id:'c4',name:'Gants Myco',         icon:'⚡',cost:800000, eff:'x10 puissance clic',   type:'click',mult:10, req:()=>G.lifetime>=400000},
-  {id:'c5',name:'Apotheose Fongique', icon:'🌟',cost:5e7,    eff:'x20 puissance clic',   type:'click',mult:20, req:()=>G.lifetime>=2e7},
-  {id:'sp1',name:'Pods Plus Forts',   icon:'🫧',cost:400,    eff:'Pods x2 SPS',          type:'bld',bld:'spore',  mult:2,req:()=>bldN('spore')>=5},
-  {id:'sp2',name:'Nuage Dense',       icon:'🫧',cost:6000,   eff:'Pods x3 SPS',          type:'bld',bld:'spore',  mult:3,req:()=>bldN('spore')>=15},
-  {id:'sp3',name:'Canon de Spores',   icon:'🫧',cost:80000,  eff:'Pods x5 SPS',          type:'bld',bld:'spore',  mult:5,req:()=>bldN('spore')>=30},
-  {id:'my1',name:'Filaments Larges',  icon:'🕸️',cost:2500,   eff:'Mycelium x2 SPS',      type:'bld',bld:'mycel',  mult:2,req:()=>bldN('mycel')>=5},
-  {id:'my2',name:'Fungi Neural',      icon:'🕸️',cost:35000,  eff:'Mycelium x3 SPS',      type:'bld',bld:'mycel',  mult:3,req:()=>bldN('mycel')>=15},
-  {id:'fr1',name:'Resonance Anneau',  icon:'💫',cost:14000,  eff:'Fairy Rings x2 SPS',   type:'bld',bld:'fairy',  mult:2,req:()=>bldN('fairy')>=5},
-  {id:'fr2',name:'Pacte Ancien',      icon:'💫',cost:180000, eff:'Fairy Rings x3 SPS',   type:'bld',bld:'fairy',  mult:3,req:()=>bldN('fairy')>=15},
-  {id:'tr1',name:'Arome Profond',     icon:'🌰',cost:75000,  eff:'Truffles x2 SPS',      type:'bld',bld:'truffle',mult:2,req:()=>bldN('truffle')>=5},
-  {id:'tr2',name:'Extrait de Truffe', icon:'🌰',cost:1000000,eff:'Truffles x3 SPS',      type:'bld',bld:'truffle',mult:3,req:()=>bldN('truffle')>=15},
-  {id:'gs1',name:'Goutte Fertilisant',icon:'🍄',cost:400000, eff:'Giant Shrooms x2 SPS', type:'bld',bld:'giant',  mult:2,req:()=>bldN('giant')>=5},
-  {id:'gs2',name:'Croissance Titan',  icon:'🍄',cost:5000000,eff:'Giant Shrooms x3 SPS', type:'bld',bld:'giant',  mult:3,req:()=>bldN('giant')>=15},
-  {id:'g1',name:'Alliance Foret',     icon:'🌿',cost:4000,   eff:'Tout SPS x1.5',        type:'global',mult:1.5,req:()=>G.lifetime>=2000},
-  {id:'g2',name:'Guilde Decomposeurs',icon:'♻️',cost:80000,  eff:'Tout SPS x2',          type:'global',mult:2,  req:()=>G.lifetime>=40000},
-  {id:'g3',name:'Conscience Myco',    icon:'🧠',cost:1500000,eff:'Tout SPS x3',          type:'global',mult:3,  req:()=>G.lifetime>=800000},
-  {id:'g4',name:'Overmind Hyphae',    icon:'🌐',cost:3e7,    eff:'Tout SPS x5',          type:'global',mult:5,  req:()=>G.lifetime>=1.5e7},
-  {id:'g5',name:'Singularite Spore',  icon:'∞', cost:8e8,    eff:'Tout SPS x10',         type:'global',mult:10, req:()=>G.lifetime>=4e8},
-];
+function buyerAvatar(b){ return b.scammer&&S._reveal? '🎭' : pick(['🙂','😎','🤓','🧢','👤','😊','🙃','🫡','😐']); }
 
-const ACHIEVEMENTS=[
-  {id:'first', name:'Premiere Recolte',  icon:'🌱',desc:'Clique le champignon une fois.',    req:()=>G.totalClicks>=1},
-  {id:'tap100',name:'Inlassable',        icon:'👆',desc:'Clique 100 fois.',                  req:()=>G.totalClicks>=100},
-  {id:'tap1k', name:'Obsessionnel',      icon:'🤯',desc:'Clique 1 000 fois.',                req:()=>G.totalClicks>=1000},
-  {id:'s1k',   name:'Accumulateur',      icon:'✨',desc:'Collecte 1 000 spores.',            req:()=>G.lifetime>=1000},
-  {id:'s100k', name:'Baron Fongique',    icon:'🍄',desc:'Collecte 100 000 spores.',          req:()=>G.lifetime>=100000},
-  {id:'s1m',   name:'Myco-Millionnaire',icon:'💰',desc:'Collecte 1 Million de spores.',     req:()=>G.lifetime>=1e6},
-  {id:'s1b',   name:'Milliardaire Spore',icon:'🤑',desc:'Collecte 1 Milliard de spores.',   req:()=>G.lifetime>=1e9},
-  {id:'s1t',   name:'Titan Fongique',    icon:'🌍',desc:'Collecte 1 Trillion de spores.',   req:()=>G.lifetime>=1e12},
-  {id:'b10',   name:'Cultivateur',       icon:'🌿',desc:'Possede 10 colonies.',              req:()=>totalBlds()>=10},
-  {id:'b50',   name:'Mycologue',         icon:'🔬',desc:'Possede 50 colonies.',              req:()=>totalBlds()>=50},
-  {id:'b100',  name:'Empire Fongique',   icon:'👑',desc:'Possede 100 colonies.',             req:()=>totalBlds()>=100},
-  {id:'b200',  name:'L Overmind',        icon:'🌀',desc:'Possede 200 colonies.',             req:()=>totalBlds()>=200},
-  {id:'allbld',name:'Ecosysteme Complet',icon:'🌲',desc:'Possede 1 de chaque type.',         req:()=>BUILDINGS.every(b=>bldN(b.id)>=1)},
-  {id:'asc1',  name:'Spore Renee',       icon:'🔄',desc:'Ascende pour la premiere fois.',    req:()=>G.ascendCount>=1},
-  {id:'asc3',  name:'Fungi Eternel',     icon:'♾️',desc:'Ascende 3 fois.',                  req:()=>G.ascendCount>=3},
-];
-
-const STAGES=[
-  {at:0,      name:'🌱 Spore Solitaire',   desc:'Une seule spore sur le sol de la foret.'},
-  {at:200,    name:'🍄 Germination',        desc:'De petits champignons emergent du sol.'},
-  {at:2000,   name:'🌿 Reseau Mycelien',    desc:'Des filaments souterrains connectent ton empire.'},
-  {at:20000,  name:'🌲 Gardien de Foret',   desc:'Les arbres chuchotent a ton mycelium.'},
-  {at:200000, name:'🦋 Bosquet Enchante',   desc:'La magie s imprègne dans ton reseau.'},
-  {at:2e6,    name:'🌍 Mycelium Planetaire',desc:'Tes racines couvrent des continents.'},
-  {at:2e9,    name:'🌌 Spore Dimensionnel', desc:'Tes spores voyagent entre les mondes.'},
-  {at:2e12,   name:'👑 Divinite Fongique',  desc:'Tu es la foret. Tu es tout.'},
-];
-
-const TICKERS=[
-  '🍄 Un fermier signale des champignons couvrant son champ entier du jour au lendemain.',
-  '🌿 Des botanistes perplexes face aux reseaux de mycelium sous les rues de la ville.',
-  '✨ Un anneau de fees atteint 3 km de diametre — les touristes affluent en masse.',
-  '🦠 Scientists: La foret pense. Nous ne pouvons pas l expliquer.',
-  '🌰 Le marche mondial des truffes s effondre — l offre devient inepuisable.',
-  '🕸️ Un reseau mycelien communique via des signaux chimiques entre continents entiers.',
-  '🌀 Des rapports d une dimension de spores apparaissant dans l ocean Pacifique.',
-  '💰 Les futures de spores atteignent un sommet historique sur l echange interplanetaire.',
-  '🧠 Des biologistes confirment: le reseau mycelien a atteint une conscience collective.',
-];
-
-const EVENTS=[
-  {id:'spore_rain',    icon:'🌧️',title:'Pluie de Spores!',          desc:'Une tempete de spores balaie la foret. +3 minutes de production!',             type:'bonus',weight:12,apply:()=>{const b=getSPS()*180;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
-  {id:'giant_shroom',  icon:'🌲',title:'Champignon Geant!',          desc:'Un champignon colossal surgit. +5 minutes de production!',                     type:'bonus',weight:8, apply:()=>{const b=getSPS()*300;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
-  {id:'ancient_ritual',icon:'🔮',title:'Rituel Ancien!',             desc:'Un rituel ancestral. +10 min du meilleur batiment!',                           type:'bonus',weight:5, apply:()=>{let best=0;BUILDINGS.forEach(b=>{const s=b.cps*bldN(b.id)*bldMult(b.id)*globalMult();if(s>best)best=s;});const b=best*600;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
-  {id:'spore_bounty',  icon:'🎁',title:'Bounty de Spores!',          desc:'Un chasseur offre une recompense. +2 minutes de production!',                  type:'bonus',weight:10,apply:()=>{const b=getSPS()*120;G.spores+=b;G.lifetime+=b;return '+'+fmt(b)+' spores';}},
-  {id:'myco_frenzy',   icon:'🍄',title:'Frenesie Mycelium!',          desc:'Le reseau vibre. Production x3 / 30s!',                                        type:'boost',weight:10,apply:()=>{addBoost('myco_frenzy','🍄 Frenesie x3',3,30);return 'x3 / 30s';}},
-  {id:'spore_wind',    icon:'🌀',title:'Vent de Spores!',             desc:'Un vent porte tes spores. Tap x5 / 45s!',                                      type:'boost',weight:9, apply:()=>{addBoost('spore_wind','🌀 Tap x5',5,45,'click');return 'Tap x5 / 45s';}},
-  {id:'fairy_blessing',icon:'💫',title:'Benediction des Fees!',       desc:'Les fees te benissent. Production x2 / 60s!',                                  type:'boost',weight:8, apply:()=>{addBoost('fairy_blessing','💫 Benediction x2',2,60);return 'x2 / 60s';}},
-  {id:'truffle_rush',  icon:'🌰',title:'Ruee aux Truffes!',           desc:'Truffes rares. +50% clic / 60s!',                                              type:'boost',weight:9, apply:()=>{addBoost('truffle_rush','🌰 Clic +50%',1.5,60,'click');return '+50% clic / 60s';}},
-  {id:'spore_storm',   icon:'⚡',title:'Tempete de Spores!',          desc:'Ionisation. Production x5 / 20s!',                                             type:'boost',weight:6, apply:()=>{addBoost('spore_storm','⚡ Tempete x5',5,20);return 'x5 / 20s';}},
-  {id:'mycoburst',     icon:'🌟',title:'Explosion Mycelienne!',       desc:'Explosion d energie. Production x4 / 45s!',                                    type:'boost',weight:7, apply:()=>{addBoost('mycoburst','🌟 Burst x4',4,45);return 'x4 / 45s';}},
-  {id:'drought',       icon:'☀️',title:'Secheresse!',                 desc:'Sol desseche. Production -50% / 45s.',                                         type:'malus',weight:8, apply:()=>{addBoost('drought','☀️ Secheresse -50%',0.5,45);return '-50% / 45s';}},
-  {id:'rot',           icon:'🦠',title:'Pourriture Mycelienne!',      desc:'Maladie. -10% de spores actuels.',                                             type:'malus',weight:6, apply:()=>{const l=Math.floor(G.spores*0.1);G.spores=Math.max(0,G.spores-l);return '-'+fmt(l)+' spores';}},
-  {id:'spore_thieves', icon:'🐛',title:'Voleurs de Spores!',          desc:'Insectes envahisseurs. Production -70% / 30s.',                                type:'malus',weight:5, apply:()=>{addBoost('spore_thieves','🐛 Invasion -70%',0.3,30);return '-70% / 30s';}},
-  {id:'cold_snap',     icon:'❄️',title:'Vague de Froid!',             desc:'Gel. Production -40% / 60s.',                                                  type:'malus',weight:7, apply:()=>{addBoost('cold_snap','❄️ Gel -40%',0.6,60);return '-40% / 60s';}},
-  {id:'fungal_blight', icon:'🌑',title:'Fletrissure Fongique!',       desc:'Fletrissure noire. Production -60% / 40s.',                                    type:'malus',weight:5, apply:()=>{addBoost('fungal_blight','🌑 Fletrissure -60%',0.4,40);return '-60% / 40s';}},
-  {id:'root_damage',   icon:'⚠️',title:'Racines Endommagees!',        desc:'Tunneliers. Production -30% / 90s.',                                           type:'malus',weight:6, apply:()=>{addBoost('root_damage','⚠️ Racines -30%',0.7,90);return '-30% / 90s';}},
-  {id:'spore_collapse',icon:'💀',title:'Effondrement!',               desc:'Catastrophe rare. -25% de spores.',                                            type:'malus',weight:2, apply:()=>{const l=Math.floor(G.spores*0.25);G.spores=Math.max(0,G.spores-l);return '-'+fmt(l)+' spores';}},
-  {id:'mega_drought',  icon:'🔥',title:'Grande Secheresse!',          desc:'Megasecheresse. Production -80% / 60s!',                                       type:'malus',weight:2, apply:()=>{addBoost('mega_drought','🔥 Megasecheresse -80%',0.2,60);return '-80% / 60s';}},
-  {id:'parasite',      icon:'🕷️',title:'Parasite Mycelien!',          desc:'Parasite. -50% prod ET -50% tap / 45s!',                                      type:'malus',weight:3, apply:()=>{addBoost('parasite_prod','🕷️ Parasite -50%',0.5,45);addBoost('parasite_click','🕷️ Tap -50%',0.5,45,'click');return '-50% tout / 45s';}},
-];
-
-const SHOP_ITEMS_POOL=[
-  {id:'s_click2',   rarity:'common',   icon:'🖐️',name:'Dose de Spores',    desc:'Tap power x2 / 2 minutes.',          cost:()=>Math.max(100,getSPS()*20),   apply:()=>addBoost('s_click2','🖐️ Tap x2',2,120,'click')},
-  {id:'s_prod15',   rarity:'common',   icon:'🌿',name:'Fertilisant Leger',  desc:'Production +50% / 2 minutes.',       cost:()=>Math.max(150,getSPS()*25),   apply:()=>addBoost('s_prod15','🌿 Prod +50%',1.5,120)},
-  {id:'s_instant',  rarity:'common',   icon:'✨',name:'Recolte Rapide',     desc:'Recolte 1 minute de production.',    cost:()=>Math.max(80,getSPS()*15),    apply:()=>{const b=getSPS()*60;G.spores+=b;G.lifetime+=b;}},
-  {id:'s_click3',   rarity:'rare',     icon:'⚡',name:'Gants Myceliens',    desc:'Tap power x3 / 3 minutes.',          cost:()=>Math.max(500,getSPS()*60),   apply:()=>addBoost('s_click3','⚡ Tap x3',3,180,'click')},
-  {id:'s_prod2',    rarity:'rare',     icon:'🍄',name:'Champignon Booste',  desc:'Production x2 / 3 minutes.',         cost:()=>Math.max(600,getSPS()*70),   apply:()=>addBoost('s_prod2','🍄 Prod x2',2,180)},
-  {id:'s_instant5', rarity:'rare',     icon:'🌧️',name:'Pluie de Spores',   desc:'Recolte 5 minutes de production.',   cost:()=>Math.max(400,getSPS()*80),   apply:()=>{const b=getSPS()*300;G.spores+=b;G.lifetime+=b;}},
-  {id:'s_antidote', rarity:'rare',     icon:'🛡️',name:'Antidote Fongique',  desc:'Annule tous les malus actifs!',      cost:()=>Math.max(800,getSPS()*100),  apply:()=>{Object.keys(activeBoosts).forEach(id=>{if(activeBoosts[id].isMalus)delete activeBoosts[id];});renderBoosts();}},
-  {id:'s_prod3',    rarity:'epic',     icon:'🔮',name:'Rituel Ancien',      desc:'Production x3 / 5 minutes.',         cost:()=>Math.max(2000,getSPS()*150), apply:()=>addBoost('s_prod3','🔮 Prod x3',3,300)},
-  {id:'s_click5',   rarity:'epic',     icon:'🌀',name:'Vortex de Spores',   desc:'Tap power x5 / 3 minutes.',          cost:()=>Math.max(1800,getSPS()*140), apply:()=>addBoost('s_click5','🌀 Tap x5',5,180,'click')},
-  {id:'s_instant15',rarity:'epic',     icon:'🌲',name:'Foret Enchantee',    desc:'Recolte 15 minutes de production.',  cost:()=>Math.max(1500,getSPS()*200), apply:()=>{const b=getSPS()*900;G.spores+=b;G.lifetime+=b;}},
-  {id:'s_shield',   rarity:'epic',     icon:'🧿',name:'Bouclier Mycelien',  desc:'Bloque le prochain evenement negatif!',cost:()=>Math.max(3000,getSPS()*250),apply:()=>{G.shielded=true;addLog('🧿 Bouclier actif — prochain malus ignore!');}},
-  {id:'s_megaprod', rarity:'legendary',icon:'👑',name:'Couronne Fongique',  desc:'Production x5 / 10 minutes!',        cost:()=>Math.max(8000,getSPS()*400), apply:()=>addBoost('s_megaprod','👑 x5 LEGENDAIRE',5,600)},
-  {id:'s_megaclick',rarity:'legendary',icon:'🌟',name:'Mains des Dieux',    desc:'Tap power x10 / 5 minutes!',         cost:()=>Math.max(7000,getSPS()*350), apply:()=>addBoost('s_megaclick','🌟 Tap x10',10,300,'click')},
-  {id:'s_godboost', rarity:'legendary',icon:'∞', name:'Eveil Mycelien',     desc:'Tout x8 / 2 minutes!',               cost:()=>Math.max(15000,getSPS()*600),apply:()=>addBoost('s_godboost','∞ Eveil x8',8,120)},
-];
-
-const RARITY_WEIGHTS={common:55,rare:30,epic:12,legendary:3};
-let shopItems=[],shopCdTimer=300,shopSold={};
-let eventTimer=60+Math.random()*20;
-let activeBoosts={};
-
-function bldN(id){return G.bld[id]||0;}
-function totalBlds(){return Object.values(G.bld).reduce((a,b)=>a+b,0);}
-function bldCost(b){return Math.floor(b.base*Math.pow(1.16,bldN(b.id)));}
-function clickMult(){let m=1;UPGRADES.forEach(u=>{if(u.type==='click'&&G.upg[u.id])m*=u.mult;});return m;}
-function globalMult(){let m=1;UPGRADES.forEach(u=>{if(u.type==='global'&&G.upg[u.id])m*=u.mult;});return m*G.ascendMult;}
-function bldMult(id){let m=1;UPGRADES.forEach(u=>{if(u.type==='bld'&&u.bld===id&&G.upg[u.id])m*=u.mult;});return m;}
-function getEventBoostMult(){let m=1;Object.values(activeBoosts).forEach(b=>{if(b.type==='global')m*=b.mult;});return m;}
-function getEventClickMult(){let m=1;Object.values(activeBoosts).forEach(b=>{if(b.type==='click')m*=b.mult;});return m;}
-function getSPS(){let s=0;BUILDINGS.forEach(b=>{const n=bldN(b.id);if(n>0)s+=b.cps*n*bldMult(b.id);});return s*globalMult()*getEventBoostMult();}
-function getClickPow(){return Math.ceil(Math.max(1,getSPS()*0.004+1)*clickMult()*G.ascendMult*getEventClickMult());}
-
-const logLines=[];
-function addLog(msg){
-  const d=new Date(),ts=d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
-  logLines.unshift('<span style="color:var(--text2)">['+ts+']</span> '+msg);
-  if(logLines.length>40)logLines.pop();
-  document.getElementById('logDiv').innerHTML=logLines.join('<br>');
+function startChat(prodId){
+  if(S.energy<1){toast('No energy left today.');return null;}
+  const prod=S.products.find(p=>p.id===prodId);
+  if(!prod||prod.stock<=0){toast('Nothing in stock to sell.');return null;}
+  const b=genBuyer();
+  const price=+(prod.price*(b.budgetMood==='tight'?rf(.85,1):b.budgetMood==='flush'?rf(1,1.15):rf(.92,1.08))).toFixed(2);
+  const thread={id:'t'+b.id,buyerId:b.id,buyer:b,prodId,prodName:prod.name,askPrice:prod.price,offerPrice:prod.price,
+    msgs:[], stage:'open', done:false, qty: chance(.15)&&prod.tier<=1?ri(2,4):1};
+  const opener=fill(pick(OPENERS),{item:prod.name});
+  pushMsg(thread,'b',styleWrap(opener,b.style));
+  if(b.scammer && chance(.5)) pushMsg(thread,'b',styleWrap(pick(SCAM_LINES),b.style));
+  else if(chance(.35)) pushMsg(thread,'b',styleWrap(fill(pick(HAGGLE_LINES),{p:money(Math.max(prod.cost*1.05,prod.price*rf(.7,.92)))}),b.style));
+  S.energy-=1;
+  S.inbox.unshift(thread);
+  return thread;
 }
-function notif(msg){
-  const el=document.createElement('div');el.className='notif';el.innerHTML=msg;
-  document.body.appendChild(el);setTimeout(()=>el.remove(),3500);
-}
+function pushMsg(th,who,text){ th.msgs.push({who,text}); }
 
-function addBoost(id,label,mult,duration,type='global'){
-  activeBoosts[id]={label,mult,timeLeft:duration,type,isMalus:mult<1};
-  renderBoosts();
+function chatOptions(th){
+  if(th.done) return [];
+  const prod=S.products.find(p=>p.id===th.prodId);
+  const opts=[];
+  opts.push({k:'pitch',label:'Reassure them',hint:'Build trust, describe the item honestly.'});
+  if(prod) opts.push({k:'discount',label:'Offer 10% off',hint:'Sweeten the deal to close faster.'});
+  opts.push({k:'firm',label:'Hold the price',hint:'No discount. Confidence check.'});
+  opts.push({k:'flag',label:'Flag as scam',hint:'End the chat and report them. Right call sometimes, wrong call others.'});
+  return opts;
 }
-function renderBoosts(){
-  const bar=document.getElementById('boostsBar');
-  bar.querySelectorAll('.boost-chip').forEach(c=>c.remove());
-  const keys=Object.keys(activeBoosts);
-  document.getElementById('noBoosts').style.display=keys.length?'none':'';
-  keys.forEach(id=>{
-    const b=activeBoosts[id];
-    const chip=document.createElement('div');chip.id='chip_'+id;chip.className='boost-chip';
-    if(b.isMalus)chip.style.cssText='background:rgba(255,68,68,0.1);border-color:#ff4444;color:#ff6666;';
-    chip.innerHTML=b.label+' <span class="boost-chip-timer" id="chiptimer_'+id+'">'+Math.ceil(b.timeLeft)+'s</span>';
-    bar.appendChild(chip);
-  });
-}
-function tickBoosts(dt){
-  let changed=false;
-  Object.keys(activeBoosts).forEach(id=>{
-    activeBoosts[id].timeLeft-=dt;
-    const tel=document.getElementById('chiptimer_'+id);
-    if(tel)tel.textContent=Math.max(0,Math.ceil(activeBoosts[id].timeLeft))+'s';
-    if(activeBoosts[id].timeLeft<=0){delete activeBoosts[id];const chip=document.getElementById('chip_'+id);if(chip)chip.remove();changed=true;}
-  });
-  if(changed)renderBoosts();
-}
-
-// EVENTS — auto-appliques, banniere qui disparait seule
-function triggerEvent(){
-  if(getSPS()<=0&&G.lifetime<100)return;
-  const totalW=EVENTS.reduce((s,e)=>s+(e.weight||1),0);
-  let r=Math.random()*totalW,cum=0,ev=EVENTS[0];
-  for(const e of EVENTS){cum+=(e.weight||1);if(r<=cum){ev=e;break;}}
-  if(ev.type==='malus'&&G.shielded){
-    G.shielded=false;
-    addLog('🧿 <strong style="color:var(--glow)">Bouclier!</strong> Malus bloque: '+ev.title);
-    notif('🧿 <strong>Bouclier!</strong><br>'+ev.title+' bloque!');
+function chatReply(th,action){
+  const b=th.buyer; const prod=S.products.find(p=>p.id===th.prodId);
+  if(!prod){ endChat(th,'lost','The listing disappeared mid-chat.'); return; }
+  if(action==='flag'){
+    if(b.scammer){
+      endChat(th,'scamcaught','You reported them. Good call — that one was a scammer.');
+      S.stats.scamsCaught++; gainXP('security',5); S.rep+=1;
+    } else {
+      endChat(th,'lost','False alarm — they were real, and now annoyed.');
+      S.rep=Math.max(0,S.rep-1);
+    }
     return;
   }
-  const result=ev.apply();
-  const borderCol=ev.type==='malus'?'#ff4444':ev.type==='boost'?'#00ffaa':'#ffaa22';
-  const titleCol=ev.type==='malus'?'#ff6666':ev.type==='boost'?'#00ffaa':'#ffaa22';
-  const typeLabel=ev.type==='malus'?'⚠️ Evenement negatif':ev.type==='boost'?'✨ Bonus temporaire':'🎁 Recompense';
-  const logColor=ev.type==='malus'?'#ff6666':ev.type==='boost'?'#00ffaa':'#ffaa22';
-  addLog(ev.icon+' <strong style="color:'+logColor+'">'+ev.title+'</strong> — '+result);
-  // Banniere auto
-  const old=document.getElementById('eventBanner');if(old)old.remove();
-  const banner=document.createElement('div');
-  banner.id='eventBanner';
-  banner.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:900;width:380px;max-width:92vw;background:linear-gradient(135deg,#1a0a00,#0d0800);border:2px solid '+borderCol+';border-radius:12px;padding:14px 20px;box-shadow:0 0 40px rgba(0,0,0,0.6);animation:eventSlide 0.4s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;';
-  banner.innerHTML='<div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#9a7a44;margin-bottom:2px">'+typeLabel+'</div><div style="font-family:Cinzel,serif;font-size:16px;font-weight:900;color:'+titleCol+';margin-bottom:4px">'+ev.icon+' '+ev.title+'</div><div style="font-size:12px;color:#e8d5a0;font-style:italic;margin-bottom:6px">'+ev.desc+'</div><div style="font-family:Cinzel,serif;font-size:13px;color:'+titleCol+';font-weight:700">'+result+'</div>';
-  document.body.appendChild(banner);
-  setTimeout(()=>{banner.style.transition='opacity 0.5s';banner.style.opacity='0';setTimeout(()=>banner.remove(),500);},4000);
-  refresh();
-}
-
-function generateShop(){
-  shopItems=[];shopSold={};
-  const pool=[...SHOP_ITEMS_POOL],picked=new Set();
-  while(shopItems.length<4&&pool.length>0){
-    const totalW=pool.reduce((s,item)=>s+RARITY_WEIGHTS[item.rarity],0);
-    let r=Math.random()*totalW,cum=0,chosen=null;
-    for(const item of pool){cum+=RARITY_WEIGHTS[item.rarity];if(r<=cum){chosen=item;break;}}
-    if(!chosen)chosen=pool[0];
-    if(!picked.has(chosen.id)){shopItems.push(chosen);picked.add(chosen.id);}
-    pool.splice(pool.indexOf(chosen),1);
+  let close = 0.34;
+  close += lv('care')*0.02;
+  if(action==='discount') close+=0.16;
+  if(action==='firm') close-=0.05 + (b.budgetMood==='tight'?0.08:0);
+  if(action==='pitch') close+=0.06;
+  if(b.mood==='grumpy') close-=0.1;
+  if(b.mood==='excited') close+=0.12;
+  if(S.path==='clout') close+=0.05;
+  th.patienceUsed=(th.patienceUsed||0)+1;
+  if(b.scammer){
+    // scammers eventually either get caught, ghost, or (if you fall for it) burn you
+    if(action==='discount'||action==='pitch'||action==='firm'){
+      if(th.patienceUsed>=2 && chance(.55)){
+        pushMsg(th,'b',styleWrap(pick(SCAM_LINES),b.style));
+      }
+      if(th.patienceUsed>=3){
+        if(chance(0.5-lv('security')*0.03)){
+          // you get burned only if you actually ship without payment — handled via 'ship_first' option elsewhere; default safe path:
+          pushMsg(th,'n','You sense something is off and stall on shipping details.');
+          endChat(th,'lost','They stopped responding. Probably for the best.');
+        } else {
+          endChat(th,'lost','They vanish mid-conversation. Another one that got away — safely.');
+        }
+      } else {
+        pushMsg(th,'b',styleWrap(pick(HAGGLE_LINES),b.style).replace(/\{p\}/,money(th.offerPrice)));
+        render();
+      }
+      return;
+    }
+  }
+  if(rnd()<close){
+    const finalPrice = action==='discount'? +(th.askPrice*0.9).toFixed(2) : th.askPrice;
+    pushMsg(th,'b',styleWrap(pick(ACCEPT_LINES),b.style));
+    completeSale(th,prod,finalPrice);
+  } else {
+    if(th.patienceUsed>=b.patience){
+      pushMsg(th,'b',styleWrap(pick(DECLINE_LINES),b.style));
+      endChat(th,'lost','They left without buying.');
+    } else {
+      pushMsg(th,'b',styleWrap(fill(pick(HAGGLE_LINES),{p:money(Math.max(prod.cost*1.05,th.askPrice*rf(.75,.94)))}),b.style));
+      render();
+    }
   }
 }
-function openShop(){generateShopUI();document.getElementById('shopOverlay').style.display='flex';}
-function closeShop(){document.getElementById('shopOverlay').style.display='none';}
-function generateShopUI(){
-  const grid=document.getElementById('shopGrid');grid.innerHTML='';
-  const rarityColors={common:'#aaa',rare:'#44aaff',epic:'#cc44ff',legendary:'#ffaa22'};
-  shopItems.forEach(item=>{
-    const sold=shopSold[item.id],cost=item.cost(),canAfford=G.spores>=cost;
-    const div=document.createElement('div');
-    div.className='shop-item'+(sold?' sold':'');
-    div.innerHTML='<div class="shop-item-rarity" style="color:'+rarityColors[item.rarity]+'">'+item.rarity.toUpperCase()+'</div><div class="shop-item-icon">'+item.icon+'</div><div class="shop-item-name">'+item.name+'</div><div class="shop-item-desc">'+item.desc+'</div><div class="shop-item-cost" style="color:'+(canAfford?'var(--amber)':'var(--red)')+'">'+fmt(cost)+' ✨</div>';
-    if(!sold)div.onclick=()=>buyShopItem(item.id);
-    grid.appendChild(div);
-  });
+function completeSale(th,prod,price){
+  const qty=Math.min(th.qty,prod.stock);
+  if(qty<=0){ endChat(th,'lost','Out of stock right when they said yes. Brutal.'); return; }
+  prod.stock-=qty; prod.sold+=qty;
+  const total=+(price*qty).toFixed(2);
+  const promised=S.day+ (hasGear('gateway')?ri(1,2):ri(1,3));
+  S.orders.push({id:++S.lastOrdId,buyer:th.buyer.handle,item:prod.name,qty,price:total,age:0,promised,prodId:prod.id});
+  S.rep+=0.3*qty; S.hype=clamp(S.hype+1,0,100);
+  S.stats.chats++;
+  gainXP('marketing',2*qty); gainXP('care',1);
+  th.done=true; th.stage='won';
+  addLog(`Sold ${qty}x "${prod.name}" to @${th.buyer.handle} for ${money(total)} (unpaid order, awaiting fulfillment).`);
+  render();
 }
-function buyShopItem(id){
-  const item=shopItems.find(x=>x.id===id);
-  if(!item||shopSold[id])return;
-  const cost=item.cost();
-  if(G.spores<cost){notif('Pas assez de spores!');return;}
-  G.spores-=cost;shopSold[id]=true;item.apply();
-  addLog('🏪 Achete: <strong style="color:var(--amber)">'+item.name+'</strong> — '+fmt(cost)+' spores');
-  notif('✅ <strong>'+item.name+'</strong> active!');
-  generateShopUI();refresh();
+function endChat(th,stage,note){
+  th.done=true; th.stage=stage;
+  if(note) pushMsg(th,'n',note);
+  S.stats.chats++;
+  render();
 }
-function tickShop(dt){
-  shopCdTimer-=dt;eventTimer-=dt;
-  if(eventTimer<=0){eventTimer=50+Math.random()*30;triggerEvent();}
-  if(shopCdTimer<=0){
-    shopCdTimer=300;generateShop();
-    addLog('🏪 <strong style="color:var(--amber)">Marche renouvele!</strong>');
-    notif('🏪 <strong>Marche renouvele!</strong><br>Nouveaux boosts disponibles!');
-  }
-  const sm=Math.floor(shopCdTimer/60),ss=Math.floor(shopCdTimer%60);
-  const txt='Nouveau dans '+sm+':'+(ss<10?'0':'')+ss;
-  const el1=document.getElementById('shopCdTxt');if(el1)el1.textContent=txt;
-  const el2=document.getElementById('shopTimerTxt');if(el2)el2.textContent='Se renouvelle dans '+sm+':'+(ss<10?'0':'')+ss;
+/* ================= fulfillment ================= */
+function packOrder(orderId){
+  const o=S.orders.find(x=>x.id===orderId); if(!o||o.packed) return;
+  if(S.energy<1){toast('No energy to pack.');return;}
+  S.energy-=1;
+  o.packed=true;
+  addLog(`Packed order #${o.id} (${o.item}) for @${o.buyer}.`);
+  render();
 }
-
-function quickRefresh(){
-  const sps=getSPS(),cp=getClickPow();
-  document.getElementById('sporeCount').textContent=fmt(G.spores);
-  document.getElementById('spsDisplay').textContent=fmt(sps);
-  document.getElementById('spcDisplay').textContent=fmt(cp);
-  document.getElementById('tSpores').textContent=fmt(G.spores);
-  document.getElementById('tSPS').textContent=fmt(sps);
-  document.getElementById('tLife').textContent=fmt(G.lifetime);
-  document.querySelectorAll('.bld-card').forEach((el,i)=>{
-    const b=BUILDINGS[i];if(!b)return;
-    const cost=bldCost(b),locked=G.lifetime<b.unlock,afford=!locked&&G.spores>=cost;
-    el.classList.toggle('affordable',afford);
-    const ce=el.querySelector('.bld-count');if(ce)ce.textContent=bldN(b.id);
-    const cps=el.querySelector('.bld-cps'),n=bldN(b.id);
-    if(cps)cps.textContent=n>0?fmt(b.cps*n*bldMult(b.id)*globalMult())+' /s':'';
-  });
+function batchPack(n){
+  let done=0;
+  const cap=3+gearLevel('batch')*3;
+  const avail=S.orders.filter(o=>!o.packed);
+  for(const o of avail){ if(done>=cap||S.energy<1) break; o.packed=true; S.energy-=1; done++; }
+  if(done) addLog(`Packed ${done} order${done>1?'s':''} in a batch session.`);
+  else toast('Nothing to pack, or no energy.');
+  render();
 }
-function refresh(){
-  const sps=getSPS(),cp=getClickPow();
-  document.getElementById('sporeCount').textContent=fmt(G.spores);
-  document.getElementById('spsDisplay').textContent=fmt(sps);
-  document.getElementById('spcDisplay').textContent=fmt(cp);
-  document.getElementById('tSpores').textContent=fmt(G.spores);
-  document.getElementById('tSPS').textContent=fmt(sps);
-  document.getElementById('tMult').textContent=G.ascendMult.toFixed(2);
-  document.getElementById('tLife').textContent=fmt(G.lifetime);
-  document.getElementById('ascMultPrev').textContent='x'+(1+(G.ascendCount+1)*0.6).toFixed(2);
-  const ab=document.getElementById('ascBtn');
-  ab.disabled=G.lifetime<1e15;
-  ab.textContent=G.lifetime>=1e15?'🌀 Ascend #'+(G.ascendCount+1):'🌀 Ascend (need '+fmt(1e15)+')';
-  const{stage,pct,nextAt}=getStage();
-  document.getElementById('stageName').textContent=stage.name;
-  document.getElementById('stageBar').style.width=pct+'%';
-  document.getElementById('stageDesc').textContent=nextAt===Infinity?stage.desc:stage.desc+' — Prochain: '+fmt(nextAt)+' spores';
-  renderBlds();renderUpgs();
-}
-function renderBlds(){
-  const el=document.getElementById('bldList');el.innerHTML='';
-  BUILDINGS.forEach(b=>{
-    const n=bldN(b.id),cost=bldCost(b),locked=G.lifetime<b.unlock,afford=!locked&&G.spores>=cost;
-    const sps=b.cps*Math.max(1,n)*bldMult(b.id)*globalMult();
-    const mp=[1,5,10,25,50,100,200,300],prevM=mp.filter(m=>n>=m).pop()||0,nextM=mp.find(m=>n<m)||999;
-    const prog=nextM<999?((n-prevM)/(nextM-prevM)*100):100;
-    const div=document.createElement('div');
-    div.className='bld-card'+(locked?' locked':'')+(afford?' affordable':'');
-    div.innerHTML='<div class="bld-top"><div class="bld-icon">'+b.icon+'</div><div class="bld-info"><div class="bld-name">'+b.name+'</div><div class="bld-desc">'+(locked?'Debloque a '+fmt(b.unlock)+' spores':b.desc)+'</div></div><div class="bld-count">'+n+'</div></div><div class="bld-bottom"><div class="bld-cps">'+(n>0?fmt(sps)+' /s':'')+'</div><div class="bld-cost">'+fmt(cost)+' ✨</div></div><div class="bld-prog"><div class="bld-prog-fill" style="width:'+prog+'%"></div></div>';
-    if(!locked)div.onclick=()=>buyBld(b.id);
-    el.appendChild(div);
-  });
-}
-function renderUpgs(){
-  const el=document.getElementById('upgList');el.innerHTML='';
-  UPGRADES.forEach(u=>{
-    const bought=G.upg[u.id];if(!bought&&!u.req())return;
-    const afford=!bought&&G.spores>=u.cost;
-    const div=document.createElement('div');
-    div.className='upg-card'+(bought?' bought':'')+(afford?' affordable':'');
-    div.innerHTML='<span class="upg-icon">'+u.icon+'</span><div class="upg-name">'+u.name+'</div><div class="upg-desc">'+u.eff+'</div><div class="upg-cost">'+(bought?'✓ Recherche':fmt(u.cost)+' ✨')+'</div>';
-    if(!bought)div.onclick=()=>buyUpg(u.id);
-    el.appendChild(div);
-  });
-}
-function renderAch(){
-  const el=document.getElementById('achList');el.innerHTML='';
-  ACHIEVEMENTS.forEach(a=>{
-    const u=G.ach[a.id],div=document.createElement('div');
-    div.className='ach-card '+(u?'unlocked':'locked');
-    div.innerHTML='<div class="ach-icon">'+a.icon+'</div><div><div class="ach-name">'+a.name+'</div><div class="ach-desc">'+(u?a.desc:'???')+'</div></div>';
-    el.appendChild(div);
-  });
-}
-function getStage(){
-  let s=STAGES[0];
-  for(let i=STAGES.length-1;i>=0;i--){if(G.lifetime>=STAGES[i].at){s=STAGES[i];break;}}
-  const idx=STAGES.indexOf(s),next=STAGES[idx+1];
-  if(!next)return{stage:s,pct:100,nextAt:Infinity};
-  return{stage:s,pct:Math.min(100,((G.lifetime-s.at)/(next.at-s.at))*100),nextAt:next.at};
-}
-
-const _cap=document.getElementById('shroomCap');
-let _ct=null;
-function onClickShroom(e){
-  const pow=getClickPow();
-  G.spores+=pow;G.lifetime+=pow;G.totalClicks++;
-  const fl=document.createElement('div');
-  fl.style.cssText='position:fixed;pointer-events:none;z-index:999;font-family:Cinzel,serif;font-weight:700;font-size:15px;color:#c8ff00;text-shadow:0 0 12px rgba(200,255,0,0.8);animation:floatUp 0.9s ease-out forwards;left:'+(e.clientX-20)+'px;top:'+(e.clientY-30)+'px';
-  fl.textContent='+'+fmt(pow);
-  document.body.appendChild(fl);setTimeout(()=>fl.remove(),900);
-  _cap.style.transform='scale(0.93) translateX(-50%)';
-  if(_ct)clearTimeout(_ct);
-  _ct=setTimeout(()=>{_cap.style.transform='translateX(-50%)';},80);
-  quickRefresh();checkAch();
-}
-function buyBld(id){
-  const b=BUILDINGS.find(x=>x.id===id),cost=bldCost(b);
-  if(G.spores<cost)return;
-  G.spores-=cost;G.bld[id]=(G.bld[id]||0)+1;
-  addLog('Construit '+b.icon+' <strong style="color:var(--glow)">'+b.name+'</strong> #'+bldN(id)+' — '+fmt(cost)+' spores');
-  refresh();checkAch();
-}
-function buyUpg(id){
-  if(G.upg[id])return;
-  const u=UPGRADES.find(x=>x.id===id);
-  if(!u||G.spores<u.cost)return;
-  G.spores-=u.cost;G.upg[id]=true;
-  addLog('Recherche '+u.icon+' <strong style="color:var(--amber)">'+u.name+'</strong>');
-  notif('🔬 <strong>'+u.name+'</strong><br><em>'+u.eff+'</em>');
-  refresh();
-}
-function checkAch(){
-  ACHIEVEMENTS.forEach(a=>{
-    if(!G.ach[a.id]&&a.req()){
-      G.ach[a.id]=true;
-      addLog('🏅 <strong style="color:var(--amber)">'+a.name+'</strong> debloque!');
-      notif('🏅 <strong>'+a.name+'</strong><br><em>'+a.desc+'</em>');
-      renderAch();
+function processOrdersEndOfDay(){
+  let delivered=0, late=0, lost=0, earned=0;
+  const remaining=[];
+  S.orders.forEach(o=>{
+    o.age++;
+    const autopilot = hasGear('auto') && !o.packed && Math.random()<0.6;
+    if(autopilot) o.packed=true;
+    if(o.packed){
+      const onTime = S.day<=o.promised;
+      earned+=o.price;
+      S.rep += onTime? 0.4 : -0.6;
+      if(!onTime) late++;
+      delivered++;
+      S.stats.done+=1;
+    } else if(S.day>o.promised+2){
+      S.rep-=1.4; lost++;
+    } else {
+      remaining.push(o);
     }
   });
+  S.orders=remaining;
+  if(earned>0) addCash(earned);
+  if(delivered) addLog(`${delivered} order${delivered>1?'s':''} delivered (+${money(earned)})${late?`, ${late} late`:''}.`);
+  if(lost) addLog(`${lost} order${lost>1?'s':''} never shipped and were lost. Reputation took a hit.`);
+  return {delivered,late,lost,earned};
 }
-function doAscend(){
-  if(G.lifetime<1e15)return;
-  G.ascendCount++;
-  const m=1+G.ascendCount*0.6;G.ascendMult=m;
-  G.spores=0;G.lifetime=0;G.totalClicks=0;G.bld={};G.upg={};
-  addLog('🌀 <strong style="color:#cc44ff">ASCENSION #'+G.ascendCount+'</strong> — Multiplicateur x'+m.toFixed(2));
-  notif('🌀 <strong>Ascension #'+G.ascendCount+'!</strong><br>x'+m.toFixed(2)+' permanent!');
-  refresh();renderAch();
+/* ================= company / staff ================= */
+function canFormCompany(){ return !S.co && S.act>=2 && S.rep>=25 && S.cash>=800; }
+function formCompany(name){
+  S.co={name,staff:[],payrollDay:S.day,morale:70};
+  S.rep+=5; S.cash-=800; addLog(`Incorporated ${name}.`);
+  render();
 }
-let goldActive=false;
-function spawnGold(){
-  if(goldActive)return;goldActive=true;
-  const el=document.createElement('div');el.className='gold-shroom';
-  el.textContent='🌟';el.title='Champignon Dore! Clique vite!';
-  el.style.left=(80+Math.random()*(window.innerWidth-180))+'px';
-  el.style.top=(80+Math.random()*(window.innerHeight-180))+'px';
-  el.onclick=()=>{
-    const bonus=Math.floor(getSPS()*25+getClickPow()*80);
-    G.spores+=bonus;G.lifetime+=bonus;
-    addLog('🌟 <strong style="color:var(--amber)">Champignon Dore!</strong> +'+fmt(bonus)+' spores!');
-    notif('🌟 <strong>Champignon Dore!</strong><br>+'+fmt(bonus)+' Spores!');
-    el.remove();goldActive=false;refresh();
-  };
-  document.body.appendChild(el);
-  setTimeout(()=>{el.remove();goldActive=false;},14000);
+function genCandidate(role){
+  const R=ROLES[role];
+  const skill=ri(1,4)+(S.act>=3?ri(0,2):0);
+  const trait=pick(TRAITS);
+  const wage=Math.round(R.base*(0.7+skill*0.14)*(trait.k==='genius'?1.25:1));
+  return {id:'e'+Math.random().toString(36).slice(2,8),name:pick(FIRST)+' '+pick(LAST),role,skill,trait:trait.k,wage,morale:70,days:0};
 }
+function hire(cand){
+  if(!S.co){toast('Form a company first.');return;}
+  const cap=HQS[S.hq].cap;
+  if(S.co.staff.length>=cap){toast('No desks left — upgrade HQ.');return;}
+  S.co.staff.push(cand);
+  addLog(`Hired ${cand.name} as ${ROLES[cand.role].n}.`);
+  render();
+}
+function fire(id){
+  if(!S.co)return;
+  const i=S.co.staff.findIndex(e=>e.id===id); if(i<0)return;
+  const e=S.co.staff[i];
+  S.co.staff.splice(i,1);
+  S.co.morale=clamp(S.co.morale-4,0,100);
+  addLog(`Let ${e.name} go.`);
+  render();
+}
+function effSkill(e){ return e.skill + (e.trait==='genius'?1:0); }
+function runStaffDaily(){
+  if(!S.co||!S.co.staff.length) return;
+  let payroll=0, log=[];
+  S.co.staff.forEach(e=>{
+    payroll+=e.wage; e.days++;
+    const sk=effSkill(e);
+    if(e.role==='fulfil'){
+      let n=Math.min(sk,S.orders.filter(o=>!o.packed).length);
+      const mistake = e.trait==='sloppy'&&chance(.12);
+      for(let i=0;i<n;i++){ const o=S.orders.filter(o=>!o.packed)[0]; if(o) o.packed=true; }
+      if(mistake) S.rep-=1;
+    } else if(e.role==='support'){
+      const open=S.inbox.filter(t=>!t.done);
+      let n=Math.min(Math.ceil(sk/2),open.length);
+      for(let i=0;i<n;i++){ const th=open[i]; const prod=S.products.find(p=>p.id===th.prodId);
+        if(prod && chance(0.3+sk*0.05) && !th.buyer.scammer){ completeSale(th,prod,th.askPrice); }
+        else { endChat(th,'lost','Support handled it — no sale, but resolved.'); }
+      }
+    } else if(e.role==='scout'){
+      if(chance(0.25+sk*0.05)&&S.leads.length<6) S.leads.push(genProduct(1));
+    } else if(e.role==='growth'){
+      S.hype=clamp(S.hype+sk*0.6,0,100);
+    } else if(e.role==='books'){
+      // handled in tax calc
+    } else if(e.role==='sec'){
+      // handled in scam calc
+    }
+    if(e.trait==='ambitious'&&e.days%30===0){ e.wage=Math.round(e.wage*1.12); log.push(`${e.name} asked for (and got) a raise.`); }
+    if(e.trait==='gossip'){ S.co.morale=clamp(S.co.morale+ri(-2,2),0,100); }
+  });
+  S.co.morale=clamp(S.co.morale + (S.cash>0?0.4:-1.5),0,100);
+  if(S.cash<payroll){ S.co.morale=clamp(S.co.morale-10,0,100); log.push('Payroll came up short. Morale dropped hard.'); }
+  else addCash(-payroll);
+  if(payroll) addLog(`Paid payroll: ${money(payroll)}.`+(log.length?' '+log.join(' '):''));
+  if(S.co.morale<25 && chance(.1)){
+    const q=S.co.staff[ri(0,S.co.staff.length-1)];
+    if(q){ S.co.staff=S.co.staff.filter(e=>e.id!==q.id); addLog(`${q.name} quit. Morale was too low.`); }
+  }
+}
+/* ================= promotions & gigs ================= */
+function promoAvailable(pr){
+  if(pr.co && !S.co) return false;
+  if(S.rep<pr.un) return false;
+  return true;
+}
+function runPromo(pr){
+  if(S.energy<pr.e){toast('Not enough energy.');return;}
+  if(S.cash<pr.c){toast('Not enough cash.');return;}
+  S.energy-=pr.e; addCash(-pr.c);
+  let [lo,hi]=pr.b;
+  let amt=ri(lo,hi)*(1+lv('marketing')*0.03)*(S.path==='clout'?1.3:1);
+  if(chance(pr.risk||0)){
+    amt=Math.round(amt*0.3); S.rep=Math.max(0,S.rep-1);
+    addLog(`${pr.n} backfired a little — some people found it annoying.`);
+  }
+  S.hype=clamp(S.hype+Math.round(amt),0,100);
+  S.stats.promosRun++;
+  addLog(`Ran "${pr.n}": +${Math.round(amt)} hype.`);
+  render();
+}
+function newGig(){
+  const g=pick(GIGS);
+  const cl=pick(CLIENTS);
+  const pay=ri(g.pay[0],g.pay[1]);
+  return {t:fill(g.t,{cl}),sk:g.sk,pay,stress:g.stress||3};
+}
+function rollGig(){
+  if(S.gigsToday>=2){toast('No more gig energy today.');return null;}
+  const g=newGig(); S.gig=g; return g;
+}
+function doGig(){
+  if(!S.gig)return;
+  if(S.energy<1){toast('Not enough energy.');return;}
+  S.energy-=1; S.gigsToday++;
+  const g=S.gig; S.gig=null;
+  let mult=1+ (g.sk? lv(g.sk)*0.05:0);
+  const pay=Math.round(g.pay*mult);
+  addCash(pay); addStress(g.stress);
+  if(g.sk) gainXP(g.sk,3);
+  S.stats.gigs++;
+  addLog(`Gig done: ${g.t} — earned ${money(pay)}. ${pick(GIG_END)}`);
+  render();
+}
+/* ================= news generation ================= */
+function genNewsItem(){
+  const tpl=pick(NEWS);
+  const t=fill(tpl.t,{ex:pick(SUB_NEWS_EX),celeb:pick(CELEB),country:pick(CNTRY)});
+  const item={t,cat:tpl.cat,m:tpl.m,coin:tpl.coin,amt:tpl.amt,ship:tpl.ship,day:S.day,expires:S.day+(tpl.d||4)};
+  return item;
+}
+function dailyNews(){
+  S.news=S.news.filter(n=>n.expires>=S.day);
+  const n=chance(.78)?genNewsItem():{t:pick(NEWS_FLAVOR),day:S.day,expires:S.day+1};
+  S.news.unshift(n);
+  if(n.coin&&n.amt) applyNewsMarket(n);
+  if(S.news.length>18) S.news.length=18;
+  return n;
+}
+function shipDelayBonus(){ let d=0; S.news.forEach(n=>{if(n.expires>=S.day&&n.ship)d=Math.max(d,n.ship);}); return d; }
 
-let loggedMs=-1;
-const MS=[
-  {v:100,   t:'Spore Pod debloque!'},
-  {v:500,   t:'Mycelium Thread disponible!'},
-  {v:2500,  t:'Fairy Ring decouvert!'},
-  {v:12000, t:'Truffle Network revele!'},
-  {v:60000, t:'Plan Giant Shroom trouve!'},
-  {v:300000,t:'Cave Colony prete!'},
-  {v:1.5e6, t:'Fungal Spire construit!'},
-  {v:9e6,   t:'Enchanted Forest conquise!'},
-  {v:4e7,   t:'World Root eveille!'},
-  {v:2e8,   t:'La Dimension Spore s ouvre...'},
-  {v:1e15,  t:'ASCENSION DISPONIBLE!'},
+/* ================= random flavor events (choice scenes) ================= */
+const EVENTS=[
+  {id:'ev_couch',w:3,cond:()=>true,title:'A stray $20',
+    text:'You find a crumpled bill in an old jacket. Small win.',
+    ch:[{l:'Pocket it',fx:s=>{addCash(20);}},{l:'Buy yourself lunch',fx:s=>{addCash(20);addStress(-6);}}]},
+  {id:'ev_neighbor',w:2,cond:()=>true,title:'The neighbor\'s wifi',
+    text:'Your internet drops for an hour. A buyer chat you were mid-negotiation with goes cold.',
+    ch:[{l:'Shrug it off',fx:s=>{}},{l:'Pay for a hotspot',cost:8,fx:s=>{addCash(-8);toast('Back online.');}}]},
+  {id:'ev_review',w:3,cond:()=>S.products.length>0,title:'A review comes in',
+    text:()=>{const p=pick(S.products); return chance(.6)?`A buyer leaves a glowing review of "${p.name}".`:`A buyer leaves a rough review of "${p.name}", citing slow shipping.`;},
+    ch:[{l:'Reply warmly',fx:s=>{gainXP('care',3);S.rep+=1;}},{l:'Ignore it',fx:s=>{}}]},
+  {id:'ev_scamtext',w:2,cond:()=>true,title:'A weird DM',
+    text:'Someone messages claiming to be "support" and asks for your seed phrase.',
+    ch:[{l:'Block immediately',fx:s=>{gainXP('security',3);}},{l:'Ask them questions first',fx:s=>{if(chance(.3)){addCash(-Math.round(S.cash*0.04));addLog('You got careless. A little cash vanished.');S.stats.scamsHit++;}else{gainXP('security',2);}}}]},
+  {id:'ev_burnout',w:3,cond:()=>S.stress>60,title:'Running hot',
+    text:'You have not slept properly in days. Everything feels loud.',
+    ch:[{l:'Push through',fx:s=>{addStress(10);}},{l:'Take the day slower',fx:s=>{addStress(-18);S.maxEnergy=Math.max(3,S.maxEnergy);}}]},
+  {id:'ev_market_dip',w:2,cond:()=>Object.values(S.coins).some(q=>q>0),title:'Red candles',
+    text:'The market dips hard for an hour. Group chats are pure panic.',
+    ch:[{l:'Hold, obviously',fx:s=>{gainXP('trading',2);}},{l:'Sell a little, just in case',fx:s=>{const held=Object.entries(S.coins).filter(([k,q])=>q>0);if(held.length){const[sym,q]=pick(held);sellCoin(sym,q*0.25);}}}]},
+  {id:'ev_supplier_delay',w:2,cond:()=>S.products.length>0,title:'Shipping delay',
+    text:'Your supplier emails: customs is backed up, expect delays this week.',
+    ch:[{l:'Warn your buyers early',fx:s=>{S.rep+=0.5;}},{l:'Say nothing and hope',fx:s=>{if(chance(.4)){S.rep-=1.5;addLog('Buyers noticed the silence. Not great.');}}}]},
+  {id:'ev_family',w:2,cond:()=>S.day>5,title:'A call from home',
+    text:'Family asks how "the crypto thing" is going. You give the honest number.',
+    ch:[{l:'Talk it through',fx:s=>{addStress(-10);}},{l:'Keep it vague',fx:s=>{addStress(2);}}]},
+  {id:'ev_giveaway',w:1,cond:()=>S.rep>15,title:'Someone wants free stuff',
+    text:'A follower asks for a free item "for exposure".',
+    ch:[{l:'Say no',fx:s=>{}},{l:'Send one anyway',fx:s=>{if(S.products.length){const p=pick(S.products);if(p.stock>0){p.stock--;S.hype=clamp(S.hype+6,0,100);}}}}]},
+  {id:'ev_hackscare',w:2,cond:()=>true,title:'Suspicious login alert',
+    text:'Your exchange flags a login from a new device — possibly you, possibly not.',
+    ch:[{l:'Lock it down',fx:s=>{gainXP('security',4);}},{l:'Assume it\'s fine',fx:s=>{if(chance(.22-lv('security')*0.02)){const loss=Math.round((S.cash+0.001)*0.06);addCash(-loss);addLog(`It wasn\'t fine. Lost ${money(loss)}.`);S.stats.scamsHit++;}}}]},
+  {id:'ev_viral',w:1,cond:()=>S.products.length>0,title:'Unexpected virality',
+    text:()=>{const p=pick(S.products);return `A random clip featuring "${p.name}" gets traction overnight.`;},
+    ch:[{l:'Ride the wave',fx:s=>{S.hype=clamp(S.hype+18,0,100);}}]},
+  {id:'ev_scale_bug',w:1,cond:()=>S.co,title:'A spreadsheet error',
+    text:'Someone on the team mis-typed a formula. It could have been worse.',
+    ch:[{l:'Fix it together',fx:s=>{if(S.co)S.co.morale=clamp(S.co.morale+3,0,100);}},{l:'Quietly fix it yourself',fx:s=>{addStress(5);}}]},
+  {id:'ev_competitor',w:2,cond:()=>S.day>10,title:'A copycat store',
+    text:'Someone opens a store that looks suspiciously like yours.',
+    ch:[{l:'Ignore them',fx:s=>{}},{l:'Undercut their prices for a week',fx:s=>{S.flags.priceWar=S.day+6;S.hype=clamp(S.hype+8,0,100);}}]},
 ];
-
-generateShop();
-
-let lastT=Date.now(),goldCdTimer=100,tickerIdx=0,tickerTimer=0,renderTimer=0;
-function tick(){
-  const now=Date.now(),dt=Math.min((now-lastT)/1000,1);lastT=now;
-  G.time+=dt;
-  const sps=getSPS(),earned=sps*dt;
-  G.spores+=earned;G.lifetime+=earned;
-  goldCdTimer-=dt;
-  if(goldCdTimer<=0){goldCdTimer=80+Math.random()*40;if(sps>0)spawnGold();}
-  MS.forEach((m,i)=>{if(G.lifetime>=m.v&&loggedMs<i){loggedMs=i;addLog('📍 <strong style="color:var(--glow)">'+m.t+'</strong>');}});
-  tickerTimer+=dt;
-  if(tickerTimer>35){tickerTimer=0;tickerIdx=(tickerIdx+1)%TICKERS.length;document.getElementById('tickerText').textContent=TICKERS[tickerIdx];}
-  tickBoosts(dt);
-  tickShop(dt);
-  quickRefresh();
-  renderTimer+=dt;if(renderTimer>=0.5){renderTimer=0;refresh();}
-  checkAch();
+function tryRandomEvent(){
+  const pool=EVENTS.filter(e=>e.cond());
+  if(!pool.length||chance(.42)) return null;
+  const e=wpick(pool,x=>x.w);
+  return e;
+}
+/* ================= milestone story ================= */
+const INTROS={
+  garage:{title:'The garage hustler',beats:[
+    'The garage smells like solder and cold coffee. You have {cash} to your name, a folding table, and a plan nobody asked for.',
+    'Your first plan is simple: find things people want, sell them for more than they cost, don\'t get caught doing anything stupid.',
+  ]},
+  clout:{title:'The clout kid',beats:[
+    'Your phone has more followers than your bank account has dollars — {cash} of them, to be exact.',
+    'You know how to make people look. Now you need them to buy.',
+  ]},
+  goblin:{title:'The code goblin',beats:[
+    'Six monitors, one desk chair with a personality disorder, and {cash} in a wallet you\'re slightly too proud of.',
+    'Everyone else is grinding by hand. You\'re going to make the grind do the work.',
+  ]},
+  teller:{title:'The laid-off teller',beats:[
+    'The bank "restructured". You got a box of desk plants and {cash} in severance.',
+    'You know exactly how money moves. Time to make some move your way.',
+  ]},
+};
+function introText(pathKey){
+  const p=PATHS[pathKey]; const I=INTROS[pathKey];
+  return I.beats.map(b=>fill(b,{cash:money(p.cash)})).join('\n\n')+`\n\nYour edge: ${p.perk}.`;
 }
 
-try{const sv=localStorage.getItem('myceliumEmpire');if(sv){G={...G,...JSON.parse(sv)};addLog('🍄 Spores memorisees. L empire se reveille.');}}catch(e){}
-renderAch();refresh();generateShopUI();
-addLog('🌱 Clique le champignon pour commencer ton empire!');
-addLog('💡 Achete des Colonies a droite pour automatiser la production.');
-addLog('💡 Ouvre le 🏪 Marche pour des boosts et le 🧿 Bouclier contre les malus!');
-addLog('💡 Les evenements arrivent automatiquement toutes les ~1 minute!');
-setInterval(tick,50);
-setInterval(()=>{try{localStorage.setItem('myceliumEmpire',JSON.stringify(G));}catch(e){}},8000);
-</script>
-</body>
-</html>
+function checkActProgress(){
+  if(S.act===1 && (S.day>=14 || nw()>=1200)){
+    S.act=2; return 'act2';
+  }
+  if(S.act===2 && S.co && S.co.staff.length>=1 && (S.day>=40||nw()>=8000)){
+    S.act=3; return 'act3';
+  }
+  if(S.act===3 && (S.day>=90||nw()>=60000)){
+    S.act=4; return 'act4';
+  }
+  return null;
+}
+const ACT_SCENES={
+  act2:{title:'A turn in the road',text:'Word is getting around. Suppliers greet you by name, and a couple of buyers have come back twice. It might be time to think bigger than a single table.\n\nSomewhere past 25 reputation, incorporating stops being a joke and starts being an option — check the Company tab when you\'re ready.'},
+  act3:{title:'Not a one-person show anymore',text:'You have a name on a registration form now, and someone else\'s paycheck depends on you not panicking. The grind hasn\'t stopped. It just got roommates.'},
+  act4:{title:'The long game',text:'You\'ve outlasted three market cycles, two "final" rug pulls, and one very bad supplier. Whatever happens next, you built something that wasn\'t here before.'},
+};
+function maybeAdvanceStory(){
+  const key=checkActProgress();
+  if(key){ queueScene(ACT_SCENES[key]); addLog(`— ${ACT_SCENES[key].title} —`); }
+}
+function queueScene(sc){ S.pendingEvent={kind:'story',title:sc.title,text:sc.text,ch:[{l:'Continue'}]}; }
+
+/* endings */
+function computeEnding(){
+  const worth=nw();
+  let key,title,text;
+  if(worth>=200000) {key='tycoon';title='The dropship tycoon';text=`You crossed ${money(worth)} in net worth. Somewhere, a version of you that took the safe office job is still refreshing a spreadsheet. You are not that version.`;}
+  else if(S.co && S.co.staff.length>=6) {key='builder';title='You built the thing';text=`A real company, a real team, and a story you\'ll tell for years. Net worth: ${money(worth)}.`;}
+  else if(worth<0){key='wreck';title='Chapter 11 of your life';text='The math finally caught up. It happens. You know more now than you did on day one, which is worth something.';}
+  else {key='steady';title='Still standing';text=`No empire, no wreckage — just a steady little operation worth ${money(worth)}, and a lot of nights you\'ll remember.`;}
+  return {key,title,text};
+}
+/* ================= day end resolution ================= */
+function rent(){
+  return STORES[S.store].up + HQS[S.hq].up;
+}
+function taxRate(){
+  let t=0.06 - lv('law')*0.003 - (S.co&&S.co.staff.some(e=>e.role==='books')?0.02:0);
+  return clamp(t,0.01,0.06);
+}
+function endDay(){
+  if(S.energy>0 && !confirm2()) { /* no-op, handled by UI confirm before calling */ }
+  const res=processOrdersEndOfDay();
+  runStaffDaily();
+  stepMarket();
+  const n=dailyNews();
+  const r=rent();
+  if(r>0) addCash(-r);
+  const tax = Math.max(0, S.stats.earned>0 ? Math.round((res.earned||0)*taxRate()) : 0);
+  if(tax>0){ addCash(-tax); }
+  addStress(3 - (S.stress>70?0:0));
+  S.stress=clamp(S.stress-2+ (S.orders.filter(o=>!o.packed).length*0.6),0,S.maxStress);
+  S.hype=clamp(S.hype-4,0,100);
+  // expire old inbox threads
+  S.inbox=S.inbox.filter(t=>!t.done || (S.day-((t.closedDay)||S.day))<3);
+  S.inbox.forEach(t=>{ if(t.done&&!t.closedDay) t.closedDay=S.day; });
+  // stress consequence
+  if(S.stress>=95 && chance(.35)){
+    addLog('You crash for a full day. Nothing gets done.'); S.energy=0; S.flags.forcedRest=true;
+  }
+  checkAchievements();
+  S.day++;
+  S.energy=energyMax();
+  S.gigsToday=0;
+  S.gig=null;
+  S.phase='work';
+  maybeAdvanceStory();
+  if(!S.pendingEvent){
+    const ev=tryRandomEvent();
+    if(ev) queueRandomEvent(ev);
+  }
+  render();
+  if(S.pendingEvent) openEventModal();
+  else if(rnd()<0.001){} // noop
+}
+function confirm2(){return true;}
+function queueRandomEvent(e){
+  const text= typeof e.text==='function'? e.text() : e.text;
+  S.pendingEvent={kind:'rand',id:e.id,title:e.title,text,ch:e.ch.map(c=>({l:c.l,fx:c.fx}))};
+}
+function resolveEvent(idx){
+  const ev=S.pendingEvent; if(!ev) return;
+  const c=ev.ch[idx];
+  if(c&&c.fx) c.fx();
+  S.pendingEvent=null;
+  closeModal();
+  render();
+}
+function checkAchievements(){
+  ACHS.forEach(a=>{ if(!S.achieved[a.id] && a.ck()){ S.achieved[a.id]=S.day; toast('🏆 '+a.n); addLog(`Achievement unlocked: ${a.n}.`); } });
+}
+/* ================= HUD & tabs ================= */
+const TABS=[
+  ['work','Work','🛠️'],['inbox','Inbox','💬'],['orders','Ship','📦'],['market','Market','📈'],
+  ['skills','Skills','🎓'],['shop','Upgrade','🏗️'],['company','Company','🏢'],['more','More','📋'],
+];
+let activeTab='work';
+function switchTab(id){activeTab=id; render();}
+function inboxOpenCount(){return S.inbox.filter(t=>!t.done).length;}
+function ordersDueCount(){return S.orders.filter(o=>!o.packed).length;}
+
+function renderHUD(){
+  const h=$('hud');
+  const eMax=energyMax();
+  const pips=Array.from({length:eMax},(_,i)=>`<span class="pip ${i<S.energy?'on':''}"></span>`).join('');
+  const actionLabel = S.phase==='work' ? pick(['Another day, another dropship.','Keep the store open, keep it clean.','Buyers are out there somewhere.','The market never sleeps. Neither do you, lately.']) : '';
+  h.innerHTML=`
+  <div class="hud-top">
+    <div class="dayn">Day ${S.day}</div>
+    <div class="actn">${esc(actionLabel)}</div>
+  </div>
+  <div class="stats">
+    <div class="st"><small>Cash</small><b>${money(S.cash)}</b></div>
+    <div class="st"><small>Net worth</small><b>${money(nw())}</b></div>
+    <div class="st"><small>Reputation</small><b>${Math.round(S.rep)}</b></div>
+    <div class="st"><small>Hype</small><b>${Math.round(S.hype)}</b></div>
+  </div>
+  <div class="mini">
+    <div>
+      <small><span>Energy</span><span>${S.energy}/${eMax}</span></small>
+      <div class="pips">${pips}</div>
+    </div>
+    <div>
+      <small><span>Stress</span><span>${Math.round(S.stress)}%</span></small>
+      <div class="bar ${S.stress>70?'r':S.stress>40?'y':'g'}"><i style="width:${S.stress}%"></i></div>
+    </div>
+    <div>
+      <small><span>Hype</span><span>${Math.round(S.hype)}%</span></small>
+      <div class="bar"><i style="width:${S.hype}%"></i></div>
+    </div>
+  </div>`;
+}
+function renderTabs(){
+  const nav=$('tabs');
+  nav.innerHTML=TABS.map(([id,label,ic])=>{
+    let badge='';
+    if(id==='inbox'&&inboxOpenCount()) badge=`<span class="badge">${inboxOpenCount()}</span>`;
+    if(id==='orders'&&ordersDueCount()) badge=`<span class="badge">${ordersDueCount()}</span>`;
+    return `<button class="tab ${activeTab===id?'on':''}" data-tab="${id}">${ic} ${label}${badge}</button>`;
+  }).join('');
+  nav.querySelectorAll('button').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+}
+function render(){
+  if(!S) return;
+  renderHUD(); renderTabs();
+  const v=$('view');
+  const fns={work:viewWork,inbox:viewInbox,orders:viewOrders,market:viewMarket,skills:viewSkills,shop:viewShop,company:viewCompany,more:viewMore};
+  v.innerHTML='';
+  v.appendChild(fns[activeTab]());
+  saveGame();
+}
+function el(html){const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstElementChild;}
+/* ================= WORK tab ================= */
+function viewWork(){
+  const box=document.createElement('div');
+  box.appendChild(el(`<div class="card"><h3>Your store</h3>
+    <p class="small mute">${STORES[S.store].n} · ${S.products.length}/${slotsMax()} slots used · traffic ×${traffic().toFixed(2)}</p>
+  </div>`));
+
+  // products
+  const pc=el(`<div class="card"><h3>Listings</h3></div>`);
+  if(!S.products.length){
+    pc.appendChild(el(`<p class="hint">Nothing listed yet. Research a product below to get started.</p>`));
+  } else {
+    S.products.forEach(p=>{
+      const flag = p.flagged? `<span class="tag bad">Flagged supplier</span>` : '';
+      const row=el(`<div class="li">
+        <div><b>${esc(p.name)}</b> <span class="tag">${CATS[p.cat].ic} ${CATS[p.cat].n}</span>${flag}
+          <div class="small mute">Cost ${money(p.cost)} · Price ${money(p.price)} · Stock ${p.stock} · Sold ${p.sold}</div>
+        </div>
+        <div class="row">
+          <button class="btn sm" data-chat="${p.id}">Find buyer</button>
+          <button class="btn sm" data-restock="${p.id}">Restock</button>
+          <button class="btn sm" data-delist="${p.id}">Delist</button>
+        </div></div>`);
+      pc.appendChild(row);
+    });
+  }
+  box.appendChild(pc);
+
+  // leads / research
+  const rc=el(`<div class="card"><h3>Source a product</h3>
+    <p class="small mute">Research costs ${researchCost()} energy per lead. Watch supplier flags before you commit.</p></div>`);
+  const acts=el(`<div class="acts"></div>`);
+  acts.appendChild(el(`<button class="btn act pri" id="research"><b>🔍 Research leads</b><span>Find ${researchCost()>1?'a':'2-3'} new product option(s)</span><span class="cost">${researchCost()} energy</span></button>`));
+  rc.appendChild(acts);
+  if(S.leads.length){
+    const lw=el(`<div style="margin-top:10px"></div>`);
+    S.leads.forEach((p,i)=>{
+      const flags=p.supplier.flags;
+      const price=priceSuggest(p);
+      const startQty=Math.max(3,Math.round(60/p.cost));
+      const initCost=+(p.cost*startQty).toFixed(2);
+      lw.appendChild(el(`<div class="li">
+        <div><b>${esc(p.name)}</b> <span class="tag">${CATS[p.cat].ic} ${CATS[p.cat].n}</span> <span class="tag">Tier ${p.tier+1}</span>
+          <div class="small mute">Supplier: ${esc(p.supplier.name)} · reliability ${(p.supplier.reliability*100|0)}% · cost ${money(p.cost)}/unit</div>
+          ${flags.length?`<div class="small bad">${flags.map(f=>'⚠ '+esc(f)).join(' · ')}</div>`:''}
+          <div class="small mute">Suggested price ${money(price)} · start stock ${startQty} for ${money(initCost)}</div>
+        </div>
+        <div class="row"><button class="btn sm pri" data-list="${i}">List it</button><button class="btn sm" data-drop="${i}">Skip</button></div>
+      </div>`));
+    });
+    rc.appendChild(lw);
+  }
+  box.appendChild(rc);
+
+  // promos
+  const prc=el(`<div class="card"><h3>Promotion</h3><p class="small mute">Hype fades daily but pulls in buyer chats and boosts sale odds.</p></div>`);
+  const pa=el(`<div class="acts"></div>`);
+  PROMOS.forEach(pr=>{
+    const ok=promoAvailable(pr);
+    pa.appendChild(el(`<button class="btn act ${ok?'':''}" data-promo="${pr.id}" ${ok?'':'disabled'}>
+      <b>${pr.ic} ${pr.n}</b><span>${esc(pr.d)}</span>
+      <span class="cost">${pr.e} energy${pr.c?' · '+money(pr.c):''}${!ok?' · needs '+pr.un+' rep':''}</span></button>`));
+  });
+  prc.appendChild(pa); box.appendChild(prc);
+
+  // gig
+  const gc=el(`<div class="card"><h3>Side gig</h3><p class="small mute">Quick cash, costs stress. ${S.gigsToday}/2 today.</p></div>`);
+  if(S.gig){
+    gc.appendChild(el(`<div class="li"><div><b>${esc(S.gig.t)}</b><div class="small mute">Pays ~${money(S.gig.pay)}${S.gig.sk?' · uses '+SK[S.gig.sk].n:''}</div></div>
+      <div class="row"><button class="btn sm pri" id="dogig">Do it (1 energy)</button><button class="btn sm" id="skipgig">Skip</button></div></div>`));
+  } else {
+    gc.appendChild(el(`<button class="btn" id="findgig" ${S.gigsToday>=2?'disabled':''}>Find a gig</button>`));
+  }
+  box.appendChild(gc);
+
+  // rest
+  const rc2=el(`<div class="card"><h3>Take a break</h3><p class="small mute">Stress: ${Math.round(S.stress)}%. Resting costs energy but clears your head.</p>
+    <div class="acts"><button class="btn act" id="rest" ${S.energy<2?'disabled':''}><b>😌 Rest</b><span>Lowers stress noticeably</span><span class="cost">2 energy</span></button></div>
+  </div>`);
+  box.appendChild(rc2);
+
+  // end day
+  const end=el(`<button class="endday">End the day<small>${ordersDueCount()?ordersDueCount()+' order(s) still unpacked — check Ship tab first':'Resolves orders, market, staff and news'}</small></button>`);
+  box.appendChild(end);
+
+  wireWork(box);
+  return box;
+}
+function wireWork(box){
+  const q=s=>box.querySelector(s), qa=s=>box.querySelectorAll(s);
+  const r=q('#research'); if(r) r.onclick=()=>{
+    const c=researchCost();
+    if(S.energy<c){toast('Not enough energy.');return;}
+    S.energy-=c;
+    const n= hasGear('dir')?3:2;
+    const found=[];
+    for(let i=0;i<n;i++) found.push(genProduct());
+    S.leads=found;
+    addLog(`Researched ${n} new product leads.`);
+    render();
+  };
+  qa('[data-list]').forEach(b=>b.onclick=()=>{
+    const p=S.leads[+b.dataset.list];
+    const price=priceSuggest(p);
+    const startQty=Math.max(3,Math.round(60/p.cost));
+    const cost=+(p.cost*startQty).toFixed(2);
+    if(listProduct(p,price,cost)){ S.leads=S.leads.filter(x=>x!==p); render(); }
+  });
+  qa('[data-drop]').forEach(b=>b.onclick=()=>{ S.leads.splice(+b.dataset.drop,1); render(); });
+  qa('[data-chat]').forEach(b=>b.onclick=()=>{ const th=startChat(+b.dataset.chat); if(th){activeTab='inbox'; render(); openChat(th.id);} });
+  qa('[data-restock]').forEach(b=>b.onclick=()=>{ openRestock(+b.dataset.restock); });
+  qa('[data-delist]').forEach(b=>b.onclick=()=>{ if(confirm('Delist this product? You\'ll recover part of the stock cost.')) delistProduct(+b.dataset.delist); render(); });
+  qa('[data-promo]').forEach(b=>b.onclick=()=>{ runPromo(PROMOS.find(p=>p.id===b.dataset.promo)); });
+  const fg=q('#findgig'); if(fg) fg.onclick=()=>{ rollGig(); render(); };
+  const dg=q('#dogig'); if(dg) dg.onclick=()=>doGig();
+  const sg=q('#skipgig'); if(sg) sg.onclick=()=>{S.gig=null; render();};
+  const rb=q('#rest'); if(rb) rb.onclick=()=>{
+    if(S.energy<2){toast('Not enough energy.');return;}
+    S.energy-=2; addStress(-25);
+    addLog(pick(REST_TXT));
+    render();
+  };
+  const ed=q('.endday'); if(ed) ed.onclick=()=>{ if(ordersDueCount()>2 && !confirm('Several orders are still unpacked and may arrive late. End the day anyway?')) return; endDay(); };
+}
+function openRestock(prodId){
+  const p=S.products.find(x=>x.id===prodId); if(!p) return;
+  showModal(`<h2>Restock "${esc(p.name)}"</h2>
+    <p class="mute small">Unit cost ${money(p.cost)}. Cash on hand ${money(S.cash)}.</p>
+    <div class="row" style="margin:10px 0">
+      <input type="text" inputmode="numeric" id="rqty" value="10" style="max-width:120px">
+      <button class="btn" id="rmax">Max</button>
+    </div>
+    <div class="acts">
+      <button class="btn pri act" id="rgo" style="min-height:56px"><b>Restock</b><span id="rcost"></span></button>
+    </div>`);
+  const upd=()=>{ const n=Math.max(0,parseInt($('rqty').value)||0); $('rcost').textContent='Cost '+money(restockCost(p,n)); };
+  $('rqty').oninput=upd; upd();
+  $('rmax').onclick=()=>{ $('rqty').value=Math.max(0,Math.floor(S.cash/p.cost)); upd(); };
+  $('rgo').onclick=()=>{ const n=Math.max(0,parseInt($('rqty').value)||0); if(n>0) restock(prodId,n); closeModal(); render(); };
+}
+/* ================= INBOX tab ================= */
+function viewInbox(){
+  const box=document.createElement('div');
+  box.appendChild(el(`<div class="card"><h3>Buyer chats</h3><p class="small mute">Every buyer is a different person. Read the room.</p></div>`));
+  if(!S.inbox.length){ box.appendChild(el(`<p class="hint">No conversations yet. Find a buyer from the Work tab.</p>`)); return box; }
+  const open=S.inbox.filter(t=>!t.done), closed=S.inbox.filter(t=>t.done);
+  if(open.length){
+    const c=el(`<div class="card"><h3>Open</h3></div>`);
+    open.forEach(th=>c.appendChild(threadRow(th)));
+    box.appendChild(c);
+  }
+  if(closed.length){
+    const c=el(`<div class="card"><h3>Recent</h3></div>`);
+    closed.slice(0,10).forEach(th=>c.appendChild(threadRow(th)));
+    box.appendChild(c);
+  }
+  box.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openChat(b.dataset.open));
+  return box;
+}
+function threadRow(th){
+  const b=th.buyer;
+  const stateTag={won:'<span class="tag good">Sold</span>',lost:'<span class="tag">Gone</span>',scamcaught:'<span class="tag good">Scam caught</span>',open:'<span class="tag warn">Open</span>'}[th.stage]||'';
+  const last=th.msgs[th.msgs.length-1];
+  return el(`<div class="li"><div><b>@${esc(b.handle)}</b> ${stateTag}<div class="small mute">re: ${esc(th.prodName)} — "${esc((last?.text||'').slice(0,60))}"</div></div>
+    <button class="btn sm" data-open="${th.id}">${th.done?'View':'Reply'}</button></div>`);
+}
+function openChat(id){
+  const th=S.inbox.find(t=>t.id===id); if(!th) return;
+  renderChatModal(th);
+}
+function renderChatModal(th){
+  const b=th.buyer;
+  const msgs=th.msgs.map(m=>`<div class="msg ${m.who}">${esc(m.text)}</div>`).join('');
+  const opts=chatOptions(th);
+  const optHtml = th.done? `<p class="hint">This chat is closed.</p>` :
+    `<div class="acts">${opts.map((o,i)=>`<button class="btn act" data-act="${o.k}"><b>${esc(o.label)}</b><span>${esc(o.hint)}</span></button>`).join('')}</div>`;
+  showModal(`
+    <div class="buyer"><div class="avatar">${buyerAvatar(b)}</div>
+      <div><b>@${esc(b.handle)}</b><div class="small mute">${esc(b.job)} · ${esc(b.quirk)}</div></div></div>
+    <div id="msgs">${msgs}</div>
+    ${optHtml}
+  `,()=>{
+    $('modal').querySelectorAll('[data-act]').forEach(btn=>btn.onclick=()=>{
+      chatReply(th,btn.dataset.act);
+      renderChatModal(th);
+    });
+    const mm=$('modal').querySelector('#msgs'); if(mm) mm.scrollTop=mm.scrollHeight;
+  });
+}
+/* ================= ORDERS tab ================= */
+function viewOrders(){
+  const box=document.createElement('div');
+  box.appendChild(el(`<div class="card"><h3>Fulfillment</h3>
+    <p class="small mute">Pack before the promised day or reputation takes a hit. Packing costs 1 energy per order unless automated.</p>
+    <div class="acts"><button class="btn act pri" id="batch"><b>📦 Batch pack</b><span>Pack up to ${3+gearLevel('batch')*3} at once</span></button></div>
+  </div>`));
+  if(!S.orders.length){ box.appendChild(el(`<p class="hint">No open orders. Go make some sales.</p>`)); }
+  else {
+    const c=el(`<div class="card"></div>`);
+    S.orders.slice().sort((a,b)=>a.promised-b.promised).forEach(o=>{
+      const daysLeft=o.promised-S.day;
+      const urgency=daysLeft<0?'bad':daysLeft===0?'warn':'mute';
+      c.appendChild(el(`<div class="li"><div><b>${esc(o.item)}</b> ×${o.qty} — @${esc(o.buyer)}
+        <div class="small ${urgency}">${o.packed?'Packed, awaiting delivery':daysLeft<0?'Overdue!':daysLeft===0?'Due today':'Due in '+daysLeft+'d'} · ${money(o.price)}</div></div>
+        ${o.packed?`<span class="tag good">Packed</span>`:`<button class="btn sm" data-pack="${o.id}">Pack</button>`}</div>`));
+    });
+    box.appendChild(c);
+  }
+  box.querySelectorAll('[data-pack]').forEach(b=>b.onclick=()=>packOrder(+b.dataset.pack));
+  const bp=box.querySelector('#batch'); if(bp) bp.onclick=()=>batchPack();
+  return box;
+}
+/* ================= MARKET tab ================= */
+function viewMarket(){
+  const box=document.createElement('div');
+  box.appendChild(el(`<div class="card"><h3>Exchange</h3><p class="small mute">Trade fee ${(tradeFee()*100).toFixed(2)}%. Prices move on news and noise.</p></div>`));
+  const c=el(`<div class="card"></div>`);
+  Object.entries(COINS).forEach(([sym,cn])=>{
+    const p=curPrice(sym); const hist=S.coinHist[sym];
+    const chg=(p-hist[Math.max(0,hist.length-8)])/hist[Math.max(0,hist.length-8)];
+    const held=S.coins[sym]||0;
+    c.appendChild(el(`<div class="coin">
+      <div class="row"><b class="num" style="font-size:22px">${sym}</b><span class="mute small">${esc(cn.n)}</span><span class="sp"></span><b class="num">${pfmt(p)}</b></div>
+      ${sparkline(hist)}
+      <div class="row" style="justify-content:space-between">
+        <span class="small ${chg>=0?'good':'bad'}">${pct(chg)} (7d)</span>
+        <span class="small mute">Holding ${cnum(held)} (${money(held*p)})</span>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <button class="btn sm" data-buy="${sym}">Buy</button>
+        <button class="btn sm" data-sell="${sym}" ${held<=0?'disabled':''}>Sell</button>
+      </div>
+    </div>`));
+  });
+  box.appendChild(c);
+  const nc=el(`<div class="card"><h3>Headlines</h3></div>`);
+  S.news.slice(0,8).forEach(n=>nc.appendChild(el(`<p class="small" style="margin:6px 0">📰 ${esc(n.t)}</p>`)));
+  box.appendChild(nc);
+  box.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>tradeModal(b.dataset.buy,'buy'));
+  box.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>tradeModal(b.dataset.sell,'sell'));
+  return box;
+}
+function tradeModal(sym,mode){
+  const p=curPrice(sym); const held=S.coins[sym]||0;
+  showModal(`<h2>${mode==='buy'?'Buy':'Sell'} ${sym}</h2>
+    <p class="mute small">Price ${pfmt(p)} · Cash ${money(S.cash)} · Holding ${cnum(held)}</p>
+    <div class="row" style="margin:10px 0"><input type="text" inputmode="decimal" id="tval" value="${mode==='buy'?Math.min(50,Math.floor(S.cash)):Math.min(1,held).toFixed(4)}"></div>
+    <div class="acts">
+      <button class="btn" id="tmax">${mode==='buy'?'Max cash':'Max holding'}</button>
+      <button class="btn pri act" id="tgo" style="min-height:52px"><b>Confirm</b></button>
+    </div>`);
+  $('tmax').onclick=()=>{ $('tval').value= mode==='buy'? Math.floor(S.cash) : held; };
+  $('tgo').onclick=()=>{
+    const v=parseFloat($('tval').value)||0;
+    if(mode==='buy') buyCoin(sym,v); else sellCoin(sym,v);
+    closeModal(); render();
+  };
+}
+/* ================= SKILLS tab ================= */
+function viewSkills(){
+  const box=document.createElement('div');
+  box.appendChild(el(`<div class="card"><h3>Skills</h3><p class="small mute">Skills rise from doing the work, or take a course for a guaranteed nudge.</p></div>`));
+  const c=el(`<div class="card"></div>`);
+  SKKEYS.forEach(k=>{
+    const o=S.sk[k]; const need=xpNeed(o.l);
+    const pctw=clamp(o.xp/need*100,0,100);
+    c.appendChild(el(`<div class="li"><div style="flex:1">
+      <div class="row"><b>${SK[k].ic} ${SK[k].n}</b><span class="sp"></span><b class="num">Lv ${o.l}</b></div>
+      <div class="small mute">${SK[k].d}</div>
+      <div class="bar"><i style="width:${pctw}%"></i></div>
+      </div>
+      <button class="btn sm" data-course="${k}">Course</button>
+      </div>`));
+  });
+  box.appendChild(c);
+  box.querySelectorAll('[data-course]').forEach(b=>b.onclick=()=>courseModal(b.dataset.course));
+  return box;
+}
+function courseCost(k){ const l=S.sk[k].l; return Math.round(18*Math.pow(1.32,l-1)); }
+function courseModal(k){
+  const cost=courseCost(k);
+  const name=pick(COURSES[k]);
+  showModal(`<h2>${SK[k].ic} ${esc(name)}</h2>
+    <p class="small mute">${SK[k].d}</p>
+    <p>Cost: ${money(cost)} · Time: 2 energy · Grants a guaranteed level-worth of practice.</p>
+    <div class="acts"><button class="btn pri act" id="go" style="min-height:56px"><b>Take the course</b><span>${money(cost)} · 2 energy</span></button></div>`);
+  $('go').onclick=()=>{
+    if(S.cash<cost){toast('Not enough cash.');return;}
+    if(S.energy<2){toast('Not enough energy.');return;}
+    S.cash-=cost; S.energy-=2;
+    gainXP(k,xpNeed(S.sk[k].l));
+    addLog(`Completed a course: "${name}".`);
+    closeModal(); render();
+  };
+}
+/* ================= SHOP / UPGRADE tab ================= */
+function viewShop(){
+  const box=document.createElement('div');
+  box.appendChild(el(`<div class="card"><h3>Storefront</h3><p class="small mute">Better stores mean more traffic and more slots.</p></div>`));
+  const sc=el(`<div class="card"></div>`);
+  STORES.forEach((s,i)=>{
+    const owned=i===S.store, locked=i>S.store+1 || (i>0 && S.rep<i*8);
+    sc.appendChild(el(`<div class="li"><div><b>${esc(s.n)}</b> <span class="tag">×${s.traffic} traffic</span> <span class="tag">${s.slots+2} slots</span>
+      <div class="small mute">${s.up?'Upkeep '+money(s.up)+'/day':'No upkeep'}${i>0?' · needs '+(i*8)+' rep':''}</div></div>
+      ${owned?'<span class="tag good">Current</span>':`<button class="btn sm" data-store="${i}" ${i<=S.store||locked?'disabled':''}>${money(s.c)}</button>`}
+    </div>`));
+  });
+  box.appendChild(sc);
+
+  box.appendChild(el(`<div class="card"><h3>HQ</h3><p class="small mute">More desks for staff, once you've incorporated.</p></div>`));
+  const hc=el(`<div class="card"></div>`);
+  HQS.forEach((s,i)=>{
+    const owned=i===S.hq;
+    hc.appendChild(el(`<div class="li"><div><b>${esc(s.n)}</b> <span class="tag">${s.cap} desks</span>
+      <div class="small mute">${s.up?'Upkeep '+money(s.up)+'/day':'No upkeep'}</div></div>
+      ${owned?'<span class="tag good">Current</span>':`<button class="btn sm" data-hq="${i}" ${i<=S.hq?'disabled':''}>${money(s.c)}</button>`}
+    </div>`));
+  });
+  box.appendChild(hc);
+
+  box.appendChild(el(`<div class="card"><h3>Gear</h3></div>`));
+  const gc=el(`<div class="card"></div>`);
+  GEAR.forEach(g=>{
+    const l=gearLevel(g.id), maxed=gearMaxed(g.id);
+    const locked = g.req && !g.req();
+    gc.appendChild(el(`<div class="li"><div><b>${esc(g.n)}</b> <span class="tag">Lv ${l}/${g.lv.length}</span>
+      <div class="small mute">${esc(g.d)}${locked?' · '+g.reqt:''}</div></div>
+      ${maxed?'<span class="tag good">Maxed</span>':`<button class="btn sm" data-gear="${g.id}" ${locked?'disabled':''}>${money(gearCost(g.id))}</button>`}
+    </div>`));
+  });
+  box.appendChild(gc);
+
+  box.querySelectorAll('[data-store]').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.store; const s=STORES[i];
+    if(S.cash<s.c){toast('Not enough cash.');return;}
+    S.cash-=s.c; S.store=i; addLog(`Upgraded to ${s.n}.`); render();
+  });
+  box.querySelectorAll('[data-hq]').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.hq; const s=HQS[i];
+    if(S.cash<s.c){toast('Not enough cash.');return;}
+    S.cash-=s.c; S.hq=i; addLog(`Moved into: ${s.n}.`); render();
+  });
+  box.querySelectorAll('[data-gear]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.gear; const cost=gearCost(id);
+    if(S.cash<cost){toast('Not enough cash.');return;}
+    S.cash-=cost; S.gearLv[id]=(S.gearLv[id]||0)+1;
+    addLog(`Upgraded: ${GEAR.find(g=>g.id===id).n} (Lv ${S.gearLv[id]}).`); render();
+  });
+  return box;
+}
+/* ================= COMPANY tab ================= */
+function viewCompany(){
+  const box=document.createElement('div');
+  if(!S.co){
+    box.appendChild(el(`<div class="card"><h3>Incorporate</h3>
+      <p>Right now it's just you. Forming a company lets you hire staff who work every day, even offline in spirit — but they need desks (HQ) and paychecks.</p>
+      <p class="small mute">Requires 25+ reputation and ${money(800)} cash. ${canFormCompany()?'':'<span class="bad">Not ready yet.</span>'}</p>
+      <div class="row"><input type="text" id="coname" placeholder="Company name" value="${esc((PATHS[S.path].n).split(' ').pop())} Trading Co."></div>
+      <div class="acts" style="margin-top:8px"><button class="btn pri act" id="incorp" ${canFormCompany()?'':'disabled'}><b>Incorporate</b><span>${money(800)}</span></button></div>
+    </div>`));
+    box.querySelector('#incorp').onclick=()=>{ const n=$('coname').value.trim()||'Untitled Co.'; formCompany(n); };
+    return box;
+  }
+  box.appendChild(el(`<div class="card"><h3>${esc(S.co.name)}</h3>
+    <p class="small mute">${S.co.staff.length}/${HQS[S.hq].cap} desks filled · Morale ${Math.round(S.co.morale)}%</p>
+    <div class="bar ${S.co.morale<30?'r':S.co.morale<60?'y':'g'}"><i style="width:${S.co.morale}%"></i></div>
+  </div>`));
+  const staffC=el(`<div class="card"><h3>Staff</h3></div>`);
+  if(!S.co.staff.length) staffC.appendChild(el(`<p class="hint">Nobody hired yet.</p>`));
+  S.co.staff.forEach(e=>{
+    const tr=TRAITS.find(t=>t.k===e.trait);
+    staffC.appendChild(el(`<div class="li"><div><b>${esc(e.name)}</b> <span class="tag">${ROLES[e.role].ic} ${ROLES[e.role].n}</span>
+      <div class="small mute">Skill ${e.skill} · ${tr.n} (${esc(tr.d)}) · Wage ${money(e.wage)}/day · ${e.days}d on the job</div></div>
+      <button class="btn sm" data-fire="${e.id}">Let go</button></div>`));
+  });
+  box.appendChild(staffC);
+
+  const hireC=el(`<div class="card"><h3>Hire</h3><p class="small mute">Interview a candidate for a role (costs 2 energy to run the search).</p></div>`);
+  const acts=el(`<div class="acts"></div>`);
+  Object.entries(ROLES).forEach(([k,r])=>{
+    acts.appendChild(el(`<button class="btn act" data-hunt="${k}"><b>${r.ic} ${r.n}</b><span>${r.d}</span><span class="cost">2 energy</span></button>`));
+  });
+  hireC.appendChild(acts); box.appendChild(hireC);
+
+  box.querySelectorAll('[data-fire]').forEach(b=>b.onclick=()=>{ if(confirm('Let this person go?')) fire(b.dataset.fire); });
+  box.querySelectorAll('[data-hunt]').forEach(b=>b.onclick=()=>{
+    if(S.energy<2){toast('Not enough energy.');return;}
+    S.energy-=2;
+    const cand=genCandidate(b.dataset.hunt);
+    candidateModal(cand);
+  });
+  return box;
+}
+function candidateModal(cand){
+  const tr=TRAITS.find(t=>t.k===cand.trait);
+  showModal(`<h2>${ROLES[cand.role].ic} ${esc(cand.name)}</h2>
+    <p>Applying for: <b>${ROLES[cand.role].n}</b></p>
+    <p class="small mute">Skill ${cand.skill} · ${tr.n} — ${esc(tr.d)} · Wants ${money(cand.wage)}/day</p>
+    <div class="acts"><button class="btn pri act" id="hiregO" style="min-height:52px"><b>Hire</b></button>
+    <button class="btn act" id="passC" style="min-height:52px"><b>Pass</b></button></div>`);
+  $('hiregO').onclick=()=>{ hire(cand); closeModal(); };
+  $('passC').onclick=()=>{ closeModal(); render(); };
+}
+/* ================= MORE tab (stats / achievements / log / save) ================= */
+function viewMore(){
+  const box=document.createElement('div');
+  const st=S.stats;
+  box.appendChild(el(`<div class="card"><h3>Stats</h3>
+    <dl class="kv">
+      <dt>Path</dt><dd>${PATHS[S.path].ic} ${esc(PATHS[S.path].n)}</dd>
+      <dt>Act</dt><dd>${S.act}</dd>
+      <dt>Orders delivered</dt><dd>${st.done}</dd>
+      <dt>Buyer chats</dt><dd>${st.chats}</dd>
+      <dt>Scams caught</dt><dd>${st.scamsCaught}</dd>
+      <dt>Times scammed</dt><dd>${st.scamsHit}</dd>
+      <dt>Gigs worked</dt><dd>${st.gigs}</dd>
+      <dt>Total earned</dt><dd>${money(st.earned)}</dd>
+      <dt>Total spent</dt><dd>${money(st.spent)}</dd>
+    </dl></div>`));
+  const ac=el(`<div class="card"><h3>Achievements (${Object.keys(S.achieved).length}/${ACHS.length})</h3></div>`);
+  ACHS.forEach(a=>{
+    const got=S.achieved[a.id];
+    ac.appendChild(el(`<div class="li"><div><b class="${got?'':'mute'}">${got?'🏆':'🔒'} ${esc(a.n)}</b><div class="small mute">${esc(a.d)}</div></div>${got?`<span class="tag good">Day ${got}</span>`:''}</div>`));
+  });
+  box.appendChild(ac);
+  const lc=el(`<div class="card"><h3>Log</h3></div>`);
+  if(!S.log.length) lc.appendChild(el(`<p class="hint">Nothing yet.</p>`));
+  S.log.slice(0,60).forEach(l=>lc.appendChild(el(`<p class="small" style="margin:5px 0"><span class="mute">D${l.day}</span> — ${esc(l.t)}</p>`)));
+  box.appendChild(lc);
+  box.appendChild(el(`<div class="card"><h3>Save</h3>
+    <div class="row"><button class="btn" id="exp">Export save</button><button class="btn" id="imp">Import save</button><button class="btn" id="wipe">Wipe & restart</button></div>
+  </div>`));
+  box.querySelector('#exp').onclick=()=>{ const s=btoa(unescape(encodeURIComponent(JSON.stringify(S)))); showModal(`<h2>Export</h2><p class="small mute">Copy this text somewhere safe.</p><textarea readonly>${s}</textarea>`); };
+  box.querySelector('#imp').onclick=()=>{ showModal(`<h2>Import</h2><textarea id="impt" placeholder="Paste save text here"></textarea><div class="acts"><button class="btn pri act" id="impgo" style="min-height:52px"><b>Load</b></button></div>`); $('impgo').onclick=()=>{ try{ S=JSON.parse(decodeURIComponent(escape(atob($('impt').value.trim())))); closeModal(); boot(true); }catch(e){ toast('Could not read that save.'); } }; };
+  box.querySelector('#wipe').onclick=()=>{ if(confirm('Erase your save and start over?')){ localStorage.removeItem('dh_save'); location.reload(); } };
+  return box;
+}
+/* ================= modal shell ================= */
+function showModal(html,after){
+  const m=$('modal');
+  m.innerHTML=`<div class="sheet">${html}<div style="margin-top:12px"><button class="btn" id="mclose">Close</button></div></div>`;
+  m.hidden=false;
+  m.onclick=e=>{ if(e.target===m) closeModal(); };
+  const cb=$('mclose'); if(cb) cb.onclick=closeModal;
+  if(after) after();
+}
+function closeModal(){ const m=$('modal'); m.hidden=true; m.innerHTML=''; render(); }
+function openEventModal(){
+  const ev=S.pendingEvent; if(!ev) return;
+  const m=$('modal');
+  m.innerHTML=`<div class="sheet story">
+    <h2>${esc(ev.title)}</h2>
+    <p>${esc(ev.text)}</p>
+    ${ev.ch.map((c,i)=>`<button class="ch" data-ch="${i}">${esc(c.l)}</button>`).join('')}
+  </div>`;
+  m.hidden=false;
+  m.onclick=null;
+  m.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>resolveEvent(+b.dataset.ch));
+}
+/* ================= boot / save / splash ================= */
+const SAVE_KEY='dh_save_v1';
+function saveGame(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
+function loadGame(){ try{ const s=localStorage.getItem(SAVE_KEY); return s?JSON.parse(s):null; }catch(e){ return null; } }
+
+function renderSplash(){
+  $('hud').hidden=true; $('tabs').hidden=true; $('view').innerHTML='';
+  const sp=$('splash');
+  sp.innerHTML=`
+  <div class="splash">
+    <div class="label">
+      <div class="top"><div><b>DROP &amp; HODL</b>NET WT. one dropshipper</div><div><b>SIM</b>choose a path</div></div>
+      <div class="mid">
+        <h1 class="title">DROP<br>&amp; HODL</h1>
+        <div class="barcode"></div>
+        <p class="small mute" style="margin-top:6px">A long, grindy, choice-driven dropshipping-and-crypto life sim. Every buyer is different. Every run plays out differently.</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px"><h3>Pick your start</h3><div id="paths"></div></div>
+    <div id="continueWrap"></div>
+  </div>`;
+  const pc=$('paths');
+  Object.entries(PATHS).forEach(([k,p])=>{
+    pc.appendChild(el(`<button class="ch" data-p="${k}"><span style="font-size:22px">${p.ic}</span> ${esc(p.n)}
+      <small>${esc(p.d)} Start: ${money(p.cash)} cash, ${p.rep} rep.</small></button>`));
+  });
+  pc.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>startNewGame(b.dataset.p));
+  const existing=loadGame();
+  if(existing){
+    const cw=$('continueWrap');
+    cw.innerHTML=`<button class="btn dark act" id="cont" style="width:100%;margin-top:10px;min-height:60px"><b>Continue saved run</b><span>Day ${existing.day} · ${PATHS[existing.path].n} · ${money(existing.cash)} cash</span></button>`;
+    $('cont').onclick=()=>{ S=existing; boot(true); };
+  }
+}
+function startNewGame(pathKey){
+  S=newState(pathKey);
+  initMarket();
+  S.news=[]; for(let i=0;i<3;i++) dailyNews();
+  boot(false, pathKey);
+}
+function boot(skipIntro,introPath){
+  $('splash').innerHTML='';
+  $('hud').hidden=false; $('tabs').hidden=false;
+  activeTab='work';
+  render();
+  if(!skipIntro && introPath){
+    showModal(`<div class="story"><h2>${esc(INTROS[introPath].title)}</h2><p style="white-space:pre-line">${esc(introText(introPath))}</p></div>`);
+  }
+}
+window.addEventListener('DOMContentLoaded',()=>{ renderSplash(); });
+</script></body></html>
