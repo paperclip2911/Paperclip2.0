@@ -55,10 +55,10 @@ canvas{display:block;position:absolute;inset:0}
   text-shadow:0 2px 8px #000,0 0 12px currentColor;pointer-events:none;white-space:nowrap;
   will-change:transform,opacity}
 
-#stealBar{position:absolute;left:0;top:0;width:80px;height:11px;background:rgba(0,0,0,.75);
-  border:2px solid #ffd75e;border-radius:6px;pointer-events:none;display:none;z-index:12;
-  transform:translate(-50%,-50%);box-shadow:0 0 12px rgba(255,215,94,.6)}
-#stealBarFill{height:100%;width:0%;background:#ffd75e;border-radius:3px;transition:width .05s}
+#stealBar{position:absolute;left:0;top:0;width:86px;height:12px;background:rgba(0,0,0,.8);
+  border:2px solid #ffd75e;border-radius:7px;pointer-events:none;display:none;z-index:12;
+  transform:translate(-50%,-50%);box-shadow:0 0 14px rgba(255,215,94,.7)}
+#stealBarFill{height:100%;width:0%;background:linear-gradient(90deg,#ffe27a,#ffa020);border-radius:4px;transition:width .05s}
 
 #panel{position:absolute;inset:0;background:rgba(4,8,16,.78);display:none;
   align-items:center;justify-content:center;pointer-events:auto;backdrop-filter:blur(4px);z-index:20;padding:12px}
@@ -288,12 +288,12 @@ const WORLDS = [
 const WAVES_PER_WORLD = 5;
 const SPEEDS = [200,252,312,382,462];
 const BOT_NAMES = ['xXNoobXx','PetKing99','ShadowHunter','LunaStar','BlazeYT','CookieMon','Zephyr'];
-const BOT_COLORS = ['#ef4444','#f59e0b','#10b981','#8b5cf6','#ec4899','#06b6d4','#84cc16'];
+const BOT_COLORS = ['#ff4466','#ffaa22','#44dd88','#aa66ff','#ff66cc','#22ccff','#aaff44'];
 
-const KEY = 'stealthepets3d_save_v1';
+const KEY = 'stealthepets3d_save_v2';
 
 /* ==================================================================
-   GAME STATE
+   STATE
    ================================================================== */
 let uidC = 0, T = 0, NOW = 0;
 const S = {
@@ -302,15 +302,14 @@ const S = {
   collection:{}, waves:0, rebirths:0,
   stats:{stolen:0,lost:0,eggs:0,waves:0},
 };
-
 const bases = [], pets = [], bots = [];
 const player = {
   x:CX, y:CY+RING+260, baseId:0, carrying:null,
   name:'You', color:'#3b82f6', isPlayer:true,
   stealProgress:0, stealTarget:null, mesh:null,
+  _lx:CX, _ly:CY+RING+260, walkPhase:0, facing:Math.PI,
 };
-
-const camPos = { x: player.x * SCALE, z: player.y * SCALE };
+const camPos = { x: player.x*SCALE, z: player.y*SCALE };
 
 /* ==================================================================
    THREE.JS SETUP
@@ -326,17 +325,58 @@ try {
 renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xbfe3ff);
-scene.fog = new THREE.Fog(0xbfe3ff, 70, 200);
+scene.fog = new THREE.Fog(0x9fd8ff, 75, 230);
 
-const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 500);
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 600);
 
-scene.add(new THREE.HemisphereLight(0xffffff, 0x557755, 1.15));
-const dir = new THREE.DirectionalLight(0xffffff, 1.5);
-dir.position.set(40, 80, 30);
+/* ---- sky gradient ---- */
+(function buildSky() {
+  const skyGeo = new THREE.SphereGeometry(280, 32, 16);
+  const skyMat = new THREE.ShaderMaterial({
+    uniforms: {
+      topColor:    { value: new THREE.Color(0x3a7bd5) },
+      bottomColor: { value: new THREE.Color(0xbfe9ff) },
+      offset:      { value: 30 },
+      exponent:    { value: 0.75 },
+    },
+    vertexShader: `
+      varying vec3 vWorldPosition;
+      void main() {
+        vec4 worldPos = modelMatrix * vec4(position, 1.0);
+        vWorldPosition = worldPos.xyz;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform vec3 topColor;
+      uniform vec3 bottomColor;
+      uniform float offset;
+      uniform float exponent;
+      varying vec3 vWorldPosition;
+      void main() {
+        float h = normalize(vWorldPosition + vec3(0.0, offset, 0.0)).y;
+        gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h,0.0), exponent), 0.0)), 1.0);
+      }
+    `,
+    side: THREE.BackSide,
+    depthWrite: false,
+  });
+  const sky = new THREE.Mesh(skyGeo, skyMat);
+  scene.add(sky);
+})();
+
+/* ---- lights ---- */
+scene.add(new THREE.HemisphereLight(0xffffff, 0x88aa88, 1.25));
+const dir = new THREE.DirectionalLight(0xffffff, 1.6);
+dir.position.set(50, 90, 40);
 scene.add(dir);
+const fill = new THREE.DirectionalLight(0x88ccff, 0.4);
+fill.position.set(-40, 50, -30);
+scene.add(fill);
 
 const s = v => v * SCALE;
 
@@ -344,9 +384,7 @@ const s = v => v * SCALE;
    TEXTURE HELPERS
    ================================================================== */
 const emojiTexCache = {};
-const glowTexCache = {};
-
-function emojiTexture(emoji, size = 128) {
+function emojiTexture(emoji, size = 160) {
   const c = document.createElement('canvas');
   c.width = c.height = size;
   const g = c.getContext('2d');
@@ -362,21 +400,6 @@ function getEmojiTex(emoji) {
   if (!emojiTexCache[emoji]) emojiTexCache[emoji] = emojiTexture(emoji);
   return emojiTexCache[emoji];
 }
-function getGlowTex(hex) {
-  if (!glowTexCache[hex]) {
-    const c = document.createElement('canvas');
-    c.width = c.height = 128;
-    const g = c.getContext('2d');
-    const grad = g.createRadialGradient(64,64,0,64,64,64);
-    grad.addColorStop(0, hex + 'dd');
-    grad.addColorStop(0.45, hex + '44');
-    grad.addColorStop(1, hex + '00');
-    g.fillStyle = grad;
-    g.fillRect(0,0,128,128);
-    glowTexCache[hex] = new THREE.CanvasTexture(c);
-  }
-  return glowTexCache[hex];
-}
 function rr(g,x,y,w,h,r){
   r = Math.min(r, w/2, h/2);
   g.beginPath();
@@ -391,17 +414,17 @@ function makeLabelTexture(text, colorHex, w, h) {
   const c = document.createElement('canvas');
   c.width = w; c.height = h;
   const g = c.getContext('2d');
-  g.font = `bold ${Math.floor(h*0.55)}px "Trebuchet MS",sans-serif`;
+  g.font = `bold ${Math.floor(h*0.5)}px "Trebuchet MS",sans-serif`;
   g.textAlign = 'center';
   g.textBaseline = 'middle';
   const tw = g.measureText(text).width;
-  const padX = 28, boxW = Math.min(w - 20, tw + padX*2), boxH = h * 0.72;
+  const padX = 30, boxW = Math.min(w - 20, tw + padX*2), boxH = h * 0.72;
   const bx = (w - boxW)/2, by = (h - boxH)/2;
-  rr(g, bx, by, boxW, boxH, 20);
-  g.fillStyle = 'rgba(8,14,26,0.88)';
+  rr(g, bx, by, boxW, boxH, 22);
+  g.fillStyle = 'rgba(8,14,26,0.92)';
   g.fill();
   g.strokeStyle = colorHex;
-  g.lineWidth = 4;
+  g.lineWidth = 5;
   g.stroke();
   g.fillStyle = colorHex;
   g.fillText(text, w/2, h/2 + 2);
@@ -409,6 +432,85 @@ function makeLabelTexture(text, colorHex, w, h) {
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
 }
+
+/* blob shadow texture */
+function makeBlobTex() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(32,32,0,32,32,32);
+  grad.addColorStop(0, 'rgba(0,0,0,0.55)');
+  grad.addColorStop(0.65, 'rgba(0,0,0,0.22)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = grad;
+  g.fillRect(0,0,64,64);
+  const tex = new THREE.CanvasTexture(c);
+  return tex;
+}
+const blobTex = makeBlobTex();
+
+/* face textures for characters */
+function makeFaceTexture(mood) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const g = c.getContext('2d');
+  // skin base
+  g.fillStyle = '#ffd6a8';
+  g.fillRect(0, 0, 128, 128);
+
+  if (mood === 'evil') {
+    // angry brows
+    g.strokeStyle = '#1a1a1a';
+    g.lineWidth = 8;
+    g.lineCap = 'round';
+    g.beginPath(); g.moveTo(28, 42); g.lineTo(52, 50); g.stroke();
+    g.beginPath(); g.moveTo(100, 42); g.lineTo(76, 50); g.stroke();
+
+    // narrow eyes
+    g.fillStyle = '#1a1a1a';
+    g.beginPath(); g.ellipse(42, 64, 9, 6, 0, 0, 6.28); g.fill();
+    g.beginPath(); g.ellipse(86, 64, 9, 6, 0, 0, 6.28); g.fill();
+    g.fillStyle = '#ff3333';
+    g.beginPath(); g.arc(42, 64, 4, 0, 6.28); g.fill();
+    g.beginPath(); g.arc(86, 64, 4, 0, 6.28); g.fill();
+
+    // sharp grin
+    g.strokeStyle = '#1a1a1a';
+    g.lineWidth = 5;
+    g.beginPath();
+    g.moveTo(30, 88);
+    g.quadraticCurveTo(64, 112, 98, 88);
+    g.stroke();
+    // teeth
+    g.fillStyle = '#fff';
+    g.fillRect(46, 88, 12, 9);
+    g.fillRect(70, 88, 12, 9);
+  } else {
+    // friendly eyes
+    g.fillStyle = '#1a1a1a';
+    g.beginPath(); g.arc(42, 60, 9, 0, 6.28); g.fill();
+    g.beginPath(); g.arc(86, 60, 9, 0, 6.28); g.fill();
+    // eye shine
+    g.fillStyle = '#fff';
+    g.beginPath(); g.arc(45, 57, 3, 0, 6.28); g.fill();
+    g.beginPath(); g.arc(89, 57, 3, 0, 6.28); g.fill();
+
+    // big smile
+    g.strokeStyle = '#1a1a1a';
+    g.lineWidth = 5;
+    g.lineCap = 'round';
+    g.beginPath();
+    g.moveTo(40, 84);
+    g.quadraticCurveTo(64, 104, 88, 84);
+    g.stroke();
+  }
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+const faceHappyTex = makeFaceTexture('happy');
+const faceEvilTex  = makeFaceTexture('evil');
 
 /* ==================================================================
    GROUND
@@ -421,13 +523,18 @@ function makeLabelTexture(text, colorHex, w, h) {
   for (let y = 0; y < 512; y += cell) {
     for (let x = 0; x < 512; x += cell) {
       const even = ((x/cell) + (y/cell)) % 2 === 0;
-      g.fillStyle = even ? '#5f8f5f' : '#558355';
+      g.fillStyle = even ? '#7fc97f' : '#72bd72';
       g.fillRect(x, y, cell, cell);
+      // tiny grass detail
+      g.fillStyle = even ? '#9adf9a' : '#8ed48e';
+      for (let k = 0; k < 3; k++) {
+        g.fillRect(x + Math.random()*cell, y + Math.random()*cell, 3, 3);
+      }
     }
   }
   const tex = new THREE.CanvasTexture(c);
   tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(GROUND_GAME/512*1.5, GROUND_GAME/512*1.5);
+  tex.repeat.set(GROUND_GAME/512*2, GROUND_GAME/512*2);
   tex.colorSpace = THREE.SRGBColorSpace;
   const mat = new THREE.MeshStandardMaterial({map:tex, roughness:1});
   const geo = new THREE.PlaneGeometry(s(GROUND_GAME), s(GROUND_GAME));
@@ -436,44 +543,116 @@ function makeLabelTexture(text, colorHex, w, h) {
   mesh.position.set(s(CX), 0, s(CY));
   scene.add(mesh);
 
-  // plaza
+  // central plaza disc
   const plaza = new THREE.Mesh(
-    new THREE.CylinderGeometry(s(360), s(360), 0.3, 48),
-    new THREE.MeshStandardMaterial({color:0x3b4a5e, roughness:0.9})
+    new THREE.CylinderGeometry(s(380), s(380), 0.4, 64),
+    new THREE.MeshStandardMaterial({color:0x5a7291, roughness:0.7, metalness:0.15})
   );
-  plaza.position.set(s(CX), 0.15, s(CY));
+  plaza.position.set(s(CX), 0.2, s(CY));
   scene.add(plaza);
 
-  // fountain
-  const fBase = new THREE.Mesh(
-    new THREE.CylinderGeometry(s(90), s(90), 0.6, 32),
-    new THREE.MeshStandardMaterial({color:0x8899aa, roughness:0.7})
+  // glowing ring around plaza
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(s(380), 0.18, 8, 64),
+    new THREE.MeshBasicMaterial({color:0x7dd3fc, transparent:true, opacity:0.9})
   );
-  fBase.position.set(s(CX), 0.6, s(CY));
+  ring.rotation.x = Math.PI/2;
+  ring.position.set(s(CX), 0.42, s(CY));
+  scene.add(ring);
+
+  // fountain base
+  const fBase = new THREE.Mesh(
+    new THREE.CylinderGeometry(s(95), s(110), 1.2, 32),
+    new THREE.MeshStandardMaterial({color:0x8c9cb0, roughness:0.6, metalness:0.3})
+  );
+  fBase.position.set(s(CX), 0.8, s(CY));
   scene.add(fBase);
 
   const fWater = new THREE.Mesh(
-    new THREE.CylinderGeometry(s(74), s(74), 0.3, 32),
-    new THREE.MeshStandardMaterial({color:0x2f6f9e, roughness:0.2, metalness:0.4,
-      emissive:0x1a4a6e, emissiveIntensity:0.5})
+    new THREE.CylinderGeometry(s(80), s(80), 0.4, 32),
+    new THREE.MeshStandardMaterial({color:0x38bdf8, roughness:0.2, metalness:0.5,
+      emissive:0x0e7490, emissiveIntensity:0.7})
   );
-  fWater.position.set(s(CX), 0.85, s(CY));
+  fWater.position.set(s(CX), 1.45, s(CY));
   scene.add(fWater);
 
   const fPillar = new THREE.Mesh(
-    new THREE.CylinderGeometry(s(14), s(20), s(160), 16),
-    new THREE.MeshStandardMaterial({color:0x9aa9bb, roughness:0.7})
+    new THREE.CylinderGeometry(s(16), s(24), s(170), 16),
+    new THREE.MeshStandardMaterial({color:0xb0bdd0, roughness:0.6, metalness:0.3})
   );
-  fPillar.position.set(s(CX), s(90), s(CY));
+  fPillar.position.set(s(CX), s(95), s(CY));
   scene.add(fPillar);
 
   const fTop = new THREE.Mesh(
-    new THREE.SphereGeometry(s(22), 16, 12),
-    new THREE.MeshStandardMaterial({color:0x2f6f9e, emissive:0x1a4a6e, emissiveIntensity:0.6})
+    new THREE.SphereGeometry(s(26), 16, 12),
+    new THREE.MeshStandardMaterial({color:0x38bdf8, emissive:0x0e7490, emissiveIntensity:0.8})
   );
-  fTop.position.set(s(CX), s(180), s(CY));
+  fTop.position.set(s(CX), s(190), s(CY));
   scene.add(fTop);
 })();
+
+/* ==================================================================
+   DECORATIONS
+   ================================================================== */
+function addDecorations() {
+  const treeFoliageMat = new THREE.MeshStandardMaterial({color:0x2e8b57, roughness:0.85});
+  const treeFoliage2Mat = new THREE.MeshStandardMaterial({color:0x37a066, roughness:0.85});
+  const trunkMat = new THREE.MeshStandardMaterial({color:0x6b4226, roughness:0.95});
+  const rockMat = new THREE.MeshStandardMaterial({color:0x8a94a6, roughness:0.95, flatShading:true});
+
+  let placed = 0, attempts = 0;
+  while (placed < 55 && attempts < 400) {
+    attempts++;
+    const ang = Math.random() * Math.PI * 2;
+    const r = rand(520, 1900);
+    const x = CX + Math.cos(ang) * r;
+    const y = CY + Math.sin(ang) * r;
+    if (Math.hypot(x - CX, y - CY) < 480) continue;
+    if (bases.some(b => Math.abs(x - b.x) < b.hw + 220 && Math.abs(y - b.y) < b.hh + 220)) continue;
+
+    if (Math.random() < 0.65) {
+      const tree = new THREE.Group();
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.7, 3, 7), trunkMat);
+      trunk.position.y = 1.5;
+      tree.add(trunk);
+      const f1 = new THREE.Mesh(new THREE.ConeGeometry(2.6, 3.6, 8), treeFoliageMat);
+      f1.position.y = 4;
+      tree.add(f1);
+      const f2 = new THREE.Mesh(new THREE.ConeGeometry(2.0, 3.0, 8), treeFoliage2Mat);
+      f2.position.y = 5.8;
+      tree.add(f2);
+      tree.position.set(s(x), 0, s(y));
+      tree.scale.setScalar(rand(0.85, 1.45));
+      tree.rotation.y = Math.random() * 6.28;
+      scene.add(tree);
+    } else {
+      const rock = new THREE.Mesh(new THREE.IcosahedronGeometry(rand(0.9, 2.0), 0), rockMat);
+      rock.position.set(s(x), rand(0.3, 0.7), s(y));
+      rock.rotation.set(Math.random()*3, Math.random()*3, Math.random()*3);
+      scene.add(rock);
+    }
+    placed++;
+  }
+
+  // little lamp posts around plaza
+  for (let i = 0; i < 8; i++) {
+    const ang = i * Math.PI*2/8;
+    const x = CX + Math.cos(ang) * 460;
+    const y = CY + Math.sin(ang) * 460;
+    const post = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.15, 0.2, 5, 6),
+      new THREE.MeshStandardMaterial({color:0x2a3442, roughness:0.6, metalness:0.5})
+    );
+    post.position.set(s(x), 2.5, s(y));
+    scene.add(post);
+    const bulb = new THREE.Mesh(
+      new THREE.SphereGeometry(0.5, 10, 8),
+      new THREE.MeshBasicMaterial({color:0xffe27a})
+    );
+    bulb.position.set(s(x), 5.2, s(y));
+    scene.add(bulb);
+  }
+}
 
 /* ==================================================================
    BASES
@@ -486,9 +665,8 @@ function makeBases() {
     bases.push({
       id:i, x:bx, y:by, hw:BASE_HW, hh:BASE_HH,
       name: i === 0 ? 'YOUR BASE' : BOT_NAMES[i-1],
-      color: i === 0 ? '#3b82f6' : BOT_COLORS[i-1],
-      isPlayer: i === 0, shieldUntil: 0, bot: null,
-      shieldMesh: null,
+      color: i === 0 ? '#38bdf8' : BOT_COLORS[i-1],
+      isPlayer: i === 0, shieldUntil: 0, bot: null, shieldMesh: null,
     });
   }
   for (const b of bases) createBaseMesh(b);
@@ -498,40 +676,96 @@ function createBaseMesh(b) {
   const sx = s(b.x), sz = s(b.y);
   const w = s(b.hw*2), d = s(b.hh*2);
   const col = new THREE.Color(b.color);
+  const floorColor = b.isPlayer ? 0x2a4a72 : 0x3a2a5a;
 
-  // outer glow rim
-  const rim = new THREE.Mesh(
-    new THREE.BoxGeometry(w + 1.4, 0.5, d + 1.4),
-    new THREE.MeshStandardMaterial({color:col, emissive:col, emissiveIntensity:0.55, roughness:0.5})
+  // dark base platform
+  const platform = new THREE.Mesh(
+    new THREE.BoxGeometry(w + 1.6, 0.6, d + 1.6),
+    new THREE.MeshStandardMaterial({color:0x1a2030, roughness:0.85})
   );
-  rim.position.set(sx, 0.25, sz);
-  scene.add(rim);
+  platform.position.set(sx, 0.3, sz);
+  scene.add(platform);
 
-  // floor
-  const floor = new THREE.Mesh(
-    new THREE.BoxGeometry(w, 0.6, d),
-    new THREE.MeshStandardMaterial({color:b.isPlayer ? 0x1d2c46 : 0x211a2a, roughness:0.9})
-  );
-  floor.position.set(sx, 0.6, sz);
-  scene.add(floor);
-
-  // name sign
-  const tex = makeLabelTexture(b.name, b.color, 512, 96);
-  const spr = new THREE.Sprite(new THREE.SpriteMaterial({map:tex, depthTest:true, depthWrite:false}));
-  spr.scale.set(6.5, 1.22, 1);
-  spr.position.set(sx, 4.8, sz);
-  scene.add(spr);
-
-  // shield dome
-  const shieldR = Math.max(w, d) / 2 + 0.9;
-  const shield = new THREE.Mesh(
-    new THREE.CylinderGeometry(shieldR, shieldR, 4, 40, 1, true),
-    new THREE.MeshBasicMaterial({
-      color:0x38bdf8, transparent:true, opacity:0.22,
-      side:THREE.DoubleSide, depthWrite:false, blending:THREE.AdditiveBlending,
+  // bright top surface
+  const top = new THREE.Mesh(
+    new THREE.BoxGeometry(w, 0.25, d),
+    new THREE.MeshStandardMaterial({
+      color: floorColor, roughness: 0.55, metalness: 0.25,
+      emissive: col, emissiveIntensity: 0.08,
     })
   );
-  shield.position.set(sx, 2, sz);
+  top.position.set(sx, 0.73, sz);
+  scene.add(top);
+
+  // neon edge strips (4 sides, entrance gap at front/bottom)
+  const neonMat = new THREE.MeshBasicMaterial({color: col});
+  const edgeY = 0.92, t = 0.22;
+
+  // back edge
+  const backEdge = new THREE.Mesh(new THREE.BoxGeometry(w + t, t, t), neonMat);
+  backEdge.position.set(sx, edgeY, sz - d/2);
+  scene.add(backEdge);
+
+  // left and right edges
+  const leftEdge = new THREE.Mesh(new THREE.BoxGeometry(t, t, d + t), neonMat);
+  leftEdge.position.set(sx - w/2, edgeY, sz);
+  scene.add(leftEdge);
+  const rightEdge = new THREE.Mesh(new THREE.BoxGeometry(t, t, d + t), neonMat);
+  rightEdge.position.set(sx + w/2, edgeY, sz);
+  scene.add(rightEdge);
+
+  // front edge with entrance gap
+  const gapW = 2.6;
+  const frontSegW = (w - gapW) / 2;
+  const fL = new THREE.Mesh(new THREE.BoxGeometry(frontSegW, t, t), neonMat);
+  fL.position.set(sx - w/2 + frontSegW/2, edgeY, sz + d/2);
+  scene.add(fL);
+  const fR = new THREE.Mesh(new THREE.BoxGeometry(frontSegW, t, t), neonMat);
+  fR.position.set(sx + w/2 - frontSegW/2, edgeY, sz + d/2);
+  scene.add(fR);
+
+  // corner pillars with glowing orbs
+  const corners = [
+    [sx - w/2, sz - d/2],
+    [sx + w/2, sz - d/2],
+    [sx - w/2, sz + d/2],
+    [sx + w/2, sz + d/2],
+  ];
+  for (const [cx, cz] of corners) {
+    const pillar = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.28, 0.34, 2.6, 10),
+      new THREE.MeshStandardMaterial({color:0x2a3040, roughness:0.5, metalness:0.6})
+    );
+    pillar.position.set(cx, 2.3, cz);
+    scene.add(pillar);
+    const orb = new THREE.Mesh(
+      new THREE.SphereGeometry(0.42, 12, 10),
+      new THREE.MeshBasicMaterial({color: col})
+    );
+    orb.position.set(cx, 3.9, cz);
+    scene.add(orb);
+  }
+
+  // hanging name sign
+  const labelTex = makeLabelTexture(b.name, b.color, 512, 100);
+  const sign = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: labelTex, depthTest: true, depthWrite: false,
+  }));
+  sign.scale.set(7, 1.37, 1);
+  sign.position.set(sx, 5.2, sz);
+  scene.add(sign);
+
+  // shield dome
+  const shieldR = Math.max(w, d) / 2 + 1.2;
+  const shield = new THREE.Mesh(
+    new THREE.CylinderGeometry(shieldR, shieldR, 5.5, 48, 1, true),
+    new THREE.MeshBasicMaterial({
+      color:0x38bdf8, transparent:true, opacity:0.20,
+      side:THREE.DoubleSide, depthWrite:false,
+      blending:THREE.AdditiveBlending,
+    })
+  );
+  shield.position.set(sx, 2.8, sz);
   shield.visible = false;
   scene.add(shield);
   b.shieldMesh = shield;
@@ -543,45 +777,92 @@ function insideBase(b,x,y,pad=0) {
 }
 
 /* ==================================================================
-   ENTITIES (player + bots)
+   ENTITY (Roblox-style blocky character)
    ================================================================== */
 function createEntityMesh(e) {
-  const group = new THREE.Group();
+  const root = new THREE.Group();
+  const body = new THREE.Group();
+  root.add(body);
 
-  const body = new THREE.Mesh(
-    new THREE.CapsuleGeometry(0.65, 1.2, 6, 14),
-    new THREE.MeshStandardMaterial({color:new THREE.Color(e.color), roughness:0.55, metalness:0.05})
-  );
-  body.position.y = 1.25;
-  group.add(body);
+  const skinMat  = new THREE.MeshStandardMaterial({color: new THREE.Color(e.color), roughness: 0.55, metalness: 0.05});
+  const sleeveMat = new THREE.MeshStandardMaterial({color: new THREE.Color(e.color).multiplyScalar(0.8), roughness: 0.55});
+  const pantsMat = new THREE.MeshStandardMaterial({color: 0x2a3450, roughness: 0.7});
+  const skinHeadMat = new THREE.MeshStandardMaterial({color: 0xffd6a8, roughness: 0.6});
+  const faceMat = new THREE.MeshStandardMaterial({
+    map: e.isPlayer ? faceHappyTex : faceEvilTex,
+    roughness: 0.6,
+  });
 
-  const head = new THREE.Sprite(new THREE.SpriteMaterial({
-    map:getEmojiTex(e.isPlayer ? '🙂' : '😈'),
-    depthTest:true, depthWrite:false,
-  }));
-  head.scale.set(1.0, 1.0, 1);
-  head.position.y = 2.75;
-  group.add(head);
+  // torso
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(1.15, 1.1, 0.6), skinMat);
+  torso.position.y = 1.45;
+  body.add(torso);
 
-  const nameTex = makeLabelTexture(e.name, e.isPlayer ? '#7dd3fc' : '#ffb3b3', 512, 96);
+  // head (with face on +Z)
+  const headMats = [
+    skinHeadMat, skinHeadMat, skinHeadMat, skinHeadMat, faceMat, skinHeadMat,
+  ];
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.92, 0.92), headMats);
+  head.position.y = 2.5;
+  body.add(head);
+
+  // legs
+  const legGeo = new THREE.BoxGeometry(0.36, 0.95, 0.42);
+  const legLPivot = new THREE.Group();
+  legLPivot.position.set(-0.29, 0.95, 0);
+  const legL = new THREE.Mesh(legGeo, pantsMat);
+  legL.position.y = -0.475;
+  legLPivot.add(legL);
+  body.add(legLPivot);
+
+  const legRPivot = new THREE.Group();
+  legRPivot.position.set(0.29, 0.95, 0);
+  const legR = new THREE.Mesh(legGeo, pantsMat);
+  legR.position.y = -0.475;
+  legRPivot.add(legR);
+  body.add(legRPivot);
+
+  // arms
+  const armGeo = new THREE.BoxGeometry(0.32, 1.0, 0.4);
+  const armLPivot = new THREE.Group();
+  armLPivot.position.set(-0.77, 1.9, 0);
+  const armL = new THREE.Mesh(armGeo, sleeveMat);
+  armL.position.y = -0.5;
+  armLPivot.add(armL);
+  body.add(armLPivot);
+
+  const armRPivot = new THREE.Group();
+  armRPivot.position.set(0.77, 1.9, 0);
+  const armR = new THREE.Mesh(armGeo, sleeveMat);
+  armR.position.y = -0.5;
+  armRPivot.add(armR);
+  body.add(armRPivot);
+
+  // name tag
+  const nameTex = makeLabelTexture(e.name, e.isPlayer ? '#7dd3fc' : '#ffb3b3', 512, 100);
   const nameSpr = new THREE.Sprite(new THREE.SpriteMaterial({
-    map:nameTex, depthTest:true, depthWrite:false,
+    map: nameTex, depthTest: true, depthWrite: false,
   }));
-  nameSpr.scale.set(2.7, 0.51, 1);
-  nameSpr.position.y = 4.0;
-  group.add(nameSpr);
+  nameSpr.scale.set(3.0, 0.59, 1);
+  nameSpr.position.y = 3.75;
+  root.add(nameSpr);
 
+  // blob shadow
   const shadow = new THREE.Mesh(
-    new THREE.CircleGeometry(0.95, 20),
-    new THREE.MeshBasicMaterial({color:0x000000, transparent:true, opacity:0.35, depthWrite:false})
+    new THREE.PlaneGeometry(2.2, 2.2),
+    new THREE.MeshBasicMaterial({map: blobTex, transparent:true, depthWrite:false})
   );
   shadow.rotation.x = -Math.PI/2;
-  shadow.position.y = 0.03;
-  group.add(shadow);
+  shadow.position.y = 0.02;
+  root.add(shadow);
 
-  group.position.set(s(e.x), 0, s(e.y));
-  scene.add(group);
-  e.mesh = group;
+  root.position.set(s(e.x), 0, s(e.y));
+  root.rotation.y = e.facing || 0;
+  scene.add(root);
+
+  e.mesh = root;
+  e.body = body;
+  e.limbs = { legL: legLPivot, legR: legRPivot, armL: armLPivot, armR: armRPivot };
 }
 
 function initBots() {
@@ -593,6 +874,7 @@ function initBots() {
       money:rand(400,6000), level:randi(1,6), stolen:0,
       wanderX:bases[i].x, wanderY:bases[i].y, wanderT:0,
       speed:rand(178,228), mesh:null,
+      _lx:bases[i].x, _ly:bases[i].y, walkPhase:0, facing:0,
     };
     createEntityMesh(bot);
     bots.push(bot);
@@ -601,7 +883,7 @@ function initBots() {
 }
 
 /* ==================================================================
-   PETS
+   PETS (pedestal + sprite + beam)
    ================================================================== */
 function petDef(p) { return PETS[p.sp]; }
 function petIncome(p) { return PETS[p.sp].i; }
@@ -613,7 +895,7 @@ function makePet(spId, baseId) {
     uid:++uidC, sp:spId, baseId, homeBase:baseId, carrier:null,
     x:rand(inn.x0,inn.x1), y:rand(inn.y0,inn.y1),
     tx:0, ty:0, wt:rand(0.5,2.5), bob:Math.random()*6.28,
-    sprite:null, glowSprite:null,
+    mesh:null, sprite:null, pedestal:null, ring:null, glow:null, beam:null,
   };
   p.tx = p.x; p.ty = p.y;
   return p;
@@ -621,22 +903,75 @@ function makePet(spId, baseId) {
 
 function createPetMesh(pet) {
   const def = PETS[pet.sp], rar = RARITY[def.r];
+  const rarIdx = RAR_ORDER.indexOf(def.r);
+  const col = new THREE.Color(rar.color);
+
+  const group = new THREE.Group();
+
+  // pedestal
+  const ped = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.85, 0.95, 0.7, 24),
+    new THREE.MeshStandardMaterial({
+      color: col, roughness: 0.35, metalness: 0.5,
+      emissive: col, emissiveIntensity: 0.28,
+    })
+  );
+  ped.position.y = 0.35;
+  group.add(ped);
+  pet.pedestal = ped;
+
+  // top white ring
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(0.78, 0.07, 8, 24),
+    new THREE.MeshBasicMaterial({color: 0xffffff})
+  );
+  ring.rotation.x = Math.PI / 2;
+  ring.position.y = 0.72;
+  group.add(ring);
+  pet.ring = ring;
+
+  // ground glow disc
+  const glowDisc = new THREE.Mesh(
+    new THREE.CircleGeometry(1.15, 24),
+    new THREE.MeshBasicMaterial({
+      color: col, transparent: true, opacity: 0.4,
+      depthWrite: false, blending: THREE.AdditiveBlending,
+    })
+  );
+  glowDisc.rotation.x = -Math.PI / 2;
+  glowDisc.position.y = 0.03;
+  group.add(glowDisc);
+  pet.glow = glowDisc;
+
+  // emoji sprite
   const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-    map:getEmojiTex(def.e), transparent:true, depthTest:true, depthWrite:false,
+    map: getEmojiTex(def.e), transparent: true, depthTest: true, depthWrite: false,
   }));
-  sprite.scale.set(1.55, 1.55, 1);
-  scene.add(sprite);
+  sprite.scale.set(1.7, 1.7, 1);
+  sprite.position.y = 1.85;
+  group.add(sprite);
   pet.sprite = sprite;
 
-  if (RAR_ORDER.indexOf(def.r) >= 2) {
-    const glow = new THREE.Sprite(new THREE.SpriteMaterial({
-      map:getGlowTex(rar.color), transparent:true, depthWrite:false,
-      blending:THREE.AdditiveBlending,
-    }));
-    glow.scale.set(2.5, 2.5, 1);
-    scene.add(glow);
-    pet.glowSprite = glow;
+  // light beam for rare+
+  if (rarIdx >= 2) {
+    const beamH = 8 + rarIdx * 1.5;
+    const beam = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.55, 0.85, beamH, 16, 1, true),
+      new THREE.MeshBasicMaterial({
+        color: col, transparent: true,
+        opacity: 0.10 + rarIdx * 0.04,
+        side: THREE.DoubleSide, depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      })
+    );
+    beam.position.y = 0.7 + beamH / 2;
+    group.add(beam);
+    pet.beam = beam;
   }
+
+  group.position.set(s(pet.x), 0, s(pet.y));
+  scene.add(group);
+  pet.mesh = group;
 }
 
 function addPet(spId, baseId) {
@@ -704,16 +1039,16 @@ function fmt(n) {
 }
 
 /* ==================================================================
-   FX
+   PARTICLES
    ================================================================== */
-const MAX_PARTS = 220;
+const MAX_PARTS = 240;
 const partGeo = new THREE.BufferGeometry();
 const partPositions = new Float32Array(MAX_PARTS * 3);
 const partColors = new Float32Array(MAX_PARTS * 3);
 partGeo.setAttribute('position', new THREE.BufferAttribute(partPositions, 3));
 partGeo.setAttribute('color', new THREE.BufferAttribute(partColors, 3));
 const partPoints = new THREE.Points(partGeo, new THREE.PointsMaterial({
-  size:0.55, vertexColors:true, transparent:true, opacity:0.95, depthWrite:false, sizeAttenuation:true,
+  size:0.6, vertexColors:true, transparent:true, opacity:0.95, depthWrite:false, sizeAttenuation:true,
 }));
 partPoints.frustumCulled = false;
 scene.add(partPoints);
@@ -762,7 +1097,6 @@ function updateParticles(dt) {
 /* floating DOM text */
 const floatersEl = document.getElementById('floaters');
 const floaters = [];
-
 function floatText3D(gx, gy, gz, text, color, size) {
   const el = document.createElement('div');
   el.className = 'floater';
@@ -772,7 +1106,6 @@ function floatText3D(gx, gy, gz, text, color, size) {
   floatersEl.appendChild(el);
   floaters.push({el, x:s(gx), y:gy || 2, z:s(gz), vy:2.2, life:1.2, max:1.2});
 }
-
 const _v = new THREE.Vector3();
 function updateFloaters(dt) {
   const W = window.innerWidth, H = window.innerHeight;
@@ -827,7 +1160,6 @@ if (isTouch) {
   document.getElementById('joy').style.display = 'block';
   document.getElementById('stealBtn').style.display = 'block';
 }
-
 const joy = document.getElementById('joy'), knob = document.getElementById('joyKnob');
 let joyActive = false, joyVec = {x:0, y:0};
 function joyPos(e) {
@@ -909,7 +1241,7 @@ function pickUpPet(pet) {
     owner.bot.chaseT = 16;
     owner.bot.target = player;
   }
-  floatText3D(player.x, 3, player.y, 'STEALING!', '#ffd75e', 18);
+  floatText3D(player.x, 3.5, player.y, 'STEALING!', '#ffd75e', 20);
   burst3D(pet.x, 1.5, pet.y, 16, RARITY[petDef(pet).r].color);
   toast('🫳 You grabbed ' + petDef(pet).n + '! Get home fast!', 'gold');
   playSound(660, 0.08, 'square', 0.05);
@@ -926,7 +1258,7 @@ function dropCarried(entity, returnHome) {
     pet.y = hb.y + rand(-90,90);
     pet.baseId = pet.homeBase;
     burst3D(pet.x, 1.5, pet.y, 18, '#f43f5e');
-    floatText3D(pet.x, 2.5, pet.y, 'RETURNED', '#ff8fa3', 16);
+    floatText3D(pet.x, 3, pet.y, 'RETURNED', '#ff8fa3', 16);
   }
 }
 
@@ -949,7 +1281,7 @@ function deliverPet() {
   S.stats.stolen++;
   addXP(18 + Math.floor(petIncome(pet)*0.25));
   burst3D(pet.x, 1.5, pet.y, 26, RARITY[petDef(pet).r].color);
-  floatText3D(pet.x, 2.5, pet.y, '+' + petDef(pet).n + '!', '#7dffb0', 18);
+  floatText3D(pet.x, 3, pet.y, '+' + petDef(pet).n + '!', '#7dffb0', 20);
   toast('✅ You stole ' + petDef(pet).n + '! +' + fmt(petIncome(pet)) + '/s', 'good');
   const owner = bases[pet.homeBase];
   if (owner.bot) { owner.bot.state = 'idle'; owner.bot.think = rand(4,9); }
@@ -973,6 +1305,8 @@ function playSound(freq, dur, type, vol) {
 /* ==================================================================
    UPDATE
    ================================================================== */
+let moneyFloaterTimer = 0;
+
 function updatePlayer(dt) {
   let dx = 0, dy = 0;
   if (keys['w'] || keys['arrowup'])    dy -= 1;
@@ -1178,6 +1512,17 @@ function update(dt) {
     b.money += bi*dt*(0.8 + Math.random()*0.05);
     b.level = Math.max(b.level, Math.min(60, Math.floor(Math.sqrt(b.money)/40) + 1));
   }
+
+  // money floaters above player's pets
+  moneyFloaterTimer -= dt;
+  if (moneyFloaterTimer <= 0 && inc > 0) {
+    moneyFloaterTimer = 0.9;
+    const myPetList = pets.filter(p => p.baseId === 0 && !p.carrier);
+    if (myPetList.length) {
+      const pet = pick(myPetList);
+      floatText3D(pet.x, 3.2, pet.y, '+$' + fmt(petIncome(pet) * incomeMult()), '#7dffb0', 14);
+    }
+  }
 }
 
 /* ==================================================================
@@ -1186,27 +1531,71 @@ function update(dt) {
 const stealBar = document.getElementById('stealBar');
 const stealBarFill = document.getElementById('stealBarFill');
 
-function updateEntityMesh(e) {
+function updateEntityVisual(e, dt) {
   if (!e.mesh) return;
+
+  const dx = e.x - e._lx;
+  const dy = e.y - e._ly;
+  const moved = Math.hypot(dx, dy);
+  e._lx = e.x; e._ly = e.y;
+
+  if (moved > 0.3) {
+    e.walkPhase = (e.walkPhase || 0) + dt * 11;
+    e.facing = Math.atan2(dx, dy);
+  } else {
+    e.walkPhase = lerp(e.walkPhase || 0, 0, Math.min(1, dt * 8));
+  }
+
   e.mesh.position.set(s(e.x), 0, s(e.y));
+
+  // smooth rotation toward facing
+  if (e.facing !== undefined) {
+    let diff = e.facing - e.mesh.rotation.y;
+    while (diff > Math.PI) diff -= Math.PI * 2;
+    while (diff < -Math.PI) diff += Math.PI * 2;
+    e.mesh.rotation.y += diff * Math.min(1, dt * 14);
+  }
+
+  // limb swing
+  if (e.limbs) {
+    const sw = Math.sin(e.walkPhase || 0) * 0.65;
+    e.limbs.legL.rotation.x = sw;
+    e.limbs.legR.rotation.x = -sw;
+    e.limbs.armL.rotation.x = -sw * 0.75;
+    e.limbs.armR.rotation.x = sw * 0.75;
+    // subtle vertical bob
+    e.body.position.y = Math.abs(Math.sin((e.walkPhase || 0) * 2)) * 0.06;
+  }
+
+  // carried pet float
+  if (e.carrying && e.carrying.mesh) {
+    e.carrying.mesh.position.set(
+      s(e.x),
+      3.2 + Math.sin(T * 6) * 0.18,
+      s(e.y)
+    );
+  }
 }
 
-function updatePetMesh(pet, dt) {
-  if (!pet.sprite) return;
-  let sx, sy, sz;
+function updatePetVisual(pet, dt) {
+  if (!pet.mesh) return;
   if (pet.carrier) {
-    sx = s(pet.carrier.x);
-    sz = s(pet.carrier.y);
-    sy = 5.2 + Math.sin(T*4)*0.1;
+    pet.pedestal.visible = false;
+    pet.ring.visible = false;
+    pet.glow.visible = false;
+    if (pet.beam) pet.beam.visible = false;
+    pet.sprite.position.y = 0;
   } else {
-    sx = s(pet.x);
-    sz = s(pet.y);
-    sy = 1.35 + Math.sin(pet.bob)*0.22;
-  }
-  pet.sprite.position.set(sx, sy, sz);
-  if (pet.glowSprite) {
-    pet.glowSprite.position.set(sx, sy, sz);
-    pet.glowSprite.material.opacity = 0.55 + 0.2*Math.sin(T*3 + pet.uid);
+    pet.pedestal.visible = true;
+    pet.ring.visible = true;
+    pet.glow.visible = true;
+    if (pet.beam) pet.beam.visible = true;
+    pet.mesh.position.set(s(pet.x), 0, s(pet.y));
+    pet.sprite.position.y = 1.85 + Math.sin(pet.bob) * 0.15;
+    // ring pulse
+    const rarIdx = RAR_ORDER.indexOf(petDef(pet).r);
+    pet.ring.scale.setScalar(1 + Math.sin(T*3 + pet.uid) * 0.08);
+    pet.glow.material.opacity = 0.3 + Math.sin(T*3 + pet.uid) * 0.12 + rarIdx * 0.03;
   }
 }
 
@@ -1216,521 +1605,24 @@ function render(dt) {
   const k = 1 - Math.pow(0.0015, dt);
   camPos.x = lerp(camPos.x, tx, k);
   camPos.z = lerp(camPos.z, tz, k);
-  camera.position.set(camPos.x, 26, camPos.z + 22);
-  camera.lookAt(camPos.x, 0, camPos.z);
+  camera.position.set(camPos.x, 28, camPos.z + 22);
+  camera.lookAt(camPos.x, 0.5, camPos.z);
 
-  updateEntityMesh(player);
-  for (const b of bots) updateEntityMesh(b);
-  for (const p of pets) updatePetMesh(p, dt);
+  updateEntityVisual(player, dt);
+  for (const b of bots) updateEntityVisual(b, dt);
+  for (const p of pets) updatePetVisual(p, dt);
 
   for (const b of bases) {
     if (b.shieldMesh) b.shieldMesh.visible = b.shieldUntil > NOW;
   }
 
-  // steal progress bar above pet
+  // steal progress bar
   if (player.stealTarget && player.stealProgress > 0.02) {
     const t = player.stealTarget;
-    _v.set(s(t.x), 2.6, s(t.y)).project(camera);
+    _v.set(s(t.x), 3.0, s(t.y)).project(camera);
     if (_v.z < 1) {
       stealBar.style.display = 'block';
       const sx = (_v.x*0.5 + 0.5)*window.innerWidth;
       const sy = (-_v.y*0.5 + 0.5)*window.innerHeight;
       stealBar.style.transform = `translate(${sx}px,${sy}px) translate(-50%,-50%)`;
-      stealBarFill.style.width = (player.stealProgress*100) + '%';
-    } else {
-      stealBar.style.display = 'none';
-    }
-  } else {
-    stealBar.style.display = 'none';
-  }
-
-  renderer.render(scene, camera);
-}
-
-/* ==================================================================
-   HUD
-   ================================================================== */
-let hudT = 0;
-function updateHUD(dt) {
-  hudT -= dt;
-  if (hudT > 0) return;
-  hudT = 0.1;
-  document.getElementById('uiMoney').textContent = fmt(S.money);
-  document.getElementById('uiIncome').textContent = fmt(income());
-  document.getElementById('uiLevel').textContent = S.level;
-  document.getElementById('uiXP').style.width = clamp(S.xp/xpNeeded(S.level)*100, 0, 100) + '%';
-  document.getElementById('uiSpeed').textContent = 'Lv ' + S.sp.speed;
-  document.getElementById('uiStr').textContent = 'Lv ' + S.sp.strength;
-  document.getElementById('uiPets').textContent = myPets() + ' / ' + capacity();
-  const wi = Math.min(WORLDS.length-1, Math.floor(S.waves/WAVES_PER_WORLD));
-  document.getElementById('uiWorld').textContent = (wi+1) + ' · W' + ((S.waves % WAVES_PER_WORLD)+1);
-  document.getElementById('uiReb').textContent = S.rebirths;
-}
-
-/* ==================================================================
-   PANELS
-   ================================================================== */
-const panel = document.getElementById('panel');
-const panelBody = document.getElementById('panelBody');
-const panelTitle = document.getElementById('panelTitle');
-let currentPanel = null;
-
-document.getElementById('panelClose').onclick = closePanel;
-panel.addEventListener('click', e => { if (e.target.id === 'panel') closePanel(); });
-document.querySelectorAll('#dock button').forEach(btn => {
-  btn.onclick = () => openPanel(btn.dataset.panel);
-});
-function closePanel() { panel.classList.remove('open'); currentPanel = null; }
-function openPanel(name) { currentPanel = name; panel.classList.add('open'); renderPanel(); }
-function renderPanel() {
-  if (!currentPanel) return;
-  if (currentPanel === 'shop') renderShop();
-  else if (currentPanel === 'eggs') renderEggs();
-  else if (currentPanel === 'pets') renderPets();
-  else if (currentPanel === 'waves') renderWaves();
-  else if (currentPanel === 'board') renderBoard();
-  else if (currentPanel === 'rebirth') renderRebirth();
-}
-
-function renderShop() {
-  panelTitle.textContent = '🛒 Upgrade Shop';
-  let html = '<div class="grid g2">';
-  for (const key in UPGRADES) {
-    const u = UPGRADES[key], lvl = S.sp[key], maxed = lvl >= u.max;
-    const cost = upgCost(key);
-    const can = !maxed && S.money >= cost;
-    html += `<div class="card">
-      <div class="ct">${u.emoji} ${u.name} <span style="margin-left:auto;color:#7dffb0;font-size:12px">Lv ${lvl}/${u.max}</span></div>
-      <div class="cd">${u.desc}</div>
-      <div class="btnrow">
-        <button class="btn" data-upg="${key}" ${maxed || !can ? 'disabled' : ''}>
-          ${maxed ? '✅ MAXED' : 'Upgrade — 💰 ' + fmt(cost)}
-        </button>
-      </div>
-    </div>`;
-  }
-  html += '</div>';
-  html += `<h3 class="sec">Stats</h3>
-  <div class="card"><div class="cd" style="min-height:0;font-size:13px;line-height:1.8">
-    ⚡ Power Score: <b style="color:#ffd75e">${Math.floor(power())}</b><br>
-    👟 Move Speed: <b>${SPEEDS[S.sp.speed-1]} u/s</b><br>
-    🫳 Steal Time: <b>${stealTime().toFixed(2)}s</b><br>
-    💵 Income Multiplier: <b>×${incomeMult().toFixed(2)}</b><br>
-    📦 Capacity: <b>${capacity()} pets</b>
-  </div></div>`;
-  panelBody.innerHTML = html;
-  panelBody.querySelectorAll('[data-upg]').forEach(b => {
-    b.onclick = () => {
-      const k = b.dataset.upg;
-      const c = upgCost(k);
-      if (S.money < c) return;
-      S.money -= c; S.sp[k]++;
-      burst3D(player.x, 2, player.y, 18, '#7dffb0');
-      toast('⬆️ ' + UPGRADES[k].name + ' upgraded to Lv ' + S.sp[k] + '!', 'good');
-      playSound(880, 0.09, 'square', 0.05);
-      renderShop(); save();
-    };
-  });
-}
-
-function renderEggs() {
-  panelTitle.textContent = '🥚 Egg Shop';
-  let html = '<div class="dim" style="margin-bottom:14px">Hatch eggs to discover new pets. Rare pets generate way more money per second!</div><div class="grid g2">';
-  for (const egg of EGGS) {
-    const can = S.money >= egg.cost;
-    const odds = Object.entries(egg.w).map(([r,v]) =>
-      `<span style="color:${RARITY[r].color}">${RARITY[r].name} ${v}%</span>`).join(' · ');
-    html += `<div class="card">
-      <div class="ct">${egg.emoji} ${egg.name}</div>
-      <div class="cd">${odds}</div>
-      <div class="btnrow">
-        <button class="btn gold" data-egg="${egg.id}" ${can ? '' : 'disabled'}>
-          ${can ? 'Open — 💰 ' + fmt(egg.cost) : 'Need 💰 ' + fmt(egg.cost)}
-        </button>
-      </div>
-    </div>`;
-  }
-  html += '</div>';
-  panelBody.innerHTML = html;
-  panelBody.querySelectorAll('[data-egg]').forEach(b => {
-    b.onclick = () => openEgg(b.dataset.egg);
-  });
-}
-
-function rollEgg(egg) {
-  const total = Object.values(egg.w).reduce((a,b) => a+b, 0);
-  let r = Math.random()*total, chosen = null;
-  for (const k in egg.w) { r -= egg.w[k]; if (r <= 0) { chosen = k; break; } }
-  if (!chosen) chosen = Object.keys(egg.w)[0];
-  const pool = PETS.map((p,i) => ({p,i})).filter(o => o.p.r === chosen);
-  return pick(pool).i;
-}
-
-function openEgg(eggId) {
-  const egg = EGGS.find(e => e.id === eggId);
-  if (!egg || S.money < egg.cost) return;
-  S.money -= egg.cost;
-  S.stats.eggs++;
-
-  panelTitle.textContent = '🥚 Hatching...';
-  panelBody.innerHTML = `<div class="center" style="padding:26px 0">
-    <div class="bigpet shake" style="font-size:96px">🥚</div>
-    <div class="dim" style="margin-top:16px">Cracking open your ${egg.name}...</div>
-  </div>`;
-
-  setTimeout(() => {
-    const sp = rollEgg(egg);
-    const def = PETS[sp], rar = RARITY[def.r];
-    addPet(sp, 0);
-    S.collection[sp] = (S.collection[sp] || 0) + 1;
-    addXP(10 + RAR_ORDER.indexOf(def.r)*22);
-
-    panelBody.innerHTML = `<div class="center" style="padding:18px 0">
-      <div class="bigpet">${def.e}</div>
-      <div style="font-size:22px;font-weight:bold;margin-top:12px;color:${rar.color};text-shadow:0 0 22px ${rar.color}">${def.n}</div>
-      <div style="font-size:13px;font-weight:bold;letter-spacing:2px;color:${rar.color};margin-top:4px">${rar.name.toUpperCase()}</div>
-      <div style="font-size:16px;font-weight:bold;color:#7dffb0;margin-top:10px">💵 +${fmt(def.i)}/sec</div>
-      <div class="btnrow" style="max-width:260px;margin:22px auto 0">
-        <button class="btn gold" id="hatchAgain">Hatch Another — 💰 ${fmt(egg.cost)}</button>
-      </div>
-      <div class="btnrow" style="max-width:260px;margin:10px auto 0">
-        <button class="btn blue" id="backToEggs">Back to Eggs</button>
-      </div>
-    </div>`;
-
-    const t = document.getElementById('hatchAgain');
-    if (t) t.disabled = S.money < egg.cost;
-    if (t) t.onclick = () => openEgg(eggId);
-    document.getElementById('backToEggs').onclick = () => renderEggs();
-
-    burst3D(player.x, 2, player.y, 30, rar.color);
-    if (RAR_ORDER.indexOf(def.r) >= 4) {
-      toast('✨ WOW! You hatched a ' + rar.name + ' ' + def.n + '!', 'epic');
-      playSound(1046, 0.2, 'sine', 0.07);
-      setTimeout(() => playSound(1318, 0.25, 'sine', 0.07), 140);
-    } else {
-      toast('🥚 Hatched ' + def.n + ' (' + rar.name + ')', 'good');
-      playSound(660, 0.1, 'sine', 0.05);
-    }
-    save();
-  }, 950);
-}
-
-function renderPets() {
-  panelTitle.textContent = '🐾 My Pets';
-  const mine = pets.filter(p => p.baseId === 0);
-  let html = `<div class="dim" style="margin-bottom:12px">
-    Base capacity: <b style="color:#ffd75e">${mine.length} / ${capacity()}</b> ·
-    Total income: <b style="color:#7dffb0">💰 ${fmt(income())}/sec</b></div>`;
-
-  if (mine.length === 0) {
-    html += '<div class="card center" style="padding:34px"><div style="font-size:44px">🫥</div>' +
-            '<div class="dim" style="margin-top:10px">No pets yet! Buy an egg or steal one.</div></div>';
-  } else {
-    const sorted = mine.slice().sort((a,b) => petIncome(b) - petIncome(a));
-    html += '<div class="petgrid">';
-    for (const p of sorted) {
-      const d = petDef(p), r = RARITY[d.r];
-      html += `<div class="petcell" style="border-color:${r.color}55">
-        <div class="pe">${d.e}</div>
-        <div class="pn" title="${d.n}">${d.n}</div>
-        <div class="pi">${fmt(d.i)}/s</div>
-        <div class="pr" style="color:${r.color}">${r.name.toUpperCase()}</div>
-      </div>`;
-    }
-    html += '</div>';
-  }
-
-  const found = Object.keys(S.collection).length;
-  html += `<h3 class="sec">Collection Index — ${found} / ${PETS.length}</h3><div class="petgrid">`;
-  for (let i = 0; i < PETS.length; i++) {
-    const d = PETS[i], r = RARITY[d.r];
-    const owned = (S.collection[i] || 0) > 0;
-    html += `<div class="petcell" style="${owned ? 'border-color:' + r.color + '66' : 'opacity:.3'}">
-      <div class="pe">${owned ? d.e : '❓'}</div>
-      <div class="pn">${owned ? d.n : '???'}</div>
-      <div class="pr" style="color:${r.color}">${owned ? r.name.toUpperCase() : '—'}</div>
-    </div>`;
-  }
-  html += '</div>';
-  panelBody.innerHTML = html;
-}
-
-function waveRequirement(g) { return 12 + g*20; }
-
-function renderWaves() {
-  panelTitle.textContent = '🌍 Challenge Worlds';
-  const g = S.waves;
-  const wi = Math.min(WORLDS.length-1, Math.floor(g/WAVES_PER_WORLD));
-  const wIn = g % WAVES_PER_WORLD;
-  const req = waveRequirement(g);
-  const p = power();
-  const can = p >= req;
-  const allDone = g >= WORLDS.length * WAVES_PER_WORLD;
-
-  let html = `<div class="card" style="margin-bottom:14px">
-    <div class="ct">${WORLDS[wi].emoji} ${WORLDS[wi].name}
-      <span style="margin-left:auto;font-size:12px;color:#7dffb0">Wave ${wIn+1}/${WAVES_PER_WORLD}</span></div>
-    <div class="cd" style="min-height:0">
-      Required Power: <b style="color:#ffd75e">${req}</b> &nbsp;·&nbsp;
-      Your Power: <b style="color:${can ? '#7dffb0' : '#ff8fa3'}">${Math.floor(p)}</b><br>
-      ${allDone ? '👑 All 50 waves cleared! Endless mode active.' : 'Reward: 💰 ' + fmt(Math.floor(180*Math.pow(1.32,g))) + ' + XP'}
-    </div>
-    <div class="btnrow">
-      <button class="btn gold" id="attemptWave" ${can ? '' : 'disabled'}>
-        ${can ? '▶ ATTEMPT WAVE' : '🔒 Need ' + Math.ceil(req) + ' Power'}
-      </button>
-    </div>
-  </div>`;
-
-  html += '<h3 class="sec">Worlds</h3><div class="grid g2">';
-  for (let i = 0; i < WORLDS.length; i++) {
-    const w = WORLDS[i];
-    const cleared = clamp(g - i*WAVES_PER_WORLD, 0, WAVES_PER_WORLD);
-    const locked = (i*WAVES_PER_WORLD) > g;
-    html += `<div class="card" style="${locked ? 'opacity:.45' : ''}">
-      <div class="ct">${w.emoji} ${w.name}</div>
-      <div class="cd" style="min-height:0">${locked ? '🔒 Locked' : 'Progress: ' + cleared + ' / ' + WAVES_PER_WORLD + ' waves'}</div>
-      <div style="height:9px;background:#0a1220;border-radius:6px;margin-top:8px;overflow:hidden">
-        <div style="height:100%;width:${cleared/WAVES_PER_WORLD*100}%;background:linear-gradient(90deg,#38bdf8,#a855f7)"></div></div>
-    </div>`;
-  }
-  html += '</div>';
-  panelBody.innerHTML = html;
-  const btn = document.getElementById('attemptWave');
-  if (btn && can) btn.onclick = () => runWave();
-}
-
-function runWave() {
-  const g = S.waves;
-  if (power() < waveRequirement(g)) return;
-  const isBoss = (g % WAVES_PER_WORLD) === WAVES_PER_WORLD - 1;
-
-  panelTitle.textContent = isBoss ? '⚔️ BOSS WAVE' : '🏁 Wave Race';
-  panelBody.innerHTML = `<div class="center" style="padding:6px 0 0">
-    <div class="dim" style="margin-bottom:10px">${WORLDS[Math.min(9, Math.floor(g/5))].emoji} ${WORLDS[Math.min(9, Math.floor(g/5))].name} — Wave ${(g%5)+1}</div>
-    <div class="race">
-      <div class="raceTrack"><div class="raceFill" id="rMe"></div><span class="raceLabel">YOU</span></div>
-      <div class="raceTrack"><div class="raceFill rival" id="rBot"></div><span class="raceLabel">RIVAL</span></div>
-    </div>
-    <div class="dim" id="raceMsg">Racing...</div>
-  </div>`;
-
-  const meEl = document.getElementById('rMe');
-  const botEl = document.getElementById('rBot');
-  const myDur = 1400 - S.sp.speed*140 - S.sp.strength*40;
-  const botDur = myDur + rand(-140, 320);
-  const t0 = performance.now();
-
-  function step() {
-    const el = performance.now() - t0;
-    const a = clamp(el/myDur, 0, 1);
-    const b = clamp(el/botDur, 0, 1);
-    if (meEl) meEl.style.width = (a*100) + '%';
-    if (botEl) botEl.style.width = (b*100) + '%';
-    if (a >= 1 || b >= 1) { finishWave(g, isBoss, a >= b); return; }
-    requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
-function finishWave(g, isBoss, won) {
-  const reward = Math.floor(180*Math.pow(1.32, g));
-  const xp = 30 + g*12;
-  S.waves++;
-  S.stats.waves++;
-  S.money += reward;
-  S.totalEarned += reward;
-  addXP(xp);
-
-  let extraHtml = '';
-  if (isBoss) {
-    const tier = clamp(Math.floor(g/5), 0, EGGS.length-1);
-    const egg = EGGS[tier];
-    const sp = rollEgg(egg);
-    addPet(sp, 0);
-    S.collection[sp] = (S.collection[sp] || 0) + 1;
-    const d = PETS[sp], r = RARITY[d.r];
-    extraHtml = `<div class="bigpet" style="margin-top:16px">${d.e}</div>
-      <div style="font-weight:bold;font-size:17px;color:${r.color};margin-top:6px">${d.n}</div>
-      <div style="font-size:11px;letter-spacing:2px;color:${r.color}">${r.name.toUpperCase()} — BOSS REWARD</div>`;
-    toast('👑 Boss defeated! You earned a ' + r.name + ' ' + d.n + '!', 'epic');
-    playSound(1046, 0.22, 'sine', 0.07);
-  } else {
-    toast('🏁 Wave cleared! +💰' + fmt(reward) + ' +' + xp + ' XP', 'good');
-    playSound(784, 0.12, 'square', 0.05);
-  }
-  burst3D(player.x, 2, player.y, 26, '#ffd75e');
-
-  panelBody.innerHTML = `<div class="center" style="padding:14px 0">
-    <div style="font-size:46px">🏆</div>
-    <div style="font-size:20px;font-weight:bold;color:#ffd75e;margin-top:8px">WAVE CLEARED!</div>
-    <div style="font-size:14px;color:#7dffb0;margin-top:8px">+💰 ${fmt(reward)} &nbsp; +${xp} XP</div>
-    ${extraHtml}
-    <div class="btnrow" style="max-width:280px;margin:22px auto 0">
-      <button class="btn gold" id="nextWave">Continue</button>
-    </div>
-  </div>`;
-  const nb = document.getElementById('nextWave');
-  if (nb) nb.onclick = () => renderWaves();
-  save();
-}
-
-function renderBoard() {
-  panelTitle.textContent = '🏆 Leaderboard';
-  const rows = leaderboardData();
-  const cats = [
-    {key:'money', label:'💰 Richest Players', fmtv:v => '💰 ' + fmt(v)},
-    {key:'stolen', label:'🫳 Most Pets Stolen', fmtv:v => v + ' pets'},
-    {key:'level', label:'⭐ Highest Level', fmtv:v => 'Lv ' + v},
-    {key:'waves', label:'🌍 Most Waves', fmtv:v => v + ' waves'},
-  ];
-  let html = '';
-  for (const c of cats) {
-    const sorted = rows.slice().sort((a,b) => b[c.key] - a[c.key]).slice(0, 8);
-    html += `<h3 class="sec">${c.label}</h3>`;
-    sorted.forEach((r, i) => {
-      html += `<div class="lbrow ${r.me ? 'me' : ''}">
-        <span class="lbrank">#${i+1}</span>
-        <span style="width:9px;height:9px;border-radius:50%;background:${r.color};flex:none"></span>
-        <span class="lbname">${r.name}</span>
-        <span class="lbval">${c.fmtv(r[c.key])}</span>
-      </div>`;
-    });
-  }
-  html += `<h3 class="sec">Your Career</h3>
-  <div class="card"><div class="cd" style="min-height:0;line-height:1.9;font-size:13px">
-    🫳 Pets stolen: <b>${S.stats.stolen}</b><br>
-    💔 Pets lost: <b>${S.stats.lost}</b><br>
-    🥚 Eggs hatched: <b>${S.stats.eggs}</b><br>
-    🌍 Waves cleared: <b>${S.stats.waves}</b><br>
-    ♻️ Rebirths: <b>${S.rebirths}</b><br>
-    💰 Lifetime earnings: <b>${fmt(S.totalEarned)}</b>
-  </div></div>`;
-  panelBody.innerHTML = html;
-}
-
-function renderRebirth() {
-  panelTitle.textContent = '♻️ Rebirth';
-  const reqLevel = 20, reqMoney = 500000;
-  const can = S.level >= reqLevel && S.money >= reqMoney;
-  panelBody.innerHTML = `<div class="center" style="padding:10px 0">
-    <div style="font-size:54px">♻️</div>
-    <div style="font-size:18px;font-weight:bold;color:#c78bff;margin-top:8px">Rebirth ${S.rebirths+1}</div>
-    <div class="dim" style="margin-top:12px;max-width:420px;margin-left:auto;margin-right:auto;text-align:left">
-      <b style="color:#fff">Requirements:</b><br>
-      ⭐ Level ${reqLevel} — <span style="color:${S.level >= reqLevel ? '#7dffb0' : '#ff8fa3'}">you are Lv ${S.level}</span><br>
-      💰 ${fmt(reqMoney)} — <span style="color:${S.money >= reqMoney ? '#7dffb0' : '#ff8fa3'}">you have ${fmt(S.money)}</span>
-      <br><br>
-      <b style="color:#fff">Rewards:</b><br>
-      ✅ Permanent <b style="color:#ffd75e">+35% income</b> per rebirth<br>
-      ✅ <b style="color:#ffd75e">+120 Power</b> for challenges<br>
-      ✅ One free <b style="color:#f43f5e">Mythic-or-better</b> pet<br>
-      ✅ Keeps all your pets!<br><br>
-      <b style="color:#fff">Resets:</b><br>
-      ❌ Money goes back to 💰 200<br>
-      ❌ All upgrades reset to Level 1
-    </div>
-    <div class="btnrow" style="max-width:300px;margin:22px auto 0">
-      <button class="btn purple" id="doRebirth" ${can ? '' : 'disabled'}>
-        ${can ? '♻️ REBIRTH NOW' : '🔒 Requirements not met'}
-      </button>
-    </div>
-    <div class="dim" style="margin-top:14px">Current income multiplier: <b style="color:#7dffb0">×${incomeMult().toFixed(2)}</b></div>
-  </div>`;
-  const b = document.getElementById('doRebirth');
-  if (b && can) b.onclick = () => {
-    S.rebirths++;
-    S.money = 200;
-    S.level = 1; S.xp = 0;
-    for (const k in S.sp) S.sp[k] = 1;
-    const pool = PETS.map((p,i) => ({p,i})).filter(o => RAR_ORDER.indexOf(o.p.r) >= 5);
-    const sp = pick(pool).i;
-    addPet(sp, 0);
-    S.collection[sp] = (S.collection[sp] || 0) + 1;
-    const d = PETS[sp], r = RARITY[d.r];
-    burst3D(player.x, 2, player.y, 50, '#c78bff');
-    toast('♻️ REBIRTH ' + S.rebirths + '! You got a ' + r.name + ' ' + d.n + '!', 'epic');
-    playSound(523, 0.15, 'sine', 0.07);
-    setTimeout(() => playSound(784, 0.2, 'sine', 0.07), 150);
-    setTimeout(() => playSound(1046, 0.3, 'sine', 0.07), 300);
-    renderRebirth(); save();
-  };
-}
-
-/* ==================================================================
-   BOT PETS
-   ================================================================== */
-function spawnBotPets() {
-  for (let i = 1; i < 8; i++) {
-    const n = randi(3, 5);
-    const pool = RAR_ORDER.slice(0, 3);
-    for (let k = 0; k < n; k++) {
-      const rar = pick(pool);
-      const options = PETS.map((p,idx) => ({p,idx})).filter(o => o.p.r === rar);
-      if (options.length) addPet(pick(options).idx, i);
-    }
-  }
-}
-
-/* ==================================================================
-   NEW GAME
-   ================================================================== */
-function newGame() {
-  S.money = 120; S.totalEarned = 0; S.xp = 0; S.level = 1;
-  for (const k in S.sp) S.sp[k] = 1;
-  S.collection = {}; S.waves = 0; S.rebirths = 0;
-  S.stats = {stolen:0, lost:0, eggs:0, waves:0};
-  bases[0].shieldUntil = 0;
-  addPet(0, 0);
-  S.collection[0] = 1;
-  setTimeout(() => {
-    toast('🐾 Welcome to STEAL THE PETS 3D!', 'gold');
-    setTimeout(() => toast('Steal pets from other bases and bring them home!', ''), 2200);
-    setTimeout(() => toast('Hold [E] near a pet to steal it. Good luck!', 'good'), 4600);
-  }, 500);
-}
-
-/* ==================================================================
-   BOOT
-   ================================================================== */
-function boot() {
-  makeBases();
-  initBots();
-  createEntityMesh(player);
-
-  const loaded = load();
-  spawnBotPets();
-  if (!loaded) newGame();
-
-  camPos.x = player.x * SCALE;
-  camPos.z = player.y * SCALE;
-  camera.position.set(camPos.x, 26, camPos.z + 22);
-  camera.lookAt(camPos.x, 0, camPos.z);
-
-  window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
-
-  setInterval(save, 8000);
-  window.addEventListener('beforeunload', save);
-
-  let last = performance.now();
-  function loop(now) {
-    const dt = Math.min(0.05, (now - last)/1000);
-    last = now;
-    update(dt);
-    render(dt);
-    updateHUD(dt);
-    requestAnimationFrame(loop);
-  }
-  requestAnimationFrame(loop);
-  window.__gameStarted = true;
-}
-
-boot();
-</script>
-</body>
-</html>
+      stealBarFill.style.width = (player.steal
