@@ -8,7 +8,7 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:#0b1220;
   font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;user-select:none;color:#fff}
-canvas{display:block;position:absolute;inset:0}
+canvas{display:block;position:absolute;inset:0;touch-action:none}
 #ui{position:absolute;inset:0;pointer-events:none;z-index:10}
 #ui > *{pointer-events:none}
 
@@ -120,11 +120,16 @@ canvas{display:block;position:absolute;inset:0}
 #joyKnob{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;
   border-radius:50%;background:radial-gradient(circle at 35% 30%,#9fd0ff,#3b7fc4);
   box-shadow:0 4px 14px rgba(0,0,0,.5)}
-#stealBtn{position:absolute;right:22px;bottom:150px;width:96px;height:96px;border-radius:50%;
-  background:radial-gradient(circle at 35% 30%,#ffe27a,#e8a03a);border:3px solid #fff3c4;
-  color:#231a00;font-family:inherit;font-weight:bold;font-size:14px;pointer-events:auto;
-  display:none;touch-action:none;box-shadow:0 6px 20px rgba(255,200,60,.5);z-index:99}
-#stealBtn:active{transform:scale(.94)}
+
+/* Action Buttons (Bottom Right, shifted left so dock is visible) */
+#actionBtns{position:absolute;right:150px;bottom:22px;display:flex;flex-direction:column;gap:12px;z-index:99}
+#actionBtns button{width:86px;height:86px;border-radius:50%;border:3px solid #fff;
+  font-family:inherit;font-weight:bold;font-size:14px;touch-action:none;
+  box-shadow:0 6px 20px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;text-align:center}
+#actionBtns button:active{transform:scale(.92)}
+
+#stealBtn{background:radial-gradient(circle at 35% 30%,#ffe27a,#e8a03a);border-color:#fff3c4;color:#231a00;display:none}
+#shieldBtn{background:radial-gradient(circle at 35% 30%,#7dd3fc,#0ea5e9);border-color:#bae6fd;color:#04121c}
 
 .race{margin:10px 0}
 .raceTrack{height:26px;background:#0a1220;border-radius:9px;position:relative;overflow:hidden;
@@ -188,7 +193,11 @@ h3.sec:first-child{margin-top:0}
   </div>
 
   <div id="joy"><div id="joyKnob"></div></div>
-  <button id="stealBtn">STEAL</button>
+
+  <div id="actionBtns">
+    <button id="shieldBtn">🛡️<br>Shield</button>
+    <button id="stealBtn">STEAL</button>
+  </div>
 
   <div id="panel">
     <div class="sheet">
@@ -309,7 +318,14 @@ const player = {
   stealProgress:0, stealTarget:null, mesh:null,
   _lx:CX, _ly:CY+RING+260, walkPhase:0, facing:Math.PI,
 };
-const camPos = { x: player.x*SCALE, z: player.y*SCALE };
+
+// Camera controls (Roblox Style)
+let cameraYaw = Math.PI; // Horizontal angle
+let cameraPitch = 0.35;  // Vertical angle
+let isDraggingCam = false;
+let prevMouse = { x: 0, y: 0 };
+const camDistance = 22;
+const camPos = new THREE.Vector3(player.x * SCALE, 10, player.y * SCALE);
 
 /* ==================================================================
    THREE.JS SETUP
@@ -494,7 +510,7 @@ const faceHappyTex = makeFaceTexture('happy');
 const faceEvilTex  = makeFaceTexture('evil');
 
 /* ==================================================================
-   GROUND
+   GROUND & DECORATIONS
    ================================================================== */
 (function buildGround() {
   const c = document.createElement('canvas');
@@ -568,9 +584,6 @@ const faceEvilTex  = makeFaceTexture('evil');
   scene.add(fTop);
 })();
 
-/* ==================================================================
-   DECORATIONS
-   ================================================================== */
 function addDecorations() {
   const treeFoliageMat = new THREE.MeshStandardMaterial({color:0x2e8b57, roughness:0.85});
   const treeFoliage2Mat = new THREE.MeshStandardMaterial({color:0x37a066, roughness:0.85});
@@ -610,28 +623,10 @@ function addDecorations() {
     }
     placed++;
   }
-
-  for (let i = 0; i < 8; i++) {
-    const ang = i * Math.PI*2/8;
-    const x = CX + Math.cos(ang) * 460;
-    const y = CY + Math.sin(ang) * 460;
-    const post = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.15, 0.2, 5, 6),
-      new THREE.MeshStandardMaterial({color:0x2a3442, roughness:0.6, metalness:0.5})
-    );
-    post.position.set(s(x), 2.5, s(y));
-    scene.add(post);
-    const bulb = new THREE.Mesh(
-      new THREE.SphereGeometry(0.5, 10, 8),
-      new THREE.MeshBasicMaterial({color:0xffe27a})
-    );
-    bulb.position.set(s(x), 5.2, s(y));
-    scene.add(bulb);
-  }
 }
 
 /* ==================================================================
-   BASES
+   BASES (Walls + Floor)
    ================================================================== */
 function makeBases() {
   for (let i = 0; i < 8; i++) {
@@ -654,6 +649,7 @@ function createBaseMesh(b) {
   const col = new THREE.Color(b.color);
   const floorColor = b.isPlayer ? 0x2a4a72 : 0x3a2a5a;
 
+  // Floor
   const platform = new THREE.Mesh(
     new THREE.BoxGeometry(w + 1.6, 0.6, d + 1.6),
     new THREE.MeshStandardMaterial({color:0x1a2030, roughness:0.85})
@@ -671,68 +667,59 @@ function createBaseMesh(b) {
   top.position.set(sx, 0.73, sz);
   scene.add(top);
 
+  // Walls (Back, Left, Right)
+  const wallMat = new THREE.MeshStandardMaterial({color: 0x222a35, roughness:0.8});
+  const wallH = 6;
+  
+  // Back wall
+  const backWall = new THREE.Mesh(new THREE.BoxGeometry(w, wallH, 0.5), wallMat);
+  backWall.position.set(sx, wallH/2, sz - d/2);
+  scene.add(backWall);
+
+  // Left wall
+  const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, wallH, d), wallMat);
+  leftWall.position.set(sx - w/2, wallH/2, sz);
+  scene.add(leftWall);
+
+  // Right wall
+  const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, wallH, d), wallMat);
+  rightWall.position.set(sx + w/2, wallH/2, sz);
+  scene.add(rightWall);
+
+  // Neon border on top of walls
   const neonMat = new THREE.MeshBasicMaterial({color: col});
-  const edgeY = 0.92, t = 0.22;
+  const backNeon = new THREE.Mesh(new THREE.BoxGeometry(w + 0.5, 0.2, 0.2), neonMat);
+  backNeon.position.set(sx, wallH, sz - d/2);
+  scene.add(backNeon);
 
-  const backEdge = new THREE.Mesh(new THREE.BoxGeometry(w + t, t, t), neonMat);
-  backEdge.position.set(sx, edgeY, sz - d/2);
-  scene.add(backEdge);
+  const leftNeon = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, d + 0.5), neonMat);
+  leftNeon.position.set(sx - w/2, wallH, sz);
+  scene.add(leftNeon);
 
-  const leftEdge = new THREE.Mesh(new THREE.BoxGeometry(t, t, d + t), neonMat);
-  leftEdge.position.set(sx - w/2, edgeY, sz);
-  scene.add(leftEdge);
-  const rightEdge = new THREE.Mesh(new THREE.BoxGeometry(t, t, d + t), neonMat);
-  rightEdge.position.set(sx + w/2, edgeY, sz);
-  scene.add(rightEdge);
+  const rightNeon = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, d + 0.5), neonMat);
+  rightNeon.position.set(sx + w/2, wallH, sz);
+  scene.add(rightNeon);
 
-  const gapW = 2.6;
-  const frontSegW = (w - gapW) / 2;
-  const fL = new THREE.Mesh(new THREE.BoxGeometry(frontSegW, t, t), neonMat);
-  fL.position.set(sx - w/2 + frontSegW/2, edgeY, sz + d/2);
-  scene.add(fL);
-  const fR = new THREE.Mesh(new THREE.BoxGeometry(frontSegW, t, t), neonMat);
-  fR.position.set(sx + w/2 - frontSegW/2, edgeY, sz + d/2);
-  scene.add(fR);
-
-  const corners = [
-    [sx - w/2, sz - d/2],
-    [sx + w/2, sz - d/2],
-    [sx - w/2, sz + d/2],
-    [sx + w/2, sz + d/2],
-  ];
-  for (const [cx, cz] of corners) {
-    const pillar = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.28, 0.34, 2.6, 10),
-      new THREE.MeshStandardMaterial({color:0x2a3040, roughness:0.5, metalness:0.6})
-    );
-    pillar.position.set(cx, 2.3, cz);
-    scene.add(pillar);
-    const orb = new THREE.Mesh(
-      new THREE.SphereGeometry(0.42, 12, 10),
-      new THREE.MeshBasicMaterial({color: col})
-    );
-    orb.position.set(cx, 3.9, cz);
-    scene.add(orb);
-  }
-
+  // Sign
   const labelTex = makeLabelTexture(b.name, b.color, 512, 100);
   const sign = new THREE.Sprite(new THREE.SpriteMaterial({
     map: labelTex, depthTest: true, depthWrite: false,
   }));
   sign.scale.set(7, 1.37, 1);
-  sign.position.set(sx, 5.2, sz);
+  sign.position.set(sx, wallH + 1.5, sz);
   scene.add(sign);
 
+  // Shield Dome (Temporary barrier)
   const shieldR = Math.max(w, d) / 2 + 1.2;
   const shield = new THREE.Mesh(
-    new THREE.CylinderGeometry(shieldR, shieldR, 5.5, 48, 1, true),
+    new THREE.CylinderGeometry(shieldR, shieldR, wallH + 2, 48, 1, true),
     new THREE.MeshBasicMaterial({
-      color:0x38bdf8, transparent:true, opacity:0.20,
+      color:0x38bdf8, transparent:true, opacity:0.25,
       side:THREE.DoubleSide, depthWrite:false,
       blending:THREE.AdditiveBlending,
     })
   );
-  shield.position.set(sx, 2.8, sz);
+  shield.position.set(sx, (wallH+2)/2, sz);
   shield.visible = false;
   scene.add(shield);
   b.shieldMesh = shield;
@@ -1098,7 +1085,7 @@ function toast(msg, type) {
 }
 
 /* ==================================================================
-   INPUT
+   INPUT & CAMERA CONTROLS
    ================================================================== */
 const input = { interact:false };
 const keys = {};
@@ -1109,11 +1096,31 @@ window.addEventListener('keydown', e => {
 });
 window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
+// Camera Drag logic
+canvas.addEventListener('pointerdown', e => {
+  if (e.target === canvas) {
+    isDraggingCam = true;
+    prevMouse = { x: e.clientX, y: e.clientY };
+  }
+});
+window.addEventListener('pointerup', () => { isDraggingCam = false; });
+window.addEventListener('pointermove', e => {
+  if (isDraggingCam) {
+    const dx = e.clientX - prevMouse.x;
+    const dy = e.clientY - prevMouse.y;
+    cameraYaw -= dx * 0.008;
+    cameraPitch += dy * 0.008;
+    cameraPitch = Math.max(0.05, Math.min(Math.PI/2 - 0.1, cameraPitch));
+    prevMouse = { x: e.clientX, y: e.clientY };
+  }
+});
+
 const isTouch = matchMedia('(pointer:coarse)').matches;
 if (isTouch) {
   document.getElementById('joy').style.display = 'block';
-  document.getElementById('stealBtn').style.display = 'block';
+  document.getElementById('stealBtn').style.display = 'flex';
 }
+
 const joy = document.getElementById('joy'), knob = document.getElementById('joyKnob');
 let joyActive = false, joyVec = {x:0, y:0};
 function joyPos(e) {
@@ -1136,6 +1143,24 @@ stealBtn.addEventListener('pointerdown', e => { e.preventDefault(); input.intera
 stealBtn.addEventListener('pointerup', e => { e.preventDefault(); input.interact = false; });
 stealBtn.addEventListener('pointercancel', () => { input.interact = false; });
 stealBtn.addEventListener('pointerleave', () => { input.interact = false; });
+
+// Base Shield Button
+document.getElementById('shieldBtn').onclick = () => {
+  if (bases[0].shieldUntil > NOW) {
+    toast('🛡️ Shield is already active! (' + Math.ceil(bases[0].shieldUntil - NOW) + 's left)', 'good');
+    return;
+  }
+  const cost = 1000;
+  if (S.money >= cost) {
+    S.money -= cost;
+    bases[0].shieldUntil = NOW + 60; // 60 seconds
+    toast('🛡️ Base Shield Activated for 60s!', 'good');
+    playSound(600, 0.2, 'sine', 0.08);
+    burst3D(player.x, 2, player.y, 30, '#38bdf8');
+  } else {
+    toast('❌ Need $1,000 to activate shield!', 'bad');
+  }
+};
 
 /* ==================================================================
    SAVE / LOAD
@@ -1271,9 +1296,13 @@ function updatePlayer(dt) {
   const m = Math.hypot(dx, dy);
   if (m > 0.01) { dx /= m; dy /= m; } else { dx = 0; dy = 0; }
 
+  // Move relative to camera yaw
+  const moveX = dx * Math.cos(cameraYaw) - dy * Math.sin(cameraYaw);
+  const moveZ = dx * Math.sin(cameraYaw) + dy * Math.cos(cameraYaw);
+
   const sp = playerSpeed();
-  player.x = clamp(player.x + dx*sp*dt, 30, WORLD_W-30);
-  player.y = clamp(player.y + dy*sp*dt, 30, WORLD_H-30);
+  player.x = clamp(player.x + moveX*sp*dt, 30, WORLD_W-30);
+  player.y = clamp(player.y + moveZ*sp*dt, 30, WORLD_H-30);
 
   if (player.carrying) {
     const pet = player.carrying;
@@ -1547,19 +1576,33 @@ function updatePetVisual(pet, dt) {
 }
 
 function render(dt) {
-  const tx = s(player.x), tz = s(player.y);
-  const k = 1 - Math.pow(0.0015, dt);
-  camPos.x = lerp(camPos.x, tx, k);
-  camPos.z = lerp(camPos.z, tz, k);
-  camera.position.set(camPos.x, 28, camPos.z + 22);
-  camera.lookAt(camPos.x, 0.5, camPos.z);
+  // Roblox-style orbit camera
+  const targetPos = new THREE.Vector3(s(player.x), 2, s(player.y));
+  const offset = new THREE.Vector3(
+    Math.sin(cameraYaw) * Math.cos(cameraPitch),
+    Math.sin(cameraPitch),
+    Math.cos(cameraYaw) * Math.cos(cameraPitch)
+  ).multiplyScalar(camDistance);
+
+  // Smooth camera follow
+  const camTarget = targetPos.clone().add(offset);
+  camPos.lerp(camTarget, Math.min(1, dt * 8));
+  
+  camera.position.copy(camPos);
+  camera.lookAt(targetPos.x, targetPos.y + 1, targetPos.z);
 
   updateEntityVisual(player, dt);
   for (const b of bots) updateEntityVisual(b, dt);
   for (const p of pets) updatePetVisual(p, dt);
 
   for (const b of bases) {
-    if (b.shieldMesh) b.shieldMesh.visible = b.shieldUntil > NOW;
+    if (b.shieldMesh) {
+      b.shieldMesh.visible = b.shieldUntil > NOW;
+      if (b.shieldMesh.visible) {
+        // Pulse shield opacity
+        b.shieldMesh.material.opacity = 0.15 + Math.sin(T*4) * 0.1;
+      }
+    }
   }
 
   if (player.stealTarget && player.stealProgress > 0.02) {
@@ -2021,7 +2064,7 @@ function newGame() {
   setTimeout(() => {
     toast('🐾 Welcome to STEAL THE PETS 3D!', 'gold');
     setTimeout(() => toast('Steal pets from other bases and bring them home!', ''), 2200);
-    setTimeout(() => toast('Hold [E] near a pet to steal it. Good luck!', 'good'), 4600);
+    setTimeout(() => toast('Drag the screen to rotate the camera!', 'good'), 4600);
   }, 500);
 }
 
@@ -2038,10 +2081,7 @@ function boot() {
   spawnBotPets();
   if (!loaded) newGame();
 
-  camPos.x = player.x * SCALE;
-  camPos.z = player.y * SCALE;
-  camera.position.set(camPos.x, 28, camPos.z + 22);
-  camera.lookAt(camPos.x, 0.5, camPos.z);
+  camPos.set(player.x * SCALE, 15, player.y * SCALE);
 
   window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
